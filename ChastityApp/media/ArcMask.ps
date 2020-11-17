@@ -1,0 +1,14 @@
+uniform sampler2D texture0;
+varying mediump vec2 uvVarying;
+varying mediump vec4 colorVarying;
+
+uniform float Percentage;
+ 
+void main()
+{
+	
+	vec4 finalColor = vec4(0.0);
+	if ((Percentage * 0.01) > texture2D(texture0, uvVarying).r )
+		finalColor = colorVarying * texture2D(texture0, uvVarying).a;
+    gl_FragColor = finalColor;
+}
