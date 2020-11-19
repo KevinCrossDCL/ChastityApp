@@ -746,6 +746,7 @@ if (screenToView = constLockOptionsScreen)
 		if (loadingSharedLock = 0 and fixed = 1) then regularity# = 0.016667
 		if (redrawScreen = 1)
 			OryUIUpdateTextCard(crdRegularity, "position:-1000,-1000")
+			OryUIUpdateTextCard(crdTestRegularity, "position:-1000,-1000")
 			OryUIUpdateButtonGroup(grpRegularity, "position:-1000,-1000")
 		endif
 	endif

@@ -933,6 +933,8 @@ if (screenToView = constUsersLockInformationScreen)
 					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsUnpaused", 0, 0)
 				endif
 			endif
+		endif
+		if (sharedLocks[sharedLockSelected, 0].fixed = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUnlocked[userSelected] = 0)
 			if (OryUIGetButtonGroupItemSelectedName(grpUsersToggleCumulative) = "Cumulative")
 				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 0)
 					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulativeModifiedBy[userSelected] = 1
