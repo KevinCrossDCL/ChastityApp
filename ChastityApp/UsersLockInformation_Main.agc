@@ -891,28 +891,33 @@ if (screenToView = constUsersLockInformationScreen)
 	endif
 	
 	// DELETE USER FROM LOCK
-	if (redrawScreen = 1)
-		OryUIUpdateTextCard(crdDeleteUserFromLock, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Deleting " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[userSelected] + " from this lock will mean you will no longer be able to manage their lock. They will be given a choice to either unlock for free, or continue the lock as a solo lock. Any keyholder freeze effects will be removed. Once removed, neither of you will be able to rate the other, and they will not be able to rate this lock.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-	endif
-	elementY# = elementY# + OryUIGetTextCardHeight(crdDeleteUserFromLock) + 2
-	if (redrawScreen = 1)
-		OryUIUpdateButton(btnDeleteUserFromLock, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";color:192,57,42,255;textColor:255,255,255,255")
-	endif
-	elementY# = elementY# + OryUIGetButtonHeight(btnDeleteUserFromLock) + 2
-	if (OryUIGetButtonReleased(btnDeleteUserFromLock))
-		OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Delete User From Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to delete " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[userSelected] + " from this lock? This cannot be undone.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-		OryUISetDialogButtonCount(dialog, 3)
-		OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeleteUser;text:Delete;textColorID:" + str(colorMode[colorModeSelected].textColor))
-		OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeleteAndBlockUser;text:Delete & Block;textColorID:" + str(colorMode[colorModeSelected].textColor))
-		OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
-		OryUIShowDialog(dialog)
-	endif
-	if (OryUIGetDialogButtonReleasedByName(dialog, "DeleteUser"))
-		RemoveUserFromLock(sharedLockSelected, selectedManageUsersTab, userSelected, 1)
-	endif
-	if (OryUIGetDialogButtonReleasedByName(dialog, "DeleteAndBlockUser"))
-		BlockUser(sharedLocks[sharedLockSelected, selectedManageUsersTab].usersID[userSelected], 1)
-		RemoveUserFromLock(sharedLockSelected, selectedManageUsersTab, userSelected, 1)
+	if (selectedManageUsersTab = 1)
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdDeleteUserFromLock, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Deleting " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[userSelected] + " from this lock will mean you will no longer be able to manage their lock. They will be given a choice to either unlock for free, or continue the lock as a solo lock. Any keyholder freeze effects will be removed. Once removed, neither of you will be able to rate the other, and they will not be able to rate this lock.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdDeleteUserFromLock) + 2
+		if (redrawScreen = 1)
+			OryUIUpdateButton(btnDeleteUserFromLock, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";color:192,57,42,255;textColor:255,255,255,255")
+		endif
+		elementY# = elementY# + OryUIGetButtonHeight(btnDeleteUserFromLock) + 2
+		if (OryUIGetButtonReleased(btnDeleteUserFromLock))
+			OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Delete User From Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to delete " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[userSelected] + " from this lock? This cannot be undone.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+			OryUISetDialogButtonCount(dialog, 3)
+			OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeleteUser;text:Delete;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeleteAndBlockUser;text:Delete & Block;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIShowDialog(dialog)
+		endif
+		if (OryUIGetDialogButtonReleasedByName(dialog, "DeleteUser"))
+			RemoveUserFromLock(sharedLockSelected, selectedManageUsersTab, userSelected, 1)
+		endif
+		if (OryUIGetDialogButtonReleasedByName(dialog, "DeleteAndBlockUser"))
+			BlockUser(sharedLocks[sharedLockSelected, selectedManageUsersTab].usersID[userSelected], 1)
+			RemoveUserFromLock(sharedLockSelected, selectedManageUsersTab, userSelected, 1)
+		endif
+	else
+		OryUIUpdateTextCard(crdDeleteUserFromLock, "position:-1000,-1000")
+		OryUIUpdateButton(btnDeleteUserFromLock, "position:-1000,-1000")
 	endif
 	
 	if (redrawScreen = 1)
