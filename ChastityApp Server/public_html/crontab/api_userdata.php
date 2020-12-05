@@ -234,6 +234,7 @@ try {
                 }
             }
             
+            $cumulativeMonthsLocked = $cumulativeSecondsLocked / 2592000;
             if ($cumulativeMonthsLocked >= 24) { $lockeeLevel = 5; }
             elseif ($cumulativeMonthsLocked >= 12) { $lockeeLevel = 4; }
             elseif ($cumulativeMonthsLocked >= 6 && $cumulativeMonthsLocked < 12) { $lockeeLevel = 3; }
