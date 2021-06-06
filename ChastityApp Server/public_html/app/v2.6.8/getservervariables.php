@@ -13,7 +13,7 @@ array_push($JSON1, array('variable' => 'dateMinute', 'value' => date("i")));
 array_push($JSON1, array('variable' => 'dateSecond', 'value' => date("s")));
 array_push($JSON1, array('variable' => 'timestamp', 'value' => strval(time())));
 
-$JSON2 = json_decode(file_get_contents('servervariables.json'), true);
+$JSON2 = json_decode(file_get_contents('../servervariables.json'), true);
 
 $JSON = array_merge($JSON1, $JSON2);
 
