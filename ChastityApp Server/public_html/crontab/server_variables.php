@@ -42,7 +42,6 @@ try {
     
     $query = null;
     $pdo = null;
-    mysqli_close($mysqli);
     
     array_push($JSON, array('variable' => 'keyholderLevelBOT01', 'value' => "5"));
     array_push($JSON, array('variable' => 'keyholderLevelBOT02', 'value' => "5"));
