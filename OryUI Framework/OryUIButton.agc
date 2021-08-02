@@ -1,5 +1,5 @@
 
-foldstart // OryUIButton Component (Updated 07/07/2020)
+foldstart // OryUIButton Widget
 
 type typeOryUIButton
 	id as integer
@@ -74,21 +74,23 @@ function OryUIButtonListener(oryUIButtonID as integer)
 				endif
 			endif
 		endif
-	endif
-	
-	if (OryUIButtonCollection[oryUIButtonID].enabled = 0 or (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonCollection[oryUIButtonID].sprContainer) >= oryUIScrimDepth) or oryUITouchingTopBar = 1 or oryUITouchingTabs = 1)
-		OryUIButtonCollection[oryUIButtonID].pressed = 0
-		OryUIButtonCollection[oryUIButtonID].held = 0
-		OryUIButtonCollection[oryUIButtonID].released = 0
+
+		if (OryUIButtonCollection[oryUIButtonID].enabled = 0 or (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonCollection[oryUIButtonID].sprContainer) >= oryUIScrimDepth) or oryUITouchingTopBar = 1 or oryUITouchingTabs = 1)
+			OryUIButtonCollection[oryUIButtonID].pressed = 0
+			OryUIButtonCollection[oryUIButtonID].held = 0
+			OryUIButtonCollection[oryUIButtonID].released = 0
+		endif
 	endif
 endfunction
 
-function OryUICreateButton(oryUIComponentParameters$ as string)
+function OryUICreateButton(oryUIWidgetParameters$ as string)
 	local oryUIButtonID as integer
 	
 	OryUIButtonCollection.length = OryUIButtonCollection.length + 1
 	oryUIButtonID = OryUIButtonCollection.length
 	OryUIButtonCollection[oryUIButtonID].id = oryUIButtonID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUIButtonID, "Button"))
 	
 	// DEFAULT SETTINGS
 	OryUIButtonCollection[oryUIButtonID].disabledColor#[1] = oryUIDefaults.buttonDisabledColor#[1]
@@ -151,7 +153,7 @@ function OryUICreateButton(oryUIComponentParameters$ as string)
 	SetTextDepth(OryUIButtonCollection[oryUIButtonID].txtLabel, GetSpriteDepth(OryUIButtonCollection[oryUIButtonID].sprContainer) - 1)
 	OryUIPinTextToCentreOfSprite(OryUIButtonCollection[oryUIButtonID].txtLabel, OryUIButtonCollection[oryUIButtonID].sprContainer, 0, 0)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateButton(oryUIButtonID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateButton(oryUIButtonID, oryUIWidgetParameters$)
 endfunction oryUIButtonID
 
 function OryUIDeleteButton(oryUIButtonID as integer)
@@ -218,8 +220,8 @@ function OryUIGetButtonY(oryUIButtonID as integer)
 	endif
 endfunction oryUIButtonY#
 
-function OryUIUpdateButton(oryUIButtonID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateButton(oryUIButtonID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	local oryUIIconAndLabelHeight# as float
 	local oryUIIconAndLabelOffsetX# as float
@@ -411,7 +413,7 @@ function OryUIUpdateButton(oryUIButtonID as integer, oryUIComponentParameters$ a
 			OryUIButtonCollection[oryUIButtonID].enabledTextSize# = oryUIParameters.enabledTextSize#
 		endif
 		
-		// IMPORTANT PARAMETERS WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUIButtonCollection[oryUIButtonID].sprContainer, oryUIParameters.size#[1], oryUIParameters.size#[2])
 		elseif (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] = -999999)
@@ -419,8 +421,25 @@ function OryUIUpdateButton(oryUIButtonID as integer, oryUIComponentParameters$ a
 		elseif (oryUIParameters.size#[1] = -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer), oryUIParameters.size#[2])
 		endif
-		if (oryUIParameters.offsetCenter = 1)
-			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2, GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2)
+
+		if (oryUIParameters.offsetTopLeft = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, 0, 0)
+		elseif (oryUIParameters.offsetTopCenter = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0, 0)
+		elseif (oryUIParameters.offsetTopRight = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer), 0)
+		elseif (oryUIParameters.offsetCenterLeft = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, 0, GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenter = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0, GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenterRight = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer), GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetBottomLeft = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, 0, GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer))
+		elseif (oryUIParameters.offsetBottomCenter = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer) / 2.0, GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer))
+		elseif (oryUIParameters.offsetBottomRight = 1)
+			SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, GetSpriteWidth(OryUIButtonCollection[oryUIButtonID].sprContainer), GetSpriteHeight(OryUIButtonCollection[oryUIButtonID].sprContainer))
 		else
 			if (oryUIParameters.offset#[1] > -999999 or oryUIParameters.offset#[2] > -999999)
 				SetSpriteOffset(OryUIButtonCollection[oryUIButtonID].sprContainer, oryUIParameters.offset#[1], oryUIParameters.offset#[2])

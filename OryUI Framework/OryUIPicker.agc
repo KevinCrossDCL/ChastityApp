@@ -1,5 +1,5 @@
 
-foldstart // OryUIPicker Component (Updated 07/07/2020)
+foldstart // OryUIPicker Widget
 
 type typeOryUIPicker
 	id as integer
@@ -44,12 +44,14 @@ endtype
 global OryUIPickerCollection as typeOryUIPicker[]
 OryUIPickerCollection.length = 1
 
-function OryUICreatePicker(oryUIComponentParameters$ as string)
+function OryUICreatePicker(oryUIWidgetParameters$ as string)
 	local oryUIPickerID as integer
 	
 	OryUIPickerCollection.length = OryUIPickerCollection.length + 1
 	oryUIPickerID = OryUIPickerCollection.length
 	OryUIPickerCollection[oryUIPickerID].id = oryUIPickerID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUIPickerID, "Picker"))
 
 	// DEFAULT SETTINGS
 	OryUIPickerCollection[oryUIPickerID].autoHeight = oryUIDefaults.pickerAutoHeight
@@ -87,7 +89,7 @@ function OryUICreatePicker(oryUIComponentParameters$ as string)
 	SetTextDepth(OryUIPickerCollection[oryUIPickerID].txtSupportingText, oryUIDefaults.PickerDepth - 2)
 	SetTextPosition(OryUIPickerCollection[oryUIPickerID].txtSupportingText, -999999, -999999)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdatePicker(oryUIPickerID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdatePicker(oryUIPickerID, oryUIWidgetParameters$)
 endfunction oryUIPickerID
 
 function OryUIDeletePicker(oryUIPickerID as integer)
@@ -223,7 +225,7 @@ function OryUIHidePicker(oryUIPickerID as integer)
 	next
 endfunction
 
-function OryUIInsertPickerButton(oryUIPickerID as integer, oryUIIndex as integer, oryUIComponentParameters$ as string)
+function OryUIInsertPickerButton(oryUIPickerID as integer, oryUIIndex as integer, oryUIWidgetParameters$ as string)
 	local oryUIPickerButtonID as integer
 	
 	if (oryUIIndex = -1)
@@ -248,10 +250,10 @@ function OryUIInsertPickerButton(oryUIPickerID as integer, oryUIIndex as integer
 	SetTextDepth(OryUIPickerCollection[oryUIPickerID].buttons[oryUIPickerButtonID].txtLabel, GetSpriteDepth(OryUIPickerCollection[oryUIPickerID].buttons[oryUIPickerButtonID].sprContainer) - 1)
 	SetTextPosition(OryUIPickerCollection[oryUIPickerID].buttons[oryUIPickerButtonID].txtLabel, -999999, -999999)
 	
-	if (oryUIComponentParameters$ <> "") then OryUIUpdatePickerButton(oryUIPickerID, oryUIPickerButtonID + 1, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdatePickerButton(oryUIPickerID, oryUIPickerButtonID + 1, oryUIWidgetParameters$)
 endfunction
 
-function OryUIInsertPickerSpinner(oryUIPickerID as integer, oryUIIndex as integer, oryUIComponentParameters$ as string)
+function OryUIInsertPickerSpinner(oryUIPickerID as integer, oryUIIndex as integer, oryUIWidgetParameters$ as string)
 	local oryUIPickerSpinnerID as integer
 	
 	if (oryUIIndex = -1)
@@ -275,7 +277,7 @@ function OryUIInsertPickerSpinner(oryUIPickerID as integer, oryUIIndex as intege
 	SetTextDepth(OryUIPickerCollection[oryUIPickerID].pickers[oryUIPickerSpinnerID].txtLabel, GetSpriteDepth(OryUIPickerCollection[oryUIPickerID].pickers[oryUIPickerButtonID].sprContainer) - 1)
 	SetTextPosition(OryUIPickerCollection[oryUIPickerID].pickers[oryUIPickerSpinnerID].txtLabel, -999999, -999999)
 	
-	if (oryUIComponentParameters$ <> "") then OryUIUpdatePickerSpinner(oryUIPickerID, oryUIPickerSpinnerID + 1, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdatePickerSpinner(oryUIPickerID, oryUIPickerSpinnerID + 1, oryUIWidgetParameters$)
 endfunction
 
 function OryUIInsertPickerListener(oryUIPickerID as integer)
@@ -441,12 +443,12 @@ function OryUIShowPicker(oryUIPickerID as integer)
 	endif
 endfunction
 
-function OryUIUpdatePicker(oryUIPickerID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdatePicker(oryUIPickerID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIPickerCollection[oryUIPickerID].sprContainer))
 
-		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUIPickerCollection[oryUIPickerID].sprContainer, oryUIParameters.size#[1], oryUIParameters.size#[2])
 		elseif (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] = -999999)
@@ -524,8 +526,8 @@ function OryUIUpdatePicker(oryUIPickerID as integer, oryUIComponentParameters$ a
 	endif
 endfunction
 
-function OryUIUpdatePickerButton(oryUIPickerID as integer, oryUIButtonID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdatePickerButton(oryUIPickerID as integer, oryUIButtonID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIPickerCollection[oryUIPickerID].buttons[oryUIButtonID - 1].sprContainer))
 		if (oryUIParameters.color#[1] > -999999 or oryUIParameters.color#[2] > -999999 or oryUIParameters.color#[3] > -999999 or oryUIParameters.color#[4] > -999999)

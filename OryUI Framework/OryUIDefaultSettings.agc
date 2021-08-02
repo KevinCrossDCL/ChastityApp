@@ -43,6 +43,25 @@ oryUIDefaults.buttonSize#[2] = 5
 
 foldend
 
+foldstart // Default Settings for OryUICheckbox
+
+// MAIN
+oryUIDefaults.checkboxCheckedColor#[1] = 87
+oryUIDefaults.checkboxCheckedColor#[2] = 37
+oryUIDefaults.checkboxCheckedColor#[3] = 229
+oryUIDefaults.checkboxCheckedColor#[4] = 255
+oryUIDefaults.checkboxCheckedImage = OryUIReturnIconID("check_box")
+oryUIDefaults.checkboxDepth = 100
+oryUIDefaults.checkboxSize#[1] = -1
+oryUIDefaults.checkboxSize#[2] = 3.5
+oryUIDefaults.checkboxUncheckedColor#[1] = 150
+oryUIDefaults.checkboxUncheckedColor#[2] = 150
+oryUIDefaults.checkboxUncheckedColor#[3] = 150
+oryUIDefaults.checkboxUncheckedColor#[4] = 255
+oryUIDefaults.checkboxUncheckedImage = OryUIReturnIconID("check_box_outline_blank")
+
+foldend
+
 foldstart // Default Settings for OryUIDialog
 
 // MAIN
@@ -109,6 +128,30 @@ oryUIDefaults.dialogButtonXSpacing# = 2
 oryUIDefaults.dialogButtonYSpacing# = 1
 	
 foldend
+
+foldstart // Default Settings for OryUIFloatingActionButton
+
+// MAIN
+oryUIDefaults.floatingActionButtonColor#[1] = 87
+oryUIDefaults.floatingActionButtonColor#[2] = 37
+oryUIDefaults.floatingActionButtonColor#[3] = 229
+oryUIDefaults.floatingActionButtonColor#[4] = 255
+oryUIDefaults.floatingActionButtonDepth = 10
+oryUIDefaults.floatingActionButtonIcon = OryUIReturnIconID("add")
+oryUIDefaults.floatingActionButtonIconColor#[1] = 255
+oryUIDefaults.floatingActionButtonIconColor#[2] = 255
+oryUIDefaults.floatingActionButtonIconColor#[3] = 255
+oryUIDefaults.floatingActionButtonIconColor#[4] = 255
+oryUIDefaults.floatingActionButtonIconSize#[1] = -1
+oryUIDefaults.floatingActionButtonIconSize#[2] = 3.5
+oryUIDefaults.floatingActionButtonMini = 0
+oryUIDefaults.floatingActionButtonPlacement$ = "bottomRight"
+oryUIDefaults.floatingActionButtonShadow = 1
+oryUIDefaults.floatingActionButtonSize#[1] = -1
+oryUIDefaults.floatingActionButtonSize#[2] = 9.5
+
+foldend
+
 
 foldstart // Default Settings for OryUIInputSpinner
 
@@ -476,13 +519,42 @@ oryUIDefaults.scrollToTopIconColor#[1] = 255
 oryUIDefaults.scrollToTopIconColor#[2] = 255
 oryUIDefaults.scrollToTopIconColor#[3] = 255
 oryUIDefaults.scrollToTopIconColor#[4] = 255
-oryUIDefaults.scrollToTopIconHeight# = 2
-oryUIDefaults.scrollToTopIconImage = oryUIIconScrollToTopImage
+oryUIDefaults.scrollToTopIconHeight# = 3
+oryUIDefaults.scrollToTopIconImage = OryUIReturnIconID("expand_less")
 oryUIDefaults.scrollToTopIconWidth# = -1
 oryUIDefaults.scrollToTopPlacement$ = "bottomCenter"
 oryUIDefaults.scrollToTopShowShadow = 1
 oryUIDefaults.scrollToTopStartY# = 0
 oryUIDefaults.scrollToTopWidth# = -1
+
+foldend
+
+foldstart // Default Settings for OryUISwitch
+
+// TRACK
+oryUIDefaults.switchTrackCheckedColor#[1] = 156
+oryUIDefaults.switchTrackCheckedColor#[2] = 119
+oryUIDefaults.switchTrackCheckedColor#[3] = 227
+oryUIDefaults.switchTrackCheckedColor#[4] = 255
+oryUIDefaults.switchTrackDepth = 100
+oryUIDefaults.switchTrackHeight# = 2
+oryUIDefaults.switchTrackUncheckedColor#[1] = 155
+oryUIDefaults.switchTrackUncheckedColor#[2] = 155
+oryUIDefaults.switchTrackUncheckedColor#[3] = 155
+oryUIDefaults.switchTrackUncheckedColor#[4] = 155
+oryUIDefaults.switchTrackWidth# = 12
+
+// SWITCH
+oryUIDefaults.switchCheckedColor#[1] = 87
+oryUIDefaults.switchCheckedColor#[2] = 37
+oryUIDefaults.switchCheckedColor#[3] = 229
+oryUIDefaults.switchCheckedColor#[4] = 255
+oryUIDefaults.switchHeight# = 3
+oryUIDefaults.switchUncheckedColor#[1] = 150
+oryUIDefaults.switchUncheckedColor#[2] = 150
+oryUIDefaults.switchUncheckedColor#[3] = 150
+oryUIDefaults.switchUncheckedColor#[4] = 255
+oryUIDefaults.switchWidth# = -1
 
 foldend
 

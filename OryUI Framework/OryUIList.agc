@@ -1,5 +1,5 @@
 
-foldstart // OryUIList Component (Updated 07/07/2020)
+foldstart // OryUIList Widget
 
 type typeOryUIList
 	id as integer
@@ -7,6 +7,8 @@ type typeOryUIList
 	btnRight as integer[]
 	itemNoOfLeftLines as integer[]
 	itemNoOfRightLines as integer[]
+	itemPressed as integer[]
+	itemReleased as integer
 	itemRightButtonReleased as integer
 	itemRightIconReleased as integer
 	itemSize# as float[2]
@@ -35,11 +37,13 @@ endtype
 global OryUIListCollection as typeOryUIList[]
 OryUIListCollection.length = 1
 
-function OryUICreateList(oryUIComponentParameters$ as string)
+function OryUICreateList(oryUIWidgetParameters$ as string)
 	local oryUIListID as integer
 	OryUIListCollection.length = OryUIListCollection.length + 1
 	oryUIListID = OryUIListCollection.length
 	OryUIListCollection[oryUIListID].id = oryUIListID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUIListID, "List"))
 
 	// DEFAULT SETTINGS
 	OryUIListCollection[oryUIListID].itemSize#[1] = 100
@@ -61,12 +65,12 @@ function OryUICreateList(oryUIComponentParameters$ as string)
 	SetSpritePositionByOffset(OryUIListCollection[oryUIListID].sprContainer, 0, 0)
 	SetSpritePhysicsOff(OryUIListCollection[oryUIListID].sprContainer)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateList(oryUIListID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateList(oryUIListID, oryUIWidgetParameters$)
 endfunction oryUIListID
 
 function OryUIDeleteList(oryUIListID as integer)
 	DeleteSprite(OryUIListCollection[oryUIListID].sprContainer)
-	while (OryUIListCollection[oryUIListID].itemID.length > 0)
+	while (OryUIListCollection[oryUIListID].itemID.length >= 0)
 		OryUIDeleteListItem(oryUIListID, 0)
 	endwhile
 endfunction
@@ -115,6 +119,10 @@ function OryUIGetListItemCount(oryUIListID as integer)
 	oryUIListItemCount = OryUIListCollection[oryUIListID].itemID.length + 1
 endfunction oryUIListItemCount
 
+function OryUIGetListItemReleased(oryUIListID as integer)
+
+endfunction OryUIListCollection[oryUIListID].itemReleased
+
 function OryUIGetListItemRightButtonReleased(oryUIListID as integer)
 
 endfunction OryUIListCollection[oryUIListID].itemRightButtonReleased
@@ -140,7 +148,7 @@ function OryUIGetListY(oryUIListID as integer)
 	oryUIListY# = GetSpriteY(OryUIListCollection[oryUIListID].sprContainer)
 endfunction oryUIListY#
 
-function OryUIInsertListItem(oryUIListID as integer, oryUIListIndex as integer, oryUIComponentParameters$ as string)
+function OryUIInsertListItem(oryUIListID as integer, oryUIListIndex as integer, oryUIWidgetParameters$ as string)
 	local oryUIListItemID as integer
 	
 	if (oryUIListIndex = -1)
@@ -148,6 +156,7 @@ function OryUIInsertListItem(oryUIListID as integer, oryUIListIndex as integer, 
 		OryUIListCollection[oryUIListID].itemID.length = OryUIListCollection[oryUIListID].itemID.length + 1
 		OryUIListCollection[oryUIListID].itemNoOfLeftLines.length = OryUIListCollection[oryUIListID].itemNoOfLeftLines.length + 1
 		OryUIListCollection[oryUIListID].itemNoOfRightLines.length = OryUIListCollection[oryUIListID].itemNoOfRightLines.length + 1
+		OryUIListCollection[oryUIListID].itemPressed.length = OryUIListCollection[oryUIListID].itemPressed.length + 1
 		OryUIListCollection[oryUIListID].rightIconPressed.length = OryUIListCollection[oryUIListID].rightIconPressed.length + 1
 		OryUIListCollection[oryUIListID].rightIconType$.length = OryUIListCollection[oryUIListID].rightIconType$.length + 1
 		OryUIListCollection[oryUIListID].sprItemContainer.length = OryUIListCollection[oryUIListID].sprItemContainer.length + 1
@@ -215,32 +224,35 @@ function OryUIInsertListItem(oryUIListID as integer, oryUIListIndex as integer, 
 	
 	OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID] = CreateSprite(0)
 	SetSpriteSize(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], -1, 3)
-	SetSpriteImage(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], oryUIIconDeleteImage)
+	SetSpriteImage(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID],  OryUIReturnIconID("delete"))
 	SetSpriteDepth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteDepth(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) - 1)
 	SetSpriteColor(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], 0, 0, 0, 255)
 	SetSpriteOffset(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteWidth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2, GetSpriteHeight(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2)
 	SetSpritePhysicsOff(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID])
 	
-	OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID] = CreateSprite(0)
-	SetSpriteSize(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], -1, 3)
-	SetSpriteImage(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], oryUIIconDeleteImage)
-	SetSpriteDepth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteDepth(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) - 1)
-	SetSpriteColor(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], 0, 0, 0, 255)
-	SetSpriteOffset(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteWidth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2, GetSpriteHeight(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2)
-	SetSpritePhysicsOff(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID])
+	//OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID] = CreateSprite(0)
+	//SetSpriteSize(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], -1, 3)
+	//SetSpriteImage(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], oryUIIconDeleteImage)
+	//SetSpriteDepth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteDepth(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) - 1)
+	//SetSpriteColor(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], 0, 0, 0, 255)
+	//SetSpriteOffset(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID], GetSpriteWidth(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2, GetSpriteHeight(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID]) / 2)
+	//SetSpritePhysicsOff(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIListItemID])
 	
 	OryUIListCollection[oryUIListID].btnRight[oryUIListItemID] = OryUICreateButton("text:Button;size:10,3;depth:" + str(GetSpriteDepth(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) - 1))
 
-	OryUIUpdateListItem(oryUIListID, oryUIListItemID, oryUIComponentParameters$)
+	OryUIUpdateListItem(oryUIListID, oryUIListItemID, oryUIWidgetParameters$)
 endfunction
 
 function OryUIInsertListListener(oryUIListID as integer)
 	if (oryUIScrimVisible = 1) then exitfunction
 
 	local oryUIForI as integer
+	local oryUIListItemContainerSprite as integer
+	local oryUIListItemReleased as integer
 	local oryUIListItemRightIconReleased as integer
 	local oryUIListItemRightIconSprite as integer
 
+	OryUIListCollection[oryUIListID].itemReleased = -1
 	OryUIListCollection[oryUIListID].itemRightButtonReleased = -1
 	OryUIListCollection[oryUIListID].itemRightIconReleased = -1
 	
@@ -251,16 +263,27 @@ function OryUIInsertListListener(oryUIListID as integer)
 					OryUIUpdateListItem(oryUIListID, oryUIForI, "")
 					if (OryUIGetSwipingVertically() = 0)
 						if (OryUIListCollection[oryUIListID].showRightButton = 1 and OryUIGetButtonReleased(OryUIListCollection[oryUIListID].btnRight[oryUIForI]))
+							OryUIListCollection[oryUIListID].itemReleased = oryUIForI
 							OryUIListCollection[oryUIListID].itemRightButtonReleased = oryUIForI
 						else
 							if (GetPointerPressed())
+								oryUIListItemContainerSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemContainer[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
 								oryUIListItemRightIconSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
+								if (oryUIListItemContainerSprite = 1)
+									OryUIListCollection[oryUIListID].itemPressed[oryUIForI] = 1
+								endif
 								if (oryUIListItemRightIconSprite = 1)
 									OryUIListCollection[oryUIListID].rightIconPressed[oryUIForI] = 1
 								endif
 							else
 								if (GetPointerState())
+									oryUIListItemContainerSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemContainer[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
 									oryUIListItemRightIconSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
+									if (OryUIListCollection[oryUIListID].itemPressed[oryUIForI])
+										if (oryUIListItemContainerSprite = 0)
+											OryUIListCollection[oryUIListID].itemPressed[oryUIForI] = 0
+										endif
+									endif
 									if (OryUIListCollection[oryUIListID].rightIconPressed[oryUIForI])
 										if (oryUIListItemRightIconSprite = 0)
 											OryUIListCollection[oryUIListID].rightIconPressed[oryUIForI] = 0
@@ -268,12 +291,19 @@ function OryUIInsertListListener(oryUIListID as integer)
 									endif
 								endif
 								if (GetPointerReleased())
+									oryUIListItemContainerSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemContainer[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
 									oryUIListItemRightIconSprite = GetSpriteHitTest(OryUIListCollection[oryUIListID].sprItemRightIcon[oryUIForI], ScreenToWorldX(GetPointerX()), ScreenToWorldY(GetPointerY()))
+									if (OryUIListCollection[oryUIListID].itemPressed[oryUIForI])
+										if (oryUIListItemContainerSprite = 1)
+											OryUIListCollection[oryUIListID].itemReleased = oryUIForI
+										endif
+									endif
 									if (OryUIListCollection[oryUIListID].rightIconPressed[oryUIForI])
 										if (oryUIListItemRightIconSprite = 1)
 											OryUIListCollection[oryUIListID].itemRightIconReleased = oryUIForI
 										endif
 									endif
+									OryUIListCollection[oryUIListID].itemPressed[oryUIForI] = 0
 									OryUIListCollection[oryUIListID].rightIconPressed[oryUIForI] = 0
 								endif
 							endif
@@ -306,12 +336,12 @@ function OryUISetListItemCount(oryUIListID as integer, oryUINewListItemCount as 
 	endif
 endfunction
 
-function OryUIUpdateList(oryUIListID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateList(oryUIListID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIListCollection[oryUIListID].sprContainer))
 		
-		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999)
 			SetSpriteSize(OryUIListCollection[oryUIListID].sprContainer, oryUIParameters.size#[1], 0)
 		endif
@@ -361,12 +391,12 @@ function OryUIUpdateList(oryUIListID as integer, oryUIComponentParameters$ as st
 	endif
 endfunction
 
-function OryUIUpdateListItem(oryUIListID as integer, oryUIListItemID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateListItem(oryUIListID as integer, oryUIListItemID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (oryUIListItemID <= OryUIListCollection[oryUIListID].itemID.length)
 		if (GetSpriteExists(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]))
-			// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+			// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 			SetSpritePositionByOffset(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID], GetSpriteXByOffset(OryUIListCollection[oryUIListID].sprContainer), GetSpriteYByOffset(OryUIListCollection[oryUIListID].sprContainer) + 0.1 + (oryUIListItemID * OryUIListCollection[oryUIListID].itemSize#[2]))
 		
 			if (OryUIListCollection[oryUIListID].showItemDivider = 1)
@@ -504,10 +534,10 @@ function OryUIUpdateListItem(oryUIListID as integer, oryUIListItemID as integer,
 	endif
 endfunction
 
-function OryUIUpdateListItemRightButton(oryUIListID as integer, oryUIListItemID as integer, oryUIComponentParameters$ as string)
+function OryUIUpdateListItemRightButton(oryUIListID as integer, oryUIListItemID as integer, oryUIWidgetParameters$ as string)
 	if (oryUIListItemID <= OryUIListCollection[oryUIListID].itemID.length)
 		if (GetSpriteExists(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]))
-			OryUIUpdateButton(OryUIListCollection[oryUIListID].btnRight[oryUIListItemID], oryUIComponentParameters$)
+			OryUIUpdateButton(OryUIListCollection[oryUIListID].btnRight[oryUIListItemID], oryUIWidgetParameters$)
 			if (OryUIListCollection[oryUIListID].showRightButton = 1)
 				if (OryUIListCollection[oryUIListID].showRightIcon = 0)
 					OryUIUpdateButton(OryUIListCollection[oryUIListID].btnRight[oryUIListItemID], "offset:" + str(OryUIGetButtonWidth(OryUIListCollection[oryUIListID].btnRight[oryUIListItemID])) + "," + str(OryUIGetButtonHeight(OryUIListCollection[oryUIListID].btnRight[oryUIListItemID]) / 2) + ";position:" + str(GetSpriteX(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) + GetSpriteWidth(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) - 4) + "," + str(GetSpriteY(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) + (GetSpriteHeight(OryUIListCollection[oryUIListID].sprItemContainer[oryUIListItemID]) / 2)))

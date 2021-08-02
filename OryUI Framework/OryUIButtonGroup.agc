@@ -1,5 +1,5 @@
 
-foldstart // OryUIButtonGroup Component (Updated 07/07/2020)
+foldstart // OryUIButtonGroup Widget
 
 type typeOryUIButtonGroup
 	id as integer
@@ -42,12 +42,14 @@ endtype
 global OryUIButtonGroupCollection as typeOryUIButtonGroup[]
 OryUIButtonGroupCollection.length = 1
 
-function OryUICreateButtonGroup(oryUIComponentParameters$ as string)
+function OryUICreateButtonGroup(oryUIWidgetParameters$ as string)
 	local oryUIButtonGroupID as integer
 	
 	OryUIButtonGroupCollection.length = OryUIButtonGroupCollection.length + 1
 	oryUIButtonGroupID = OryUIButtonGroupCollection.length
 	OryUIButtonGroupCollection[oryUIButtonGroupID].id = oryUIButtonGroupID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUIButtonGroupID, "ButtonGroup"))
 
 	// DEFAULT SETTINGS
 	OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased = -1
@@ -90,7 +92,7 @@ function OryUICreateButtonGroup(oryUIComponentParameters$ as string)
 	SetSpritePositionByOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, 0, 0)
 	SetSpritePhysicsOff(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer)
 	
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateButtonGroup(oryUIButtonGroupID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateButtonGroup(oryUIButtonGroupID, oryUIWidgetParameters$)
 endfunction oryUIButtonGroupID
 
 function OryUIDeleteButtonGroup(oryUIButtonGroupID as integer)
@@ -132,61 +134,73 @@ endfunction oryUIButtonGroupItemHeight#
 function OryUIGetButtonGroupItemPressedByIndex(oryUIButtonGroupID as integer, oryUIItemID as integer)
 	local oryUIButtonGroupItemPressed as integer
 
-	if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed > -1)
-		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed = oryUIItemID)
-			oryUIButtonGroupItemPressed = 1
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed > -1)
+			if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed = oryUIItemID)
+				oryUIButtonGroupItemPressed = 1
+			endif
 		endif
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemPressed = 0
 	endif
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemPressed = 0
 endfunction oryUIButtonGroupItemPressed
 
 function OryUIGetButtonGroupItemPressedByName(oryUIButtonGroupID as integer, oryUIItemName$ as string)
 	local oryUIButtonGroupItemPressed as integer
 
-	if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed > -1)
-		if (lower(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed - 1].name$) = lower(oryUIItemName$))
-			oryUIButtonGroupItemPressed = 1
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed > -1)
+			if (lower(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed - 1].name$) = lower(oryUIItemName$))
+				oryUIButtonGroupItemPressed = 1
+			endif
 		endif
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemPressed = 0
 	endif
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemPressed = 0
 endfunction oryUIButtonGroupItemPressed
 	
 function OryUIGetButtonGroupItemReleasedByIndex(oryUIButtonGroupID as integer, oryUIItemID as integer)
 	local oryUIButtonGroupItemReleased as integer
 
-	if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
-		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased = oryUIItemID)
-			oryUIButtonGroupItemReleased = 1
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
+			if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased = oryUIItemID)
+				oryUIButtonGroupItemReleased = 1
+			endif
 		endif
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleased = 0
 	endif
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleased = 0
 endfunction oryUIButtonGroupItemReleased
 
 function OryUIGetButtonGroupItemReleasedByName(oryUIButtonGroupID as integer, oryUIItemName$ as string)
 	local oryUIButtonGroupItemReleased as integer
 
-	if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
-		if (lower(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased - 1].name$) = lower(oryUIItemName$))
-			oryUIButtonGroupItemReleased = 1
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
+			if (lower(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased - 1].name$) = lower(oryUIItemName$))
+				oryUIButtonGroupItemReleased = 1
+			endif
 		endif
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleased = 0
 	endif
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleased = 0
 endfunction oryUIButtonGroupItemReleased
 
 function OryUIGetButtonGroupItemReleasedIndex(oryUIButtonGroupID as integer)
 	local oryUIButtonGroupItemReleasedIndex as integer
 	
-	oryUIButtonGroupItemReleasedIndex = OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleasedIndex = 0
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		oryUIButtonGroupItemReleasedIndex = OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleasedIndex = 0
+	endif
 endfunction oryUIButtonGroupItemReleasedIndex
 
 function OryUIGetButtonGroupItemReleasedName(oryUIButtonGroupID as integer)
 	local oryUIButtonGroupItemReleasedName$ as string
 	
-	if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
-		oryUIButtonGroupItemReleasedName$ = OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased - 1].name$
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased > -1)
+			oryUIButtonGroupItemReleasedName$ = OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased - 1].name$
+		endif
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleasedName$ = ""
 	endif
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth) then oryUIButtonGroupItemReleasedName$ = ""
 endfunction oryUIButtonGroupItemReleasedName$
 
 function OryUIGetButtonGroupItemSelectedIndex(oryUIButtonGroupID as integer)
@@ -235,7 +249,7 @@ function OryUIGetButtonGroupY(oryUIButtonGroupID as integer)
 	endif
 endfunction oryUIButtonGroupY#
 
-function OryUIInsertButtonGroupItem(oryUIButtonGroupID as integer, oryUIIndex as integer, oryUIComponentParameters$ as string)
+function OryUIInsertButtonGroupItem(oryUIButtonGroupID as integer, oryUIIndex as integer, oryUIWidgetParameters$ as string)
 	local oryUIButtonGroupItemID as integer
 	
 	if (oryUIIndex = -1)
@@ -271,14 +285,16 @@ function OryUIInsertButtonGroupItem(oryUIButtonGroupID as integer, oryUIIndex as
 	SetTextDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[oryUIButtonGroupItemID].txtLabel, GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[oryUIButtonGroupItemID].sprContainer) - 1)
 	OryUIPinTextToCentreOfSprite(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[oryUIButtonGroupItemID].txtLabel, OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[oryUIButtonGroupItemID].sprContainer, 0, 0)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateButtonGroupItem(oryUIButtonGroupID, oryUIButtonGroupItemID + 1, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateButtonGroupItem(oryUIButtonGroupID, oryUIButtonGroupItemID + 1, oryUIWidgetParameters$)
 endfunction
 
 function OryUIInsertButtonGroupListener(oryUIButtonGroupID as integer)
-	if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth or oryUITouchingTopBar = 1 or oryUITouchingTabs = 1)
-		OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed = -1
-		OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased = -1
-		exitfunction
+	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		if (oryUIScrimVisible = 1 and GetSpriteDepth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) >= oryUIScrimDepth or oryUITouchingTopBar = 1 or oryUITouchingTabs = 1)
+			OryUIButtonGroupCollection[oryUIButtonGroupID].buttonPressed = -1
+			OryUIButtonGroupCollection[oryUIButtonGroupID].buttonReleased = -1
+			exitfunction
+		endif
 	endif
 	
 	local oryUIButtonGroupItemIconSprite as integer
@@ -450,12 +466,12 @@ function OryUISetButtonGroupItemSelectedByName(oryUIButtonGroupID as integer, or
 	next
 endfunction
 
-function OryUIUpdateButtonGroup(oryUIButtonGroupID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateButtonGroup(oryUIButtonGroupID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
 
-		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, oryUIParameters.size#[1], oryUIParameters.size#[2])
 		elseif (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] = -999999)
@@ -463,8 +479,25 @@ function OryUIUpdateButtonGroup(oryUIButtonGroupID as integer, oryUIComponentPar
 		elseif (oryUIParameters.size#[1] = -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer), oryUIParameters.size#[2])
 		endif
-		if (oryUIParameters.offsetCenter = 1)
-			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2, GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2)
+
+		if (oryUIParameters.offsetTopLeft = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, 0, 0)
+		elseif (oryUIParameters.offsetTopCenter = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0, 0)
+		elseif (oryUIParameters.offsetTopRight = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer), 0)
+		elseif (oryUIParameters.offsetCenterLeft = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, 0, GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenter = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0, GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenterRight = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer), GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetBottomLeft = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, 0, GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		elseif (oryUIParameters.offsetBottomCenter = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer) / 2.0, GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
+		elseif (oryUIParameters.offsetBottomRight = 1)
+			SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, GetSpriteWidth(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer), GetSpriteHeight(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer))
 		else
 			if (oryUIParameters.offset#[1] > -999999 or oryUIParameters.offset#[2] > -999999)
 				SetSpriteOffset(OryUIButtonGroupCollection[oryUIButtonGroupID].sprContainer, oryUIParameters.offset#[1], oryUIParameters.offset#[2])
@@ -553,8 +586,8 @@ function OryUIUpdateButtonGroup(oryUIButtonGroupID as integer, oryUIComponentPar
 	OryUIResizeAndPositionButtonsInButtonGroup(oryUIButtonGroupID)
 endfunction
 
-function OryUIUpdateButtonGroupItem(oryUIButtonGroupID as integer, oryUIButtonGroupItemID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateButtonGroupItem(oryUIButtonGroupID as integer, oryUIButtonGroupItemID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIButtonGroupCollection[oryUIButtonGroupID].buttons[oryUIButtonGroupItemID - 1].sprContainer))
 		if (oryUIParameters.color#[1] > -999999 or oryUIParameters.color#[2] > -999999 or oryUIParameters.color#[3] > -999999 or oryUIParameters.color#[4] > -999999)

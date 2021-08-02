@@ -1,12 +1,18 @@
 
-foldstart // OryUIText (Updated 07/07/2020)
+foldstart // OryUIText
 
-function OryUICreateText(oryUIComponentParameters$ as string)
+function OryUICreateText(oryUIWidgetParameters$ as string)
 	local oryUITextID as integer
 	oryUITextID = CreateText("")
 	
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateText(oryUITextID, oryUIComponentParameters$)
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUITextID, "Text"))
+
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateText(oryUITextID, oryUIWidgetParameters$)
 endfunction oryUITextID
+
+function OryUIPinTextToBottomCenterOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
+	OryUIPinTextToBottomCentreOfSprite(oryUITextA, oryUISpriteB, oryUIOffsetX#, oryUIOffsetY#)
+endfunction
 
 function OryUIPinTextToBottomCentreOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
 	if (GetTextExists(oryUITextA) and GetSpriteExists(oryUISpriteB))
@@ -27,6 +33,18 @@ function OryUIPinTextToBottomRightOfSprite(oryUITextA as integer, oryUISpriteB a
 		SetTextPosition(oryUITextA, GetSpriteX(oryUISpriteB) + GetSpriteWidth(oryUISpriteB) + oryUIOffsetX#, ((GetSpriteY(oryUISpriteB) + GetSpriteHeight(oryUISpriteB)) - GetTextTotalHeight(oryUITextA)) + oryUIOffsetY#)
 		SetTextAlignment(oryUITextA, 2)
 	endif
+endfunction
+
+function OryUIPinTextToCenterLeftOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
+	OryUIPinTextToCentreLeftOfSprite(oryUITextA, oryUISpriteB, oryUIOffsetX#, oryUIOffsetY#)
+endfunction
+
+function OryUIPinTextToCenterOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
+	OryUIPinTextToCentreOfSprite(oryUITextA, oryUISpriteB, oryUIOffsetX#, oryUIOffsetY#)
+endfunction
+
+function OryUIPinTextToCenterRightOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
+	OryUIPinTextToCentreRightOfSprite(oryUITextA, oryUISpriteB, oryUIOffsetX#, oryUIOffsetY#)
 endfunction
 
 function OryUIPinTextToCentreLeftOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
@@ -50,6 +68,10 @@ function OryUIPinTextToCentreRightOfSprite(oryUITextA as integer, oryUISpriteB a
 	endif
 endfunction
 
+function OryUIPinTextToTopCenterOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
+	OryUIPinTextToTopCentreOfSprite(oryUITextA, oryUISpriteB, oryUIOffsetX#, oryUIOffsetY#)
+endfunction
+
 function OryUIPinTextToTopCentreOfSprite(oryUITextA as integer, oryUISpriteB as integer, oryUIOffsetX# as float, oryUIOffsetY# as float)
 	if (GetTextExists(oryUITextA) and GetSpriteExists(oryUISpriteB))
 		SetTextPosition(oryUITextA, GetSpriteX(oryUISpriteB) + (GetSpriteWidth(oryUISpriteB) / 2.0) + oryUIOffsetX#, GetSpriteY(oryUISpriteB) + oryUIOffsetY#)
@@ -71,8 +93,8 @@ function OryUIPinTextToTopRightOfSprite(oryUITextA as integer, oryUISpriteB as i
 	endif
 endfunction
 
-function OryUIUpdateText(oryUITextID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateText(oryUITextID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetTextExists(oryUITextID))
 		if (oryUIParameters.alignment > -999999)

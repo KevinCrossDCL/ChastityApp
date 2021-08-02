@@ -1,5 +1,5 @@
 
-foldstart // OryUIScrollToTop Component (Updated 07/07/2020)
+foldstart // OryUIScrollToTop Widget
 
 type typeOryUIScrollToTop
 	id as integer
@@ -11,17 +11,20 @@ type typeOryUIScrollToTop
 	sprIcon as integer
 	sprShadow as integer
 	startY# as float
+	timeLastVisible# as integer
 	visible as integer
 endtype
 
 global OryUIScrollToTopCollection as typeOryUIScrollToTop[]
 OryUIScrollToTopCollection.length = 1
 
-function OryUICreateScrollToTop(oryUIComponentParameters$ as string)
+function OryUICreateScrollToTop(oryUIWidgetParameters$ as string)
 	local oryUIScrollToTopID as integer
 	OryUIScrollToTopCollection.length = OryUIScrollToTopCollection.length + 1
 	oryUIScrollToTopID = OryUIScrollToTopCollection.length
 	OryUIScrollToTopCollection[oryUIScrollToTopID].id = oryUIScrollToTopID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUIScrollToTopID, "ScrollToTop"))
 
 	// DEFAULT SETTINGS
 	OryUIScrollToTopCollection[oryUIScrollToTopID].placement$ = oryUIDefaults.scrollToTopPlacement$
@@ -59,7 +62,7 @@ function OryUICreateScrollToTop(oryUIComponentParameters$ as string)
 	OryUIPinSpriteToCentreOfSprite(OryUIScrollToTopCollection[oryUIScrollToTopID].sprIcon, OryUIScrollToTopCollection[oryUIScrollToTopID].sprContainer, 0, 0)
 	//FixSpriteToScreen(OryUIScrollToTopCollection[oryUIScrollToTopID].sprIcon, 1)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateScrollToTop(oryUIScrollToTopID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateScrollToTop(oryUIScrollToTopID, oryUIWidgetParameters$)
 	OryUIHideScrollToTop(oryUIScrollToTopID)
 endfunction oryUIScrollToTopID
 
@@ -125,7 +128,16 @@ endfunction
 
 function OryUIInsertScrollToTopListener(oryUIScrollToTopID as integer)
 	local oryUIShowScrollToTopButton as integer
-	if (GetViewOffsetY() + GetScreenBoundsTop() > OryUIScrollToTopCollection[oryUIScrollToTopID].startY#) then oryUIShowScrollToTopButton = 1
+	if (GetViewOffsetY() + GetScreenBoundsTop() > OryUIScrollToTopCollection[oryUIScrollToTopID].startY#)
+		oryUIShowScrollToTopButton = 1
+		if (OryUIGetSwipingVertically())
+			OryUIScrollToTopCollection[oryUIScrollToTopID].timeLastVisible# = timer()
+		else
+			if (timer() - OryUIScrollToTopCollection[oryUIScrollToTopID].timeLastVisible# > 3)
+				oryUIShowScrollToTopButton = 0
+			endif
+		endif
+	endif
 	if (oryUIScrimVisible = 1) then oryUIShowScrollToTopButton = 0
 	if (OryUIAnyTextfieldFocused() = 1 and (GetDeviceBaseName() = "android" or GetDeviceBaseName() = "ios")) then oryUIShowScrollToTopButton = 0
 	if (oryUIShowScrollToTopButton = 0)
@@ -164,8 +176,8 @@ function OryUIShowScrollToTop(oryUIScrollToTopID as integer)
 	OryUIPinSpriteToCentreOfSprite(OryUIScrollToTopCollection[oryUIScrollToTopID].sprIcon, OryUIScrollToTopCollection[oryUIScrollToTopID].sprContainer, 0, 0)
 endfunction
 
-function OryUIUpdateScrollToTop(oryUIScrollToTopID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateScrollToTop(oryUIScrollToTopID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUIScrollToTopCollection[oryUIScrollToTopID].sprContainer))
 		if (oryUIParameters.color#[1] > -999999 or oryUIParameters.color#[2] > -999999 or oryUIParameters.color#[3] > -999999 or oryUIParameters.color#[4] > -999999)

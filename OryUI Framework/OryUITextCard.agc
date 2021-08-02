@@ -1,5 +1,5 @@
 
-foldstart // OryUITextCard Component (Updated 07/07/2020)
+foldstart // OryUITextCard Widget
 
 type typeOryUITextCard
 	id as integer
@@ -12,12 +12,14 @@ endtype
 global OryUITextCardCollection as typeOryUITextCard[]
 OryUITextCardCollection.length = 1
 
-function OryUICreateTextCard(oryUIComponentParameters$ as string)
+function OryUICreateTextCard(oryUIWidgetParameters$ as string)
 	local oryUITextCardID as integer
 	OryUITextCardCollection.length = OryUITextCardCollection.length + 1
 	oryUITextCardID = OryUITextCardCollection.length
 	OryUITextCardCollection[oryUITextCardID].id = oryUITextCardID
 	
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUITextCardID, "TextCard"))
+
 	OryUITextCardCollection[oryUITextCardID].autoHeight = 0
 	
 	OryUITextCardCollection[oryUITextCardID].sprContainer = CreateSprite(0)
@@ -41,7 +43,7 @@ function OryUICreateTextCard(oryUIComponentParameters$ as string)
 	SetTextDepth(OryUITextCardCollection[oryUITextCardID].txtSupportingText, GetSpriteDepth(OryUITextCardCollection[oryUITextCardID].sprContainer) - 1)
 	SetTextPosition(OryUITextCardCollection[oryUITextCardID].txtSupportingText, GetSpriteX(OryUITextCardCollection[oryUITextCardID].sprContainer) + 2, GetSpriteY(OryUITextCardCollection[oryUITextCardID].sprContainer) + 2 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtHeader) + 2)
 
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateTextCard(oryUITextCardID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateTextCard(oryUITextCardID, oryUIWidgetParameters$)
 endfunction oryUITextCardID
 
 function OryUIDeleteTextCard(oryUITextCardID as integer)
@@ -78,12 +80,12 @@ function OryUIGetTextCardY(oryUITextCardID as integer)
 	endif
 endfunction oryUITextCardY#
 
-function OryUIUpdateTextCard(oryUITextCardID as integer, oryUIComponentParameters$ as string)
-	OryUISetParametersType(oryUIComponentParameters$)
+function OryUIUpdateTextCard(oryUITextCardID as integer, oryUIWidgetParameters$ as string)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUITextCardCollection[oryUITextCardID].sprContainer))
 		
-		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUITextCardCollection[oryUITextCardID].sprContainer, oryUIParameters.size#[1], oryUIParameters.size#[2])
 		elseif (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] = -999999)
@@ -117,8 +119,25 @@ function OryUIUpdateTextCard(oryUITextCardID as integer, oryUIComponentParameter
 		if (OryUITextCardCollection[oryUITextCardID].autoHeight = 1)
 			SetSpriteSize(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer), 0.5 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtHeader) + 1 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtSupportingText) + 1)
 		endif
-		if (oryUIParameters.offsetCenter = 1)
-			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2, GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2)
+
+		if (oryUIParameters.offsetTopLeft = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, 0, 0)
+		elseif (oryUIParameters.offsetTopCenter = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0, 0)
+		elseif (oryUIParameters.offsetTopRight = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer), 0)
+		elseif (oryUIParameters.offsetCenterLeft = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, 0, GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenter = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0, GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetCenterRight = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer), GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0)
+		elseif (oryUIParameters.offsetBottomLeft = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, 0, GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer))
+		elseif (oryUIParameters.offsetBottomCenter = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer) / 2.0, GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer))
+		elseif (oryUIParameters.offsetBottomRight = 1)
+			SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, GetSpriteWidth(OryUITextCardCollection[oryUITextCardID].sprContainer), GetSpriteHeight(OryUITextCardCollection[oryUITextCardID].sprContainer))
 		else
 			if (oryUIParameters.offset#[1] > -999999 or oryUIParameters.offset#[2] > -999999)
 				SetSpriteOffset(OryUITextCardCollection[oryUITextCardID].sprContainer, oryUIParameters.offset#[1], oryUIParameters.offset#[2])
@@ -152,7 +171,7 @@ function OryUIUpdateTextCard(oryUITextCardID as integer, oryUIComponentParameter
 		elseif (GetTextAlignment(OryUITextCardCollection[oryUITextCardID].txtHeader) = 1)
 			OryUIPinTextToTopCentreOfSprite(OryUITextCardCollection[oryUITextCardID].txtHeader, OryUITextCardCollection[oryUITextCardID].sprContainer, 0, 0.5)
 		elseif (GetTextAlignment(OryUITextCardCollection[oryUITextCardID].txtHeader) = 2)
-			OryUIPinTextToTopRightOfSprite(OryUITextCardCollection[oryUITextCardID].txtHeader, OryUITextCardCollection[oryUITextCardID].sprContainer, 2, 0.5)
+			OryUIPinTextToTopRightOfSprite(OryUITextCardCollection[oryUITextCardID].txtHeader, OryUITextCardCollection[oryUITextCardID].sprContainer, -2, 0.5)
 		endif
 		if (oryUIParameters.headerTextColor#[1] > -999999 or oryUIParameters.headerTextColor#[2] > -999999 or oryUIParameters.headerTextColor#[3] > -999999 or oryUIParameters.headerTextColor#[4] > -999999)
 			SetTextColor(OryUITextCardCollection[oryUITextCardID].txtHeader, oryUIParameters.headerTextColor#[1], oryUIParameters.headerTextColor#[2], oryUIParameters.headerTextColor#[3], oryUIParameters.headerTextColor#[4])
@@ -168,7 +187,7 @@ function OryUIUpdateTextCard(oryUITextCardID as integer, oryUIComponentParameter
 		elseif (GetTextAlignment(OryUITextCardCollection[oryUITextCardID].txtSupportingText) = 1)
 			OryUIPinTextToTopCentreOfSprite(OryUITextCardCollection[oryUITextCardID].txtSupportingText, OryUITextCardCollection[oryUITextCardID].sprContainer, 0, 0.5 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtHeader) + 1)
 		elseif (GetTextAlignment(OryUITextCardCollection[oryUITextCardID].txtSupportingText) = 2)
-			OryUIPinTextToTopRightOfSprite(OryUITextCardCollection[oryUITextCardID].txtSupportingText, OryUITextCardCollection[oryUITextCardID].sprContainer, 2, 0.5 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtHeader) + 1)
+			OryUIPinTextToTopRightOfSprite(OryUITextCardCollection[oryUITextCardID].txtSupportingText, OryUITextCardCollection[oryUITextCardID].sprContainer, -2, 0.5 + GetTextTotalHeight(OryUITextCardCollection[oryUITextCardID].txtHeader) + 1)
 		endif
 		if (oryUIParameters.supportingTextColor#[1] > -999999 or oryUIParameters.supportingTextColor#[2] > -999999 or oryUIParameters.supportingTextColor#[3] > -999999 or oryUIParameters.supportingTextColor#[4] > -999999)
 			SetTextColor(OryUITextCardCollection[oryUITextCardID].txtSupportingText, oryUIParameters.supportingTextColor#[1], oryUIParameters.supportingTextColor#[2], oryUIParameters.supportingTextColor#[3], oryUIParameters.supportingTextColor#[4])

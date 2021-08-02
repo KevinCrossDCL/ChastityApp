@@ -1,5 +1,5 @@
 
-foldstart // OryUICard Component (NOT USABLE YET)
+foldstart // OryUICard Widget (NOT USABLE YET)
 
 type typeOryUICard
 	id as integer
@@ -22,12 +22,14 @@ endtype
 
 global OryUICardCollection as typeOryUICard[]
 
-function OryUICreateCard(oryUIComponentParameters$ as string)
+function OryUICreateCard(oryUIWidgetParameters$ as string)
 	local oryUICardID as integer
 	
 	OryUICardCollection.length = OryUICardCollection.length + 1
 	oryUICardID = OryUICardCollection.length
 	OryUICardCollection[oryUICardID].id = oryUICardID
+
+	oryUICreatedWidgets.insert(OryUIAddCreatedWidget(oryUICardID, "Card"))
 
 	// DEFAULT SETTINGS
 	OryUICardCollection[oryUICardID].autoHeight = 0
@@ -96,7 +98,7 @@ function OryUICreateCard(oryUIComponentParameters$ as string)
 	SetTextDepth(OryUICardCollection[oryUICardID].txtSupportingText, GetSpriteDepth(OryUICardCollection[oryUICardID].sprContainer) - 1)
 	remend
 	
-	if (oryUIComponentParameters$ <> "") then OryUIUpdateCard(oryUICardID, oryUIComponentParameters$)
+	if (oryUIWidgetParameters$ <> "") then OryUIUpdateCard(oryUICardID, oryUIWidgetParameters$)
 endfunction oryUICardID
 
 function OryUIDeleteCard(oryUICardID as integer)
@@ -128,10 +130,10 @@ function OryUIGetCardWidth(oryUICardID as integer)
 	endif
 endfunction oryUICardWidth#
 
-function OryUIUpdateCard(oryUICardID as integer, oryUIComponentParameters$ as string)
+function OryUIUpdateCard(oryUICardID as integer, oryUIWidgetParameters$ as string)
 	local oryUIForI as integer
 	
-	OryUISetParametersType(oryUIComponentParameters$)
+	OryUISetParametersType(oryUIWidgetParameters$)
 
 	if (GetSpriteExists(OryUICardCollection[oryUICardID].sprContainer))
 		if (oryUIParameters.blockOrder$.length >= 0)
@@ -141,7 +143,7 @@ function OryUIUpdateCard(oryUICardID as integer, oryUIComponentParameters$ as st
 			next
 		endif
 
-		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE COMPONENT
+		// IMPORTANT PARAMETERS FIRST WHICH AFFECT THE SIZE, OFFSET, AND POSITION OF THE WIDGET
 		if (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] > -999999)
 			SetSpriteSize(OryUICardCollection[oryUICardID].sprContainer, oryUIParameters.size#[1], oryUIParameters.size#[2])
 		elseif (oryUIParameters.size#[1] > -999999 and oryUIParameters.size#[2] = -999999)
