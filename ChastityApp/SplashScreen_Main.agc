@@ -14,7 +14,7 @@ if (screenToView = constSplashScreen)
 	endif
 	
 	if (OryUIGetHTTPSQueueFailedCount(httpsQueue) < 10)
-		
+				
 		// ACCEPT TERMS
 		if (splashScreenStage$ = "Accept Terms")
 			if (accept20200516TermsAlertHidden = 0)
@@ -184,37 +184,46 @@ if (screenToView = constSplashScreen)
 	
 	// FAILED TO CONNECT
 	if (OryUIGetHTTPSQueueFailedCount(httpsQueue) >= 10)
-		if (userID$ <> "" and userDBRow > 0)
-			if (timestampFromServer <= 1500000000)
-				if (OryUIGetDialogVisible(dialog) = 0)
-					OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Connection Problem;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + constAppName$ + " is experiencing problems connecting to the server." + chr(10) + chr(10) + "It will now go into offline mode.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-					OryUISetDialogButtonCount(dialog, 1)
-					OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
-					OryUIShowDialog(dialog)
-				endif
-			endif
-			if (OryUIGetDialogButtonReleasedByName(dialog, "Ok"))
-				OryUIClearHTTPSQueue(httpsQueue)
-				OryUIResetHTTPSQueueFailedCount(httpsQueue)
-				SetOfflineValue(1)
-				OryUIHideDialog(dialog)
-				SetScreenToView(selectedLocksTab)
-			endif
-		else
+//~		if (userID$ <> "" and userDBRow > 0)
+//~			if (timestampFromServer <= 1500000000)
+//~				if (OryUIGetDialogVisible(dialog) = 0)
+//~					OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Connection Problem;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + constAppName$ + " is experiencing problems connecting to the server." + chr(10) + chr(10) + "It will now go into offline mode.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+//~					OryUISetDialogButtonCount(dialog, 1)
+//~					OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+//~					OryUIShowDialog(dialog)
+//~				endif
+//~			endif
+//~			if (OryUIGetDialogButtonReleasedByName(dialog, "Ok"))
+//~				OryUIClearHTTPSQueue(httpsQueue)
+//~				OryUIResetHTTPSQueueFailedCount(httpsQueue)
+//~				SetOfflineValue(1)
+//~				OryUIHideDialog(dialog)
+//~				SetScreenToView(selectedLocksTab)
+//~			endif
+//~		else
 			if (OryUIGetDialogVisible(dialog) = 0)
-				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Connection Problem;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + constAppName$ + " is experiencing problems connecting to the server." + chr(10) + chr(10) + "If you still experience problems please try again later.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-				OryUISetDialogButtonCount(dialog, 1)
-				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Connection Problem;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + constAppName$ + " is experiencing problems connecting to the server." + chr(10) + chr(10) + "Please try again later.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+				OryUISetDialogButtonCount(dialog, 2)
+				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ViewStatusPage;text:View Status Page;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIShowDialog(dialog)
 			endif
+			if (OryUIGetDialogButtonReleasedByName(dialog, "ViewStatusPage"))
+				OryUIClearHTTPSQueue(httpsQueue)
+				OryUIResetHTTPSQueueFailedCount(httpsQueue)
+				SetOfflineValue(1)
+				OryUIHideDialog(dialog)
+				OpenBrowser(constAppStatusDomain$)
+				//SetScreenToView(selectedLocksTab)
+			endif
 			if (OryUIGetDialogButtonReleasedByName(dialog, "Ok"))
 				OryUIClearHTTPSQueue(httpsQueue)
 				OryUIResetHTTPSQueueFailedCount(httpsQueue)
 				SetOfflineValue(1)
 				OryUIHideDialog(dialog)
-				SetScreenToView(selectedLocksTab)
+				//SetScreenToView(selectedLocksTab)
 			endif
-		endif
+//~		endif
 	endif
 	
 	// ADVERTS

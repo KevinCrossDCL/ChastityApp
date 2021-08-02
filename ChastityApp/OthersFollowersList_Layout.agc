@@ -2,7 +2,7 @@
 screenNo = constOthersFollowersListScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Blocked Users;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Blocked Users;textAlignment:center;depth:10")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:refresh;icon:Refresh")
 	
 // TABS
@@ -12,7 +12,7 @@ OryUIInsertTabsButton(screen[screenNo].tabs, -1, "text:Following")
 
 // SEARCH BAR
 sprOthersFollowersSearchBar as integer : sprOthersFollowersSearchBar = OryUICreateSprite("size:100,5.02;position:-1000,-1000;depth:19")
-editOthersFollowersSearch as integer : editOthersFollowersSearch = OryUICreateTextfield("labelText:Search followers...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:cancel;depth:18")
+editOthersFollowersSearch as integer : editOthersFollowersSearch = OryUICreateTextfield("labelText:Search followers...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:clear;depth:18")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:100,0;position:-1000,-1000;depth:20")

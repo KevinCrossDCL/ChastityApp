@@ -703,6 +703,15 @@ ALTER TABLE `Usernames_Cleared`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
+--
+-- Add 4 bots to table `UserIDs_V2`
+--
+INSERT INTO `UserIDs_V2` (`id`, `user_id`, `username`, `build_number_installed`, `keyholder_level`, `main_role`) VALUES
+('', 'BOT01', 'Hailey', 99, 5, 1),
+('', 'BOT02', 'Blaine', 99, 5, 1),
+('', 'BOT03', 'Zoe', '', 99, 5, 1),
+('', 'BOT04', 'Chase', '', 99, 5, 1);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

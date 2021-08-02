@@ -26,13 +26,22 @@ if (screenToView = constLoginScreen)
 	if (redrawScreen = 1)
 		OryUIUpdateTextfield(editBoxLoginUserID, "position:" + str((screenNo * 100) + 10) + "," + str(elementY#) + ";maxLength:24;backgroundColorID:" + str(colorMode[colorModeSelected].textfieldColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";helperTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[2].textfieldStrokeColor))
 		OryUIUpdateText(OryUITextfieldCollection[editBoxLoginUserID].txtHelper, "color:255,255,255;alpha:150")
+		editBoxFocused as integer : editBoxFocused = 0
+		clipBoardText$ as string
 	endif
 	pasteButtons as integer : pasteButtons = 0
-	if (GetClipboardText() <> "") then inc pasteButtons
+	if (GetEditBoxHasFocus(OryUITextfieldCollection[editBoxLoginUserID].editBox) and editBoxFocused = 0)
+		clipBoardText$ = GetClipboardText()
+		editBoxFocused = 1
+	endif
+	if (GetEditBoxHasFocus(OryUITextfieldCollection[editBoxLoginUserID].editBox) = 0)
+		editBoxFocused = 0
+	endif
+	if (clipBoardText$ <> "") then inc pasteButtons
 	if (GetCloudDataVariable(lower(constAppName$) + ".userID", "") <> "") then inc pasteButtons
 	if (oryUIScrimVisible = 1) then pasteButtons = 0 // or OryUIGetTextfieldHasFocus(editBoxLoginUserID) = 0) then pasteButtons = 0
 	if (pasteButtons = 1)
-		if (GetClipboardText() <> "")
+		if (clipBoardText$ <> "")
 			OryUIUpdateButton(btnLoginPasteText, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#))
 			OryUIUpdateButton(btnLoginCloudText, "position:-1000,-1000")
 		elseif (GetCloudDataVariable(lower(constAppName$) + ".userID", "") <> "")
@@ -47,7 +56,7 @@ if (screenToView = constLoginScreen)
 		OryUIUpdateButton(btnLoginCloudText, "position:-1000,-1000")	
 	endif
 	if (OryUIGetButtonReleased(btnLoginPasteText))
-		OryUIUpdateTextfield(editBoxLoginUserID, "inputText:" + upper(GetClipboardText()))
+		OryUIUpdateTextfield(editBoxLoginUserID, "inputText:" + upper(clipBoardText$))
 	elseif (OryUIGetButtonReleased(btnLoginCloudText))
 		OryUIUpdateTextfield(editBoxLoginUserID, "inputText:" + upper(GetCloudDataVariable(lower(constAppName$) + ".userID", "")))
 	endif

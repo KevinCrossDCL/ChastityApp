@@ -13,6 +13,11 @@ if (screenToView = constUsersLockInformationScreen)
 		else
 			OryUISetButtonGroupItemSelectedByIndex(grpUsersToggleCumulative, 1)
 		endif
+		if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlock[userSelected] = 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpUsersAllowFreeUnlock, 2)
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpUsersAllowFreeUnlock, 1)
+		endif
 	endif
 	
 	screenNo = constUsersLockInformationScreen
@@ -192,7 +197,7 @@ if (screenToView = constUsersLockInformationScreen)
 	elementY# = elementY# + OryUIGetTextCardHeight(crdUsersLockTimeLocked)
 	
 	// LAST CHECKED IN
-	if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected] > 0)
+	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected] > 0)
 		if (timestampFromServer > 0)
 			local secondsUsersCheckInLate as integer
 			local secondsSinceUsersLastCheckIn as integer
@@ -222,7 +227,7 @@ if (screenToView = constUsersLockInformationScreen)
 							secondsUsersCheckInLate = (secondsSinceUsersLastCheckIn - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected]) - (sharedLocks[sharedLockSelected, 0].regularity# * 3600)
 						else
 							secondsUsersCheckInLate = (secondsSinceUsersLastCheckIn - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected]) - (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected] / 2)
-							if (secondsUsersCheckInLate > 86400) then secondsUsersCheckInLate = 86400
+							//if (secondsUsersCheckInLate > 86400) then secondsUsersCheckInLate = 86400
 						endif
 						dd = floor(secondsUsersCheckInLate / 60 / 60 / 24)
 						hh = floor(mod(secondsUsersCheckInLate / 60 / 60, 24))
@@ -278,7 +283,7 @@ if (screenToView = constUsersLockInformationScreen)
 							secondsUsersCheckInLate = (secondsSinceUsersLastCheckIn - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected]) - (sharedLocks[sharedLockSelected, 0].regularity# * 3600)
 						else
 							secondsUsersCheckInLate = (secondsSinceUsersLastCheckIn - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected]) - (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCheckInFrequencyInSeconds[userSelected] / 2)
-							if (secondsUsersCheckInLate > 86400) then secondsUsersCheckInLate = 86400
+							//if (secondsUsersCheckInLate > 86400) then secondsUsersCheckInLate = 86400
 						endif
 						dd = floor(secondsUsersCheckInLate / 60 / 60 / 24)
 						hh = floor(mod(secondsUsersCheckInLate / 60 / 60, 24))
@@ -518,23 +523,47 @@ if (screenToView = constUsersLockInformationScreen)
 	endif
 
 	// CHANCES ACCUMULATED
-	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 134 and sharedLocks[sharedLockSelected, 0].fixed = 0 and sharedLocks[sharedLockSelected, 0].cumulative = 1)
+	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 134 and sharedLocks[sharedLockSelected, 0].fixed = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 1)
 		noOfChances = 0
 		if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByCard[userSelected] = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholder[userSelected] = 0)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 15)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 0.5) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 30)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 3) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 3)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 6) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 6)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 12) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 12)
-			if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 24)
+			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected] > sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected])
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 15)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.5) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 30)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 3) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 60 / 3)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 6) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 60 / 6)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 12) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 60 / 12)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / 60 / 60 / 24)
+			elseif (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersChancesAccumulatedBeforeFreeze[userSelected] = 0)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 15)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.5) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 30)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 3) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 3)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 6) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 6)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 12) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 12)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected]) / 60 / 60 / 24)
+			else
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 15)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.5) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 30)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 60)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 3) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 60 / 3)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 6) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 60 / 6)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 12) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 60 / 12)
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then noOfChances = floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfrozen[userSelected]) / 60 / 60 / 24)
+				noOfChances = noOfChances + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersChancesAccumulatedBeforeFreeze[userSelected]
+			endif
+		else
+			noOfChances = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersChancesAccumulatedBeforeFreeze[userSelected]
 		endif
-		noOfChances = noOfChances + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersChancesAccumulatedBeforeFreeze[userSelected]
+		//noOfChances = noOfChances + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersChancesAccumulatedBeforeFreeze[userSelected]
 		if (noOfChances > 1)										
 			if (redrawScreen = 1)
-				OryUIUpdateTextCard(crdUsersLockChancesAccumulated, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(noOfChances) + " chances;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateTextCard(crdUsersLockChancesAccumulated, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
 			endif
+			OryUIUpdateTextCard(crdUsersLockChancesAccumulated, "supportingText:" + str(noOfChances) + " chances")
 			elementY# = elementY# + OryUIGetTextCardHeight(crdUsersLockChancesAccumulated)
 		else
 			if (redrawScreen = 1)
@@ -549,7 +578,7 @@ if (screenToView = constUsersLockInformationScreen)
 	endif
 	
 	// TOGGLE CUMULATIVE / NON-CUMULATIVE
-	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, 0].fixed = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTrustKeyholder[userSelected] = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUnlocked[userSelected] = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 275)
+	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, 0].fixed = 0 and (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 0 or (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTrustKeyholder[userSelected] = 1)) and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUnlocked[userSelected] = 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 275)
 		if (redrawScreen = 1)
 			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 1)
 				OryUIUpdateTextCard(crdUsersToggleCumulative, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:This users lock is currently cumulative. Switching it to non-cumulative will stop chances from accumulating, and will wipe any extra chances already accumulated;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -729,6 +758,17 @@ if (screenToView = constUsersLockInformationScreen)
 			multipleGreensRequired = sharedLocks[sharedLockSelected, 0].multipleGreensRequired
 			regularity# = sharedLocks[sharedLockSelected, 0].regularity#
 			resetFrequencyInSeconds = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersResetFrequencyInSeconds[userSelected]
+			simulationInitialDoubleUps = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialDoubleUpCards[userSelected]
+			simulationInitialFreezes = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialFreezeCards[userSelected]
+			simulationInitialGreens = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialGreenCards[userSelected]
+			simulationInitialReds = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialRedCards[userSelected]
+			simulationInitialResets = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialResetCards[userSelected]
+			simulationInitialStickies = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialStickyCards[userSelected]
+			simulationInitialYellowsAdd1 = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialYellowCards[userSelected, 3]
+			simulationInitialYellowsAdd2 = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialYellowCards[userSelected, 4]
+			simulationInitialYellowsAdd3 = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialYellowCards[userSelected, 5]
+			simulationInitialYellowsMinus1 = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialYellowCards[userSelected, 2]
+			simulationInitialYellowsMinus2 = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialYellowCards[userSelected, 1]
 			simulationAverageMinutesLocked = 0
 			simulationAverageNoOfTurns = 0
 			simulationAverageNoOfCardsDrawn = 0
@@ -737,6 +777,8 @@ if (screenToView = constUsersLockInformationScreen)
 			simulationBestCaseNoOfTurns = 9999999999
 			simulationBestCaseNoOfCardsDrawn = 9999999999
 			simulationBestCaseNoOfLockResets = 9999999999
+			simulationSecondsUntilUnfreezes = 0
+			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByCard[userSelected] = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] > timestampNow) then simulationSecondsUntilUnfreezes = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] - timestampNow
 			simulationWorstCaseMinutesLocked = 0
 			simulationWorstCaseNoOfTurns = 0
 			simulationWorstCaseNoOfCardsDrawn = 0
@@ -747,13 +789,19 @@ if (screenToView = constUsersLockInformationScreen)
 				simulationMinimumRedCards = 1
 			else
 				simulationMinimumRedCards = sharedLocks[sharedLockSelected, 0].minRandomReds
-				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[userSelected]) / (sharedLocks[sharedLockSelected, 0].regularity# * 3600))
-				if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 1
+				//simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[userSelected]) / (sharedLocks[sharedLockSelected, 0].regularity# * 3600))
+				//if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 1
 			endif
+			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected] > sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[userSelected])
+				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[userSelected]) / (sharedLocks[sharedLockSelected, 0].regularity# * 3600))
+			else
+				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[userSelected]) / (sharedLocks[sharedLockSelected, 0].regularity# * 3600))
+			endif
+			if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 0
 		endif
 		
 		if (simulationCount > 0)
-			RunSimulation()
+			RunSimulation(0)
 		endif
 		if (simulationCount <= simulationsToTry)
 			if (simulationMinutesLocked < simulationBestCaseMinutesLocked) then simulationBestCaseMinutesLocked = simulationMinutesLocked
@@ -887,7 +935,41 @@ if (screenToView = constUsersLockInformationScreen)
 	endif
 	if (OryUIGetButtonReleased(btnRerunUsersLockSimulation))
 		simulationCount = 0
-		RunSimulation()
+		RunSimulation(0)
+	endif
+	
+	// ALLOW FREE UNLOCK?
+	if (selectedManageUsersTab = 1 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 290)
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdUsersAllowFreeUnlock, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdUsersAllowFreeUnlock)
+		if (redrawScreen = 1)
+			OryUIUpdateButtonGroup(grpUsersAllowFreeUnlock, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+			OryUIUpdateButtonGroupItem(grpUsersAllowFreeUnlock, 1, "name:Yes;text:Yes")
+			OryUIUpdateButtonGroupItem(grpUsersAllowFreeUnlock, 2, "name:No;text:No")
+		endif
+		OryUIInsertButtonGroupListener(grpUsersAllowFreeUnlock)
+		if (OryUIGetButtonGroupItemReleasedIndex(grpUsersAllowFreeUnlock) > 0)
+			screen[screenNo].lastViewY# = GetViewOffsetY()
+			SetScreenToView(constUsersLockInformationScreen)
+		endif
+		elementY# = elementY# + OryUIGetButtonGroupHeight(grpUsersAllowFreeUnlock) + 2
+		if (OryUIGetButtonGroupItemSelectedName(grpUsersAllowFreeUnlock) = "Yes")
+			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlock[userSelected] = 0)
+				OryUIShowFloatingActionButton(fabSaveUsersLockInformation)
+			endif
+		endif
+		if (OryUIGetButtonGroupItemSelectedName(grpUsersAllowFreeUnlock) = "No")
+			if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlock[userSelected] = 1)
+				OryUIShowFloatingActionButton(fabSaveUsersLockInformation)
+			endif
+		endif
+	else
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdUsersAllowFreeUnlock, "position:-1000,-1000")
+			OryUIUpdateButtonGroup(grpUsersAllowFreeUnlock, "position:-1000,-1000")
+		endif
 	endif
 	
 	// DELETE USER FROM LOCK
@@ -929,13 +1011,13 @@ if (screenToView = constUsersLockInformationScreen)
 			if (OryUIGetButtonGroupItemSelectedName(grpUsersPauseAutoResets) = "Yes")
 				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPaused[userSelected] = 0)
 					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPausedModifiedBy[userSelected] = 1
-					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsPaused", 0, 0)
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsPaused", 0, 0, 1)
 				endif
 			endif
 			if (OryUIGetButtonGroupItemSelectedName(grpUsersPauseAutoResets) = "No")
 				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPaused[userSelected] = 1)
 					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPausedModifiedBy[userSelected] = -1
-					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsUnpaused", 0, 0)
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsUnpaused", 0, 0, 1)
 				endif
 			endif
 		endif
@@ -943,16 +1025,30 @@ if (screenToView = constUsersLockInformationScreen)
 			if (OryUIGetButtonGroupItemSelectedName(grpUsersToggleCumulative) = "Cumulative")
 				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 0)
 					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulativeModifiedBy[userSelected] = 1
-					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:SwitchedToCumulative", 0, 0)
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:SwitchedToCumulative", 0, 0, 1)
 				endif
 			endif
 			if (OryUIGetButtonGroupItemSelectedName(grpUsersToggleCumulative) = "NonCumulative")
 				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulative[userSelected] = 1)
 					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCumulativeModifiedBy[userSelected] = -1
-					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:SwitchedToNonCumulative", 0, 0)
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:SwitchedToNonCumulative", 0, 0, 1)
 					if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected] < timestampNow - (sharedLocks[sharedLockSelected, 0].regularity# * 3600))
 						sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastPicked[userSelected] = timestampNow - (sharedLocks[sharedLockSelected, 0].regularity# * 3600)
 					endif
+				endif
+			endif
+		endif
+		if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersBuildNumberInstalled[userSelected] >= 290)
+			if (OryUIGetButtonGroupItemSelectedName(grpUsersAllowFreeUnlock) = "Yes")
+				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlock[userSelected] = 0)
+					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlockModifiedBy[userSelected] = 1
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "", 0, 0, 1)
+				endif
+			endif
+			if (OryUIGetButtonGroupItemSelectedName(grpUsersAllowFreeUnlock) = "No")
+				if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlock[userSelected] = 1)
+					sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlockModifiedBy[userSelected] = -1
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "", 0, 0, 1)
 				endif
 			endif
 		endif

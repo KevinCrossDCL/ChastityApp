@@ -2,7 +2,7 @@
 screenNo = constShareLockScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Share Lock;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Share Lock;textAlignment:center;depth:10")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Share;icon:share")
 
 // PAGE
@@ -42,4 +42,4 @@ txtLockInformation as integer : txtLockInformation = OryUICreateText("text: ;siz
 
 // DOWNLOAD APP
 txtDownload as integer : txtDownload = OryUICreateText("text:Download " + constAppName$ + " to use this lock;size:3;position:-1000,-1000;alignment:center;color:44,62,80,255;depth:17")
-txtDomain as integer : txtDomain = OryUICreateText("text:www." + constAppMarketingDomain$ + ";size:2.8;position:-1000,-1000;alignment:center;color:0,0,255,255;depth:17")
+txtDomain as integer : txtDomain = OryUICreateText("text:www." + lower(constAppName$) + ".com;size:2.8;position:-1000,-1000;alignment:center;color:0,0,255,255;depth:17")

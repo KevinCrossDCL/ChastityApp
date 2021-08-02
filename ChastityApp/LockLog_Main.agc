@@ -631,6 +631,11 @@ if (screenToView = constLockLogScreen)
 						line2$ = " "
 						leftImageID = imgListGreenCard
 					endif
+					if (logItemResult$ = "Decline Unlock")
+						line1$ = whom1$ + " declined an unlock"
+						line2$ = " "
+						leftImageID = imgListBlank
+					endif
 				endif
 				if (logItemAction$ = "CheckedIn")
 					noOfLeftLines = 2
@@ -678,6 +683,12 @@ if (screenToView = constLockLogScreen)
 					line1$ = whom1$ + " deleted the lock"
 					line2$ = " "
 					leftImageID = imgListDeletedLock
+				endif
+				if (logItemAction$ = "FakeUpdate")
+					noOfLeftLines = 2
+					line1$ = whom1$ + " updated the lock"
+					line2$ = "Update hidden"
+					leftImageID = imgListBlank
 				endif
 				if (logItemAction$ = "KeyholderFreezeEnded")
 					noOfLeftLines = 2

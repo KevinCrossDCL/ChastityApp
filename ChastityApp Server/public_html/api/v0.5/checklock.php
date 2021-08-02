@@ -141,9 +141,11 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         l.lock_id as l_lock_id,
         l.name as l_name,
         l.ready_to_unlock as l_ready_to_unlock,
+        l.regularity as l_regularity,
         l.shared_id as l_shared_id,
         l.test as l_test,
         l.timestamp_locked as l_timestamp_locked, 
+        l.timestamp_requested_keyholders_decision as l_timestamp_requested_keyholders_decision,
         l.timestamp_unlocked as l_timestamp_unlocked, 
         l.unlocked as l_unlocked
     from UserIDs_V2 as u, Locks_V2 as l where ((u.username = :username and :username <> '') or (u.discord_id = :discordID and :discordID <> '')) and u.user_id = l.user_id and ((l.lock_group_id = :lockGroupID and :lockGroupID > 0) or (l.lock_id = :lockID and :lockID > 0) or (l.name = :lockName and :lockName <> '')) and l.deleted = 0");
@@ -191,8 +193,17 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
             
             if ($row["l_unlocked"] == 0) {
                 if ($row["l_ready_to_unlock"] == 1) {
-                    $lockStatus = "ReadyToUnlock";
-                    $combination = "";
+                    $maxWaitTime = 0;
+					if ($row["l_fixed"] == 0 && $row["l_regularity"] <= 3) { $maxWaitTime = 3600 * 3; }
+					if ($row["l_fixed"] == 0 && $row["l_regularity"] >= 6) { $maxWaitTime = 3600 * 6; }
+					if ($row["l_fixed"] == 1 && $row["l_regularity"] == 0.016667) { $maxWaitTime = 3600 * 3; }
+					if ($maxWaitTime - (time() - $row["l_timestamp_requested_keyholders_decision"]) > 0) {
+					    $lockStatus = "AwaitingKeyholdersDecision";
+                        $combination = "";
+                    } else {
+                        $lockStatus = "ReadyToUnlock";
+                        $combination = "";
+                    }
                 } else {
                     if ($apiUserID != $lockedByUserID) {
                         $lockStatus = "Locked";
@@ -224,7 +235,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                 'lockGroupID' => (int)$lockGroupID,
                 'lockID' => (int)$lockID,
                 'lockedBy' => $lockedBy,
-                'lockName' => $lockName,
+                'lockName' => RemoveEmoji($lockName),
                 'build' => (int)$lockBuild,
                 'combination' => $combination,
                 'lockFrozen' => $lockFrozen,

@@ -114,6 +114,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         $mainRole = "Unknown";
         if ($row["main_role"] == 1) { $mainRole = "Keyholder"; }
         if ($row["main_role"] == 2) { $mainRole = "Lockee"; }
+        $originalKeyholderLevel = $row["keyholder_level"];
         
         if ($row["status"] == 0 || $row["status"] == 1) {
             if (time() - $row["timestamp_last_active"] <= 900) {
@@ -160,6 +161,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
             l.deleted = 0 and 
             l.fake = 0 and 
             l.test = 0 and 
+            l.removed_by_keyholder = 0 and 
             l.timestamp_locked > 1451606400 and 
             l.unlocked = 0");
         $query2->execute(array('userID' => $userID));
@@ -220,6 +222,12 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         elseif ($totalLocksManaged >= 100 && time() - $timestampFirstKeyheld >= 5184000 && $timestampFirstKeyheld > 0) { $keyholderLevel = 3; }
         elseif ($totalLocksManaged >= 10 && time() - $timestampFirstKeyheld) { $keyholderLevel = 2; }
         else { $keyholderLevel = 1; }
+        
+        // UPDATE RECORD IF LEVEL HAS CHANGED
+        if ($keyholderLevel != $originalKeyholderLevel) {
+            $query2 = $pdo->prepare("update `UserIDs_V2` set keyholder_level = :keyholderLevel where user_id = :userID");
+            $query2->execute(array('keyholderLevel' => $keyholderLevel, 'userID' => $row["user_id"]));
+        }
         
         $query2 = $pdo->prepare("select id from Relations where 
             user_two_id = :userTwoID and 
@@ -523,6 +531,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                     l.shared_id = :sharedID and 
                     l.deleted = 0 and 
                     l.test = 0 and 
+                    l.removed_by_keyholder = 0 and 
                     l.timestamp_locked > 1451606400 and 
                     l.unlocked = 0 order by u_username");
                 $query2->execute(array('sharedID' => $row["share_id"]));
@@ -553,7 +562,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                 
                 $lock = array(
                     'lockID' => (integer)$row["id"],
-                    'lockName' => $row["name"],
+                    'lockName' => RemoveEmoji($row["name"]),
                     'sharedLockID' => $sharedLockID,
                     'sharedLockQRCode' => $sharedLockQRCode,
                     'sharedLockURL' => $sharedLockURL,

@@ -133,7 +133,8 @@ where s.user_id = u.user_id and
     s.fixed = 0 and
     s.simulation_average_minutes_locked > 0 and
     s.simulation_average_minutes_locked >= :minMinutes and 
-    s.simulation_average_minutes_locked <= :maxMinutes order by u_username");
+    s.simulation_average_minutes_locked <= :maxMinutes  
+    order by s.id desc limit 1000");
 $query->execute(array('minMinutes' => $minMinutes, 'maxMinutes' => $maxMinutes));
 if ($query->rowCount() >= 1) {
     header("HTTP/1.1 200 OK", true, 200);

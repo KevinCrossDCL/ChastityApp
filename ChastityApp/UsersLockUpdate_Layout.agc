@@ -2,7 +2,7 @@
 screenNo = constUsersLockUpdateScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:ABCDEFGHIJKLM;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:ABCDEFGHIJKLM;textAlignment:center;depth:10")
 
 // TABS
 screen[screenNo].tabs = OryUICreateTabs("position:-1000,-1000;scrollable:false;depth:10")

@@ -545,10 +545,28 @@ if (screenToView = constUsersLockLogScreen)
 				if (logItemAction$ = "CardFreezeStarted")
 					noOfLeftLines = 2
 					line1$ = "Card freeze started"
-					if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] - timestampNow > 0)
-						line2$ = "Unfreezes in " + lower(ConvertMinutesToText((sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] - timestampNow) / 60, 1))
-					elseif (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] - timestampNow <= 0 and sortedIteration = OryUIGetListItemCount(listUsersLog) - 1)
-						line2$ = "Unfreezes when lockee returns to the app"
+					if (logItemTimestamp >= sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampFrozenByCard[userSelected])
+						if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] > 0)
+							secondsUnfreezes = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampUnfreezes[userSelected] - timestampNow
+							dd = floor(secondsUnfreezes / 60 / 60 / 24)
+							hh = floor(mod(secondsUnfreezes / 60 / 60, 24))
+							mm = floor(mod(secondsUnfreezes / 60, 60))
+							ss = floor(mod(secondsUnfreezes, 60))
+							if (dd >= 1)
+								line2$ = "Unfreezes in " + str(dd) + "d " + str(hh) + "h " + str(mm) + "m " + str(ss) + "s "
+							elseif (hh >= 1)
+								line2$ = "Unfreezes in " + str(hh) + "h " + str(mm) + "m " + str(ss) + "s "
+							elseif (mm >= 1)
+								line2$ = "Unfreezes in " + str(mm) + "m " + str(ss) + "s "
+							elseif (ss >= 1)
+								line2$ = "Unfreezes in " + str(ss) + "s"
+							else
+								line2$ = "Unfreezes when lockee returns to the app"
+							endif
+						else
+							noOfLeftLines = 1
+							line2$ = " "
+						endif
 					else
 						noOfLeftLines = 1
 						line2$ = " "
@@ -632,12 +650,23 @@ if (screenToView = constUsersLockLogScreen)
 						line2$ = " "
 						leftImageID = imgListGreenCard
 					endif
+					if (logItemResult$ = "DeclineUnlock")
+						line1$ = whom1$ + " declined an unlock"
+						line2$ = " "
+						leftImageID = imgListBlank
+					endif
 				endif
 				if (logItemAction$ = "DeletedLock")
 					noOfLeftLines = 1
 					line1$ = whom1$ + " deleted the lock"
 					line2$ = " "
 					leftImageID = imgListDeletedLock
+				endif
+				if (logItemAction$ = "FakeUpdate")
+					noOfLeftLines = 1
+					line1$ = whom1$ + " made a hidden fake update"
+					line2$ = " "
+					leftImageID = imgListBlank
 				endif
 				if (logItemAction$ = "KeyholderFreezeEnded")
 					noOfLeftLines = 2

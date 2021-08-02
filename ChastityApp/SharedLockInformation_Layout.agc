@@ -2,14 +2,14 @@
 screenNo = constSharedLockInformationScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:" + constAppName$ + " Lock 1;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:" + constAppName$ + " Lock 1;textAlignment:center;depth:10")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;depth:20")
 
 // LOCK NAME
 crdSharedLockName as integer : crdSharedLockName = OryUICreateTextCard("width:94;headerText:XXXX;headerTextAlignment:center;supportingText: ;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")
-editBoxSharedLockName as integer : editBoxSharedLockName = OryUICreateTextfield("labelText:Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:cancel;depth:19")
+editBoxSharedLockName as integer : editBoxSharedLockName = OryUICreateTextfield("labelText:Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:clear;depth:19")
 
 // QR CODE URL
 crdSharedLockQRCodeURL as integer : crdSharedLockQRCodeURL = OryUICreateTextCard("width:94;headerText:XXXX;headerTextAlignment:center;supportingText: ;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")
@@ -130,6 +130,13 @@ OryUISetButtonGroupItemSelectedByIndex(grpSharedLockLimitNumberOfUsers, 2)
 // MAXIMUM NUMBER OF USERS
 crdSharedLockMaximumNumberOfUsers as integer : crdSharedLockMaximumNumberOfUsers = OryUICreateTextCard("width:94;headerText:Maximum number of users?;supportingText:Fake locks aren't included in this count.;position:-1000,-1000;autoHeight:true;depth:19")
 spinSharedLockMaximumNumberOfUsers as integer : spinSharedLockMaximumNumberOfUsers = OryUICreateInputSpinner("size:27,5;min:1;max:100;step:1;defaultValue:40;maxLength:1;autoCorrectIfOutOfRange:true;position:-1000,-1000;depth:18")
+
+// BLOCK TEST LOCKS?
+crdSharedLockBlockTestLocks as integer : crdSharedLockBlockTestLocks = OryUICreateTextCard("width:94;headerText:Block test locks?;supportingText:If 'Yes' then the user won't be able to load your lock as a test lock. You may still get users loading the lock without actually locking anything away which isn't something that can be stopped. Blocking test locks means the lock will be flagged as a real one, and will be included in the users stats/history.;position:-1000,-1000;autoHeight:true;depth:19")
+grpSharedLockBlockTestLocks as integer : grpSharedLockBlockTestLocks = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
+OryUIInsertButtonGroupItem(grpSharedLockBlockTestLocks, -1, "name:Yes;text:Yes")
+OryUIInsertButtonGroupItem(grpSharedLockBlockTestLocks, -1, "name:No;text:No")
+OryUISetButtonGroupItemSelectedByIndex(grpSharedLockBlockTestLocks, 2)
 
 // BLOCK USERS WITH A SPECIFIC RATING?
 crdSharedLockBlockUsersWithSpecificRating as integer : crdSharedLockBlockUsersWithSpecificRating = OryUICreateTextCard("width:94;headerText:Block users with a specific rating?;supportingText:If yes, you can restrict the lock so that only users with a certain rating and above can load the lock which is useful if you want to block users that have been rated badly by other users. Doing so may however lower your chances of finding people to load it, and it will also block all new users which haven't been rated yet, or haven't enough ratings to calculate a fair average rating.;position:-1000,-1000;autoHeight:true;depth:19")

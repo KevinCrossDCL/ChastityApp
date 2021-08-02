@@ -2,7 +2,7 @@
 screenNo = constLockInformationScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Lock ID 1234567890;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Lock ID 1234567890;textAlignment:center;depth:10")
 
 // TABS
 screen[screenNo].tabs = OryUICreateTabs("position:-1000,-1000;scrollable:false;depth:10")
@@ -18,7 +18,7 @@ screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;dep
 
 // LOCK NAME
 crdLockName as integer : crdLockName = OryUICreateTextCard("width:94;headerText:XXXX;headerTextAlignment:center;supportingText: ;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")
-editBoxLockName as integer : editBoxLockName = OryUICreateTextfield("labelText:Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:cancel;depth:19")
+editBoxLockName as integer : editBoxLockName = OryUICreateTextfield("labelText:Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:clear;depth:19")
 
 // API LOCK IDs
 crdAPILockIDs as integer : crdAPILockIDs = OryUICreateTextCard("width:94;headerText:XXXX;headerTextAlignment:center;supportingText: ;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")
@@ -51,6 +51,10 @@ sprDiscardPile as integer[11]
 for i = 1 to 10
 	sprDiscardPile[i] = OryUICreateSprite("size:" + str((cardWidth# * 0.40) / GetDisplayAspect()) + "," + str(cardHeight# * 0.40) + ";position:-1000,-1000;depth:18")
 next
+
+//~// FREEZE LOCK
+//~crdFreezeLock as integer : crdFreezeLock = OryUICreateTextCard("width:94;headerText:Freeze Lock?;headerTextAlignment:center;supportingText:Pressing the 'Freeze Lock' button below will freeze the lock for a random amount of time.;supportingTextAlignment:left;position:-1000,-1000;autoHeight:true;depth:19")
+//~btnFreezeLock as integer : btnFreezeLock = OryUICreateButton("size:30,5;text:Freeze Lock;offset:15,0;position:-1000,-1000;depth:14")
 
 // CARD COUNTS
 crdCardCounts as integer : crdCardCounts = OryUICreateTextCard("width:94;headerText:XXXX;headerTextAlignment:center;supportingText:XXXX;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")
@@ -117,6 +121,13 @@ grpTrustTheKeyholder as integer : grpTrustTheKeyholder = OryUICreateButtonGroup(
 OryUIInsertButtonGroupItem(grpTrustTheKeyholder, -1, "name:Yes;text:Yes")
 OryUIInsertButtonGroupItem(grpTrustTheKeyholder, -1, "name:No;text:No")
 OryUISetButtonGroupItemSelectedByIndex(grpTrustTheKeyholder, 2)
+
+// BLOCK BOT FROM UNLOCKING EARLY?
+crdBlockBotFromUnlockingEarly as integer : crdBlockBotFromUnlockingEarly = OryUICreateTextCard("width:94;headerText:Block XXX from unlocking you?;supportingText:If yes, XXX won't unlock this lock. This is useful if you don't want the bot to unlock you too early. You can change this option at any time.;position:-1000,-1000;autoHeight:true;depth:19")
+grpBlockBotFromUnlockingEarly as integer : grpBlockBotFromUnlockingEarly = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
+OryUIInsertButtonGroupItem(grpBlockBotFromUnlockingEarly, -1, "name:Yes;text:Yes")
+OryUIInsertButtonGroupItem(grpBlockBotFromUnlockingEarly, -1, "name:No;text:No")
+OryUISetButtonGroupItemSelectedByIndex(grpBlockBotFromUnlockingEarly, 2)
 
 // DISABLE KEYS?
 crdDisableKeys as integer : crdDisableKeys = OryUICreateTextCard("width:94;headerText:Disable keys?;supportingText:If disabled you won't be able to purchase digital keys to unlock early if you need to in an emergency. It will disable keys on all locks within the same group of locks that were created at the same time, if fake copies were created. It's recommended to leave the keys enabled if this is the first time you've locked with this keyholder. This can not be undone once changed.;position:-1000,-1000;autoHeight:true;depth:19")

@@ -52,14 +52,21 @@ if (screenToView = constLockGeneratorResultsScreen)
 	if (regularity# = 6) then drawInterval$ = " (6 hour draws)"
 	if (regularity# = 12) then drawInterval$ = " (12 hour draws)"
 	if (regularity# = 24) then drawInterval$ = " (Daily draws)"
+	
 	if (filterCount > 0)
+		local noOfMatchesToDisplay$ as string
+		if (generatedLocks[0].noOfMatches < 1000)
+			noOfMatchesToDisplay$ = str(generatedLocks[0].noOfMatches)
+		else
+			noOfMatchesToDisplay$ = "1000+"
+		endif
 		if (filterCount <> generatedLocks[0].noOfMatches)
-			OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + "Random " + str(filterCount) + " of " + str(generatedLocks[0].noOfMatches) + " results;colorID:" + str(colorMode[colorModeSelected].barIconColor))
+			OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + "Random " + str(filterCount) + " of " + noOfMatchesToDisplay$ + " results;colorID:" + str(colorMode[colorModeSelected].barIconColor))
 		else	
 			if (generatedLocks[0].noOfMatches = 1)
-				OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + str(generatedLocks[0].noOfMatches) + " result;colorID:" + str(colorMode[colorModeSelected].barIconColor))
+				OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + noOfMatchesToDisplay$ + " result;colorID:" + str(colorMode[colorModeSelected].barIconColor))
 			else
-				OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + str(generatedLocks[0].noOfMatches) + " results;colorID:" + str(colorMode[colorModeSelected].barIconColor))
+				OryUIUpdateText(txtLockGeneratorQuery, "text:Approx. " + lower(ConvertMinutesRangeToText(minMinutes, maxMinutes)) + drawInterval$ + chr(10) + noOfMatchesToDisplay$ + " results;colorID:" + str(colorMode[colorModeSelected].barIconColor))
 			endif
 		endif
 	else
@@ -151,14 +158,9 @@ if (screenToView = constLockGeneratorResultsScreen)
 							generatedLockSelected = sortedIteration + 1
 							previousBreadcrumb = GetPreviousBreadcrumb()
 							RemoveLastBreadcrumb()
+							selectedLockOptionsTab = 1
 							if (noOfLocks = 20)
-								selectedLockOptionsTab = 2
-							else
-								if (mainRoleSelected = 1)
-									selectedLockOptionsTab = 2
-								else
-									selectedLockOptionsTab = 1
-								endif
+								OryUISetButtonGroupItemSelectedByIndex(grpWhoIsTheLockFor, 2)
 							endif
 							SetScreenToView(constLockOptionsScreen)
 						endif

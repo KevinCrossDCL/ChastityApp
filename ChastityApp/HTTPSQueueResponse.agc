@@ -349,6 +349,16 @@ elseif (OryUIGetHTTPSQueueRequestScript(httpsQueue) = URLs[0].URLPath + "/" + UR
 
 	
 
+// GET RECENT ACTIVITY
+elseif (OryUIGetHTTPSQueueRequestScript(httpsQueue) = URLs[0].URLPath + "/" + URLs[0].GetRecentActivity)
+	ReceivedRecentActivity()
+	if (screenNo = constRecentActivityScreen)
+		screen[screenNo].lastViewY# = GetViewOffsetY()
+		SetScreenToView(constRecentActivityScreen)
+	endif
+	
+	
+
 // GET SERVER VARIABLES
 elseif (OryUIGetHTTPSQueueRequestScript(httpsQueue) = URLs[0].URLPath + "/" + URLs[0].GetServerVariables)
 	ReceivedServerVariables()

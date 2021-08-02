@@ -68,6 +68,8 @@ if (screenToView = constViewProfileScreen)
 		UnblockUser(profileData.id, 1)
 	endif
 	
+	startScrollBarY# = elementY# + 1
+	
 	// PAGE
 	if (redrawScreen = 1)
 		OryUIUpdateSprite(screen[screenNo].sprPage, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";alpha:0")
@@ -86,7 +88,7 @@ if (screenToView = constViewProfileScreen)
 		endif
 	endif
 	
-	loadingProfile = OryUIIsScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetprofiledata.php")
+	loadingProfile = OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetProfileData)
 	
 	hideProfile as integer : hideProfile = 0
 	if (loadingProfile = 1) then hideProfile = 1
@@ -182,7 +184,7 @@ if (screenToView = constViewProfileScreen)
 			endif
 			if (redrawScreen = 1)
 				if (profileData.noOfRatings = 0)
-					OryUIUpdateText(txtProfileRating, "position:-1000,-1000")
+					OryUIUpdateText(txtProfileRating, "text:No ratings;position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 				elseif (profileData.noOfRatings = 1)
 					OryUIUpdateText(txtProfileRating, "text:Not enough ratings (1 Rating);position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 				else
@@ -203,6 +205,30 @@ if (screenToView = constViewProfileScreen)
 		endif
 	endif
 	
+	// JOINED
+	if (hideProfile = 0 and profileData.timestampJoined > 0)
+		if (redrawScreen = 1)
+			OryUIUpdateText(txtProfileJoined, "text:Joined ChastiKey[colon] " + lower(ConvertMinutesToText((timestampNow - profileData.timestampJoined) / 60, 0)) + " ago;position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		elementY# = elementY# + GetTextTotalHeight(txtProfileJoined) + 2
+	else
+		if (redrawScreen = 1)
+			OryUIUpdateText(txtProfileJoined, "position:-1000,-1000")
+		endif
+	endif
+	
+	// LAST ONLINE
+	if (timestampNow - profileData.timestampLastActive > 86400 and profileData.timestampLastActive > 0 and hideProfile = 0)
+		if (redrawScreen = 1)
+			OryUIUpdateText(txtProfileLastOnline, "text:Last Online[colon] " + lower(ConvertMinutesToText((timestampNow - profileData.timestampLastActive) / 60, 0)) + " ago;position:" + str((screenNo * 100) + 50) + "," + str(elementY# - 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		elementY# = elementY# + GetTextTotalHeight(txtProfileLastOnline)
+	else
+		if (redrawScreen = 1)
+			OryUIUpdateText(txtProfileLastOnline, "position:-1000,-1000")
+		endif
+	endif
+	
 	// PRIVATE ACCOUNT
 	if (profileData.id <> userDBRow and loadingProfile = 0 and blockedByYou = 0 and ((profileData.privateProfile = 1 and following = 0) or blockedByOther = 1))
 		OryUIUpdateText(txtPrivateAccountLine1, "text:Private Account;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
@@ -216,8 +242,8 @@ if (screenToView = constViewProfileScreen)
 	// FOLLOWERS/FOLLOWING COUNT
 	if (hideProfile = 0)
 		if (redrawScreen = 1)
-			OryUIUpdateText(txtFollowersCount, "text:" + str(profileData.followers) + ";position:" + str((screenNo * 100) + 37) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
-			OryUIUpdateText(txtFollowingCount, "text:" + str(profileData.following) + ";position:" + str((screenNo * 100) + 63) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateText(txtFollowersCount, "text:" + AddThousandsSeperator(profileData.followers, ",") + ";position:" + str((screenNo * 100) + 37) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateText(txtFollowingCount, "text:" + AddThousandsSeperator(profileData.following, ",") + ";position:" + str((screenNo * 100) + 63) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		endif
 		elementY# = elementY# + GetTextTotalHeight(txtFollowersCount) 
 		if (redrawScreen = 1)
@@ -294,7 +320,7 @@ if (screenToView = constViewProfileScreen)
 	// REQUEST SENT
 	if (profileData.id <> userDBRow and loadingProfile = 0 and pendingByOther = 1)
 		if (redrawScreen = 1)
-			OryUIUpdateButton(btnProfileUserRequestSent, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].unselectedButtonColor) + ";textColor:255,255,255,255")
+			OryUIUpdateButton(btnProfileUserRequestSent, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(theme[themeSelected].color[3]) + ";textColor:255,255,255,255")
 		endif
 		elementY# = elementY# + OryUIGetButtonHeight(btnProfileUserRequestSent) + 2
 		if (OryUIGetButtonReleased(btnProfileUserRequestSent))
@@ -333,18 +359,6 @@ if (screenToView = constViewProfileScreen)
 	else
 		if (redrawScreen = 1)
 			OryUIUpdateButton(btnProfileUserUnblock, "position:-1000,-1000")
-		endif
-	endif
-
-	// LAST ONLINE
-	if (timestampNow - profileData.timestampLastActive > 86400 and profileData.timestampLastActive > 0 and hideProfile = 0)
-		if (redrawScreen = 1)
-			OryUIUpdateText(txtProfileLastOnline, "text:Last Online[colon] " + lower(ConvertMinutesToText((timestampNow - profileData.timestampLastActive) / 60, 0)) + " ago;position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
-		endif
-		elementY# = elementY# + GetTextTotalHeight(txtProfileLastOnline) + 2
-	else
-		if (redrawScreen = 1)
-			OryUIUpdateText(txtProfileLastOnline, "position:-1000,-1000")
 		endif
 	endif
 	
@@ -389,12 +403,104 @@ if (screenToView = constViewProfileScreen)
 	if (OryUIGetSpriteReleased() = sprTwitterLogo or OryUIGetSpriteReleased() = sprTwitterHandleButton)
 		OpenBrowser("https://twitter.com/" + profileData.twitterHandle$)
 	endif
-	
-	elementY# = elementY# + 2
 
 	// TOP PANEL
 	if (redrawScreen = 1)
 		OryUIUpdateSprite(sprProfileTopPanel, "height:" + str(elementY# - GetSpriteY(sprProfileTopPanel)))
+		elementY# = elementY# + 2
+	endif
+	
+	// STATS
+	if (hideProfile = 0)
+		if (redrawScreen = 1)
+			if (profileData.showKeyholderStatsOnProfile = 1)
+				OryUIUpdateText(txtKeyholderStats, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+				elementY# = elementY# + GetTextTotalHeight(txtKeyholderStats) + 2	
+				if (profileData.username$ = "Hailey")
+					OryUIUpdateTextCard(crdStats[1], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Locks Managed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[1].totalManaged, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateTextCard(crdStats[2], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Managing Now;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[1].lockedCount, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (profileData.username$ = "Blaine")
+					OryUIUpdateTextCard(crdStats[1], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Locks Managed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[2].totalManaged, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateTextCard(crdStats[2], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Managing Now;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[2].lockedCount, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (profileData.username$ = "Zoe")
+					OryUIUpdateTextCard(crdStats[1], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Locks Managed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[3].totalManaged, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateTextCard(crdStats[2], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Managing Now;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[3].lockedCount, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (profileData.username$ = "Chase")
+					OryUIUpdateTextCard(crdStats[1], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Locks Managed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[4].totalManaged, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateTextCard(crdStats[2], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Managing Now;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(botsData[4].lockedCount, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				else
+					OryUIUpdateTextCard(crdStats[1], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Locks Managed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(profileData.noOfLocksManaged, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateTextCard(crdStats[2], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Managing Now;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(profileData.noOfLocksManagingNow, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				endif
+				elementY# = elementY# + OryUIGetTextCardHeight(crdStats[1]) + 2
+			else
+				OryUIUpdateText(txtKeyholderStats, "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[1], "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[2], "position:-1000,-1000")
+			endif
+			if (profileData.showLockeeStatsOnProfile = 1)
+				OryUIUpdateText(txtLockeeStats, "position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+				elementY# = elementY# + GetTextTotalHeight(txtLockeeStats) + 2
+				dd = floor(profileData.cumulativeSecondsLocked / 60 / 60 / 24)
+				hh = floor(mod(profileData.cumulativeSecondsLocked / 60 / 60, 24))
+				mm = floor(mod(profileData.cumulativeSecondsLocked / 60, 60))
+				ss = floor(mod(profileData.cumulativeSecondsLocked, 60))
+				if (dd > 0)
+					OryUIUpdateTextCard(crdStats[3], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(dd) + "d " + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (hh > 0)
+					OryUIUpdateTextCard(crdStats[3], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (mm > 0)
+					OryUIUpdateTextCard(crdStats[3], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (ss >= 0)
+					OryUIUpdateTextCard(crdStats[3], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Total Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(ss) + "s;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				endif
+				OryUIUpdateTextCard(crdStats[4], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Locks Completed;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + AddThousandsSeperator(profileData.noOfLocksCompleted, ",") + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elementY# = elementY# + OryUIGetTextCardHeight(crdStats[3]) + 2
+				dd = floor(profileData.averageSecondsLocked / 60 / 60 / 24)
+				hh = floor(mod(profileData.averageSecondsLocked / 60 / 60, 24))
+				mm = floor(mod(profileData.averageSecondsLocked / 60, 60))
+				ss = floor(mod(profileData.averageSecondsLocked, 60))
+				if (dd > 0)
+					OryUIUpdateTextCard(crdStats[5], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Average Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(dd) + "d " + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (hh > 0)
+					OryUIUpdateTextCard(crdStats[5], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Average Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (mm > 0)
+					OryUIUpdateTextCard(crdStats[5], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Average Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (ss >= 0)
+					OryUIUpdateTextCard(crdStats[5], "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Average Time Locked;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(ss) + "s;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				endif
+				
+				dd = floor(profileData.longestSecondsLocked / 60 / 60 / 24)
+				hh = floor(mod(profileData.longestSecondsLocked / 60 / 60, 24))
+				mm = floor(mod(profileData.longestSecondsLocked / 60, 60))
+				ss = floor(mod(profileData.longestSecondsLocked, 60))
+				if (dd > 0)
+					OryUIUpdateTextCard(crdStats[6], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Longest Completed Lock;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(dd) + "d " + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (hh > 0)
+					OryUIUpdateTextCard(crdStats[6], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Longest Completed Lock;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(hh) + "h " + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (mm > 0)
+					OryUIUpdateTextCard(crdStats[6], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Longest Completed Lock;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(mm) + "m;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				elseif (ss >= 0)
+					OryUIUpdateTextCard(crdStats[6], "position:" + str((screenNo * 100) + 51.5) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Longest Completed Lock;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + str(ss) + "s;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+				endif
+				elementY# = elementY# + OryUIGetTextCardHeight(crdStats[5]) + 2
+			else
+				OryUIUpdateText(txtLockeeStats, "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[3], "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[4], "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[5], "position:-1000,-1000")
+				OryUIUpdateTextCard(crdStats[6], "position:-1000,-1000")
+			endif
+		endif
+	else
+		OryUIUpdateText(txtKeyholderStats, "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[1], "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[2], "position:-1000,-1000")
+		OryUIUpdateText(txtLockeeStats, "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[3], "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[4], "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[5], "position:-1000,-1000")
+		OryUIUpdateTextCard(crdStats[6], "position:-1000,-1000")
 	endif
 
 	// ADVERTS

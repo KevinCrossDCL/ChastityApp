@@ -5,7 +5,7 @@ screenNo = constCardsScreen
 sprFeltBackground as integer : sprFeltBackground = OryUICreateSprite("size:100," + str(abs(GetScreenBoundsTop() * 2) + 100) + ";position:-1000,-1000;depth:3999")
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;shadow:false;navigationName:Back;text:Locked Since XX/XX/XXXX;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;shadow:false;navigationName:Back;text:Locked Since XX/XX/XXXX;textAlignment:center;depth:10")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Info;iconID:" + str(imgInfoIcon))
 
 // DIALOG

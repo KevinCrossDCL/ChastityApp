@@ -495,8 +495,26 @@ elseif ($fixed == 0) {
 			if ($minReds == $maxReds) {
 				if ($minReds == 1) {
 				    echo "1 Red Card<br/>";
+				    /*
+					if ($regularity == 0.25) { echo "1 Red Card (Approx. 15 Minutes)<br/>"; }
+					if ($regularity == 0.5) { echo "1 Red Card (Approx. 30 Minutes)<br/>"; }
+					if ($regularity == 1) { echo "1 Red Card (Approx. 1 Hour)<br/>"; }
+					if ($regularity == 3) { echo "1 Red Card (Approx. 3 Hours)<br/>"; }
+					if ($regularity == 6) { echo "1 Red Card (Approx. 6 Hours)<br/>"; }
+					if ($regularity == 12) { echo "1 Red Card (Approx. 12 Hours)<br/>"; }
+					if ($regularity == 24) { echo "1 Red Card (Approx. 1 Day)<br/>"; }
+					*/
 				} else {
 				    echo $maxReds." Red Cards<br/>";
+				    /*
+				    if ($regularity == 0.25) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 15, 0).")<br/>"; }
+					if ($regularity == 0.5) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 30, 0).")<br/>"; }
+					if ($regularity == 1) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 60, 0).")<br/>"; }
+					if ($regularity == 3) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 180, 0).")<br/>"; }
+					if ($regularity == 6) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 360, 0).")<br/>"; }
+					if ($regularity == 12) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 720, 0).")<br/>"; }
+					if ($regularity == 24) { echo $maxReds." Red Cards (Approx. ".ConvertMinutesToText($maxReds * 1440, 0).")<br/>"; }
+					*/
 				}
 			} else {
 			    if ($minReds <= 1) {
@@ -529,10 +547,10 @@ elseif ($fixed == 0) {
 				if ($minYellowsAdd + $minYellowsMinus + $minYellows == 1) {
 					echo "1 Yellow Card<br/>";
 				} else {
-					echo ($maxYellowsAdd + $maxYellowsMinus + $maxYellows)." Random Yellow Cards<br/>";
+					echo ($maxYellowsAdd + $maxYellowsMinus + $maxYellows)." Yellow Cards<br/>";
 				}
 			} else {
-				echo ($minYellowsAdd + $minYellowsMinus + $minYellows)."-".($maxYellowsAdd + $maxYellowsMinus + $maxYellows)." Random Yellow Cards<br/>";
+				echo ($minYellowsAdd + $minYellowsMinus + $minYellows)."-".($maxYellowsAdd + $maxYellowsMinus + $maxYellows)." Yellow Cards<br/>";
 			}
 		}
 		if ($maxFreezes > 0) {

@@ -3,7 +3,7 @@ screenNo = constMyLocksScreen
 
 // TOP BAR
 screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:menu;navigationName:Menu;text:" + constAppName$ + ";depth:10")
-OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Profile;icon:profile")
+OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Profile;icon:account_box")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Refresh;icon:refresh")
 sprMyLocksStatusIcon as integer : sprMyLocksStatusIcon = OryUICreateSprite("size:-1,2;position:-1000,-1000;depth:9")
 
@@ -35,7 +35,7 @@ if (sortMyLocksOrder$ = "DESC") then OryUISetButtonGroupItemSelectedByIndex(grpS
 
 // SEARCH BAR
 sprMyLocksSearchBar as integer : sprMyLocksSearchBar = OryUICreateSprite("size:100,5.02;position:-1000,-1000;depth:19")
-editMyLocksSearch as integer : editMyLocksSearch = OryUICreateTextfield("labelText:Search your locks and keyholders...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:cancel;depth:18")
+editMyLocksSearch as integer : editMyLocksSearch = OryUICreateTextfield("labelText:Search your locks and keyholders...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:clear;depth:18")
 
 // DIALOG
 screen[screenNo].dialog = OryUICreateDialog("autoHeight:true")

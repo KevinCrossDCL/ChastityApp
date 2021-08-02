@@ -13,7 +13,7 @@ sprLoginAppTitle as integer : sprLoginAppTitle = OryUICreateSprite("size:100,7.8
 // LOGIN USER ID
 btnLoginPasteText as integer : btnLoginPasteText = OryUICreateButton("size:-1,5;text: ;offset:center;color:255,255,255,255;position:-1000,-1000;image:" + str(imgPasteText) + ";depth:18")
 btnLoginCloudText as integer : btnLoginCloudText = OryUICreateButton("size:-1,5;text: ;offset:center;color:255,255,255,255;position:-1000,-1000;image:" + str(imgCloudText) + ";depth:18")
-global editBoxLoginUserID as integer : editBoxLoginUserID = OryUICreateTextfield("labelText:" + constAppName$ + " User ID;showHelperText:true;helperText:e.g. XXXXX-XXXXX-XXXXX-XXXXX;helperTextColor:255,255,255,255;multiline:false;position:-1000,-1000;showTrailingIcon:true;trailingIcon:cancel;width:80;depth:19")
+global editBoxLoginUserID as integer : editBoxLoginUserID = OryUICreateTextfield("labelText:" + constAppName$ + " User ID;showHelperText:true;helperText:e.g. XXXXX-XXXXX-XXXXX-XXXXX;helperTextColor:255,255,255,255;multiline:false;position:-1000,-1000;showTrailingIcon:true;trailingIcon:clear;width:80;depth:19")
 
 // LOGIN BUTTON
 btnLoginUserID as integer : btnLoginUserID = OryUICreateButton("size:40,7;offset:center;text:LOGIN;position:-1000,-1000;depth:19")

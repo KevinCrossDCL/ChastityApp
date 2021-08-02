@@ -4,7 +4,12 @@ if (screenToView = constYourFollowRequestsListScreen)
 		iterationOffset = 0
 		lastFilterCount = -1
 		lastYourFollowRequestsSearchLength as integer : lastYourFollowRequestsSearchLength = 0
-		OryUIUpdateTextfield(editYourFollowRequestsSearch, "inputText:;")
+		if (searchStringFromPreviousScreen$ <> "")
+			OryUIUpdateTextfield(editYourFollowRequestsSearch, "inputText:" + searchStringFromPreviousScreen$)
+		else
+			OryUIUpdateTextfield(editYourFollowRequestsSearch, "inputText:;")
+		endif
+		searchStringFromPreviousScreen$ = ""
 	endif
 	screenNo = constYourFollowRequestsListScreen
 	
@@ -34,8 +39,6 @@ if (screenToView = constYourFollowRequestsListScreen)
 	endif
 	elementY# = elementY# + OryUIGetTopBarHeight(screen[screenNo].topBar)
 	
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
 		GetYourRelations(1)
@@ -46,7 +49,7 @@ if (screenToView = constYourFollowRequestsListScreen)
 	if (yourFriends.pendingByYou.length >= 0 or OryUIFindNameInHTTPSQueue(httpsQueue, "GetYourRelations"))
 		if (redrawScreen = 1)
 			OryUIUpdateSprite(sprYourFollowRequestsSearchBar, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor))
-			OryUIUpdateTextfield(editYourFollowRequestsSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:cancel")
+			OryUIUpdateTextfield(editYourFollowRequestsSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:clear")
 		endif
 		OryUIInsertTextFieldListener(editYourFollowRequestsSearch)
 		if (OryUIGetTextfieldTrailingIconReleased(editYourFollowRequestsSearch))
@@ -66,6 +69,8 @@ if (screenToView = constYourFollowRequestsListScreen)
 		elementY# = elementY# + 2
 	endif
 
+	startScrollBarY# = elementY# + 1
+	
 	// PAGE
 	if (redrawScreen = 1)
 		OryUIUpdateSprite(screen[screenNo].sprPage, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";alpha:0")

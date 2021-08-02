@@ -70,6 +70,7 @@ type typeBotsData
 	phrase$ as string
 	rating# as float
 	noOfRatings as integer
+	totalManaged as integer
 endtype	
 
 type typeCard
@@ -241,12 +242,14 @@ endtype
 type typeLock
 	sortKey$ as string
 	autoResetsPaused as integer
+	blockBotFromUnlocking as integer
 	blockUsersAlreadyLocked as integer
 	botChosen as integer
 	build as integer
 	cardInfoHidden as integer
 	chancesAccumulatedBeforeFreeze as integer
 	checkInFrequencyInSeconds as integer
+	checkingForUpdates as integer
 	combination$ as string
 	cumulative as integer
 	dateDeleted$ as string
@@ -311,7 +314,9 @@ type typeLock
 	initialYellowMinus1Cards as integer
 	initialYellowMinus2Cards as integer
 	iteration as integer
+	justUnlocked as integer
 	keyDisabled as integer
+	keyholderAllowsFreeUnlock as integer
 	keyholderBuildNumberInstalled as integer
 	keyholderDecisionDisabled as integer
 	keyholderDisabledKey as integer
@@ -329,6 +334,7 @@ type typeLock
 	lateCheckInWindowInSeconds as integer
 	lockFrozenByCard as integer
 	lockFrozenByKeyholder as integer
+	//lockFrozenByLockee as integer
 	lockLog as typeLog[]
 	lockName$ as string
 	maximumAutoResets as integer
@@ -386,11 +392,13 @@ type typeLock
 	timestampEndedCleanTime as integer
 	timestampFrozenByCard as integer
 	timestampFrozenByKeyholder as integer
+	//timestampFrozenByLockee as integer
 	timestampHiddenFromOwner as integer
 	timestampKeyholderRated as integer
 	timestampLastAutoReset as integer
 	timestampLastCardReset as integer
 	timestampLastCheckedIn as integer
+	timestampLastCheckedUpdates as integer
 	timestampLastFullReset as integer
 	timestampLastPicked as integer
 	timestampLastReset as integer
@@ -455,6 +463,8 @@ type typeLockCard
 	sprMoreIcon as integer
 	sprOverlay as integer
 	sprRatingStar as integer[6]
+	sprRestartButton as integer
+	sprRestartIcon as integer
 	sprRibbon as integer
 	sprScrim as integer
 	sprSyncStatus as integer
@@ -585,6 +595,7 @@ endtype
 
 type typeLockUpdates
 	actionUpdate as integer
+	allowFreeUnlockModifiedBy as integer
 	autoResetsPausedModifiedBy as integer
 	cardInfoHiddenModifiedBy as integer
 	cumulativeModifiedBy as integer
@@ -667,26 +678,52 @@ type typeProfileData
 	avatarApproved as integer
 	avatarName$ as string
 	averageRating# as float
+	averageSecondsLocked as integer
 	banned as integer
+	cumulativeSecondsLocked as integer
 	discordDiscriminator as integer
 	discordID$ as string
 	discordUsername$ as string
 	followers as integer
 	following as integer
+	joined$ as string
 	keyholderLevel as integer
 	lockeeLevel as integer
+	longestSecondsLocked as integer
 	mainRoleColour as integer
 	mainRoleLevel$ as string
 	mainRoleSelected as integer
+	noOfLocks as integer
+	noOfLocksCompleted as integer
+	noOfLocksManaged as integer
+	noOfLocksManagingNow as integer
 	noOfRatings as integer
 	privateProfile as integer
+	secondsLockedInCurrentLock as integer
+	showKeyholderStatsOnProfile as integer
+	showLockeeStatsOnProfile as integer
 	statusSelected as integer
+	timestampJoined as integer
 	timestampLastActive as integer
 	twitterHandle$ as string
 	username$ as string
-	visibleInPublicStats as integer
+	visibleInPublicStats as integer		
 endtype
 
+type typeRecentActivity
+	sortKey$ as string
+	id as integer
+	activityType$ as string
+	iteration as integer
+	lockID$ as string
+	mentionedUserID as integer
+	mentionedUsername$ as string
+	readActivity as integer
+	shareID$ as string
+	testLock as integer
+	timestamp as integer
+endtype
+	
 type typeRoleColours
 	admin as integer
 	keyholder as integer[10]
@@ -792,6 +829,8 @@ type typeSharedLockCard
 	minimised as integer
 	sprBackground as integer
 	sprButtonBar as integer
+	sprCloneButton as integer
+	sprCloneIcon as integer
 	sprConfirmButton as integer
 	sprConfirmIcon as integer
 	sprDeleteButton as integer
@@ -834,6 +873,7 @@ type typeSharedLocks
 	sortKey$ as string
 	allowCopies as integer
 	awaitingDecision as integer
+	blockTestLocks as integer
 	blockUsersAlreadyLocked as integer
 	blockUsersWithStatsHidden as integer
 	build as integer
@@ -975,9 +1015,11 @@ type typeSharedLocks
 	usersInitialResetCards as integer[200]
 	usersInitialStickyCards as integer[200]
 	usersInitialYellowCards as integer[200,6]
-	usersKeysDisabled as integer[200]
+	usersKeyholderAllowsFreeUnlock as integer[200]
+	usersKeyholderAllowsFreeUnlockModifiedBy as integer[200]
 	usersKeyholderEmojiChosen as integer[200]
 	usersKeyholderEmojiColourSelected as integer[200]
+	usersKeysDisabled as integer[200]
 	usersLastActive as integer[200]
 	usersLastUpdateHidden as integer[200]
 	usersLastUpdateIDSeen as integer[200]
@@ -1105,9 +1147,11 @@ type typeSharedLockUsers
 	usersInitialResetCards as integer
 	usersInitialStickyCards as integer
 	usersInitialYellowCards as integer[6]
-	usersKeysDisabled as integer
+	usersKeyholderAllowsFreeUnlock as integer
+	usersKeyholderAllowsFreeUnlockModifiedBy as integer
 	usersKeyholderEmojiChosen as integer
 	usersKeyholderEmojiColourSelected as integer
+	usersKeysDisabled as integer
 	usersLastActive as integer
 	usersLastUpdateHidden as integer
 	usersLastUpdateIDSeen as integer
@@ -1228,6 +1272,7 @@ type typeURLs
 	GetMyLocksDeleted as string
 	GetOthersRelations as string
 	GetProfileData as string
+	GetRecentActivity as string
 	GetServerVariables as string
 	GetSharedLockInformation as string
 	GetSharedLocksData as string
@@ -1246,6 +1291,8 @@ type typeURLs
 	UpdateAPIProject as string
 	UpdateKeyholdersEmoji as string
 	UpdateLocksDatabase as string
+	UpdateRecentActivityReadFlag as string
+	UpdateRecentActivityReadFlagForAll as string
 	UpdateSharedLock as string
 	UpdateUsername as string
 	UpdateUsersLock as string
@@ -1284,6 +1331,7 @@ type typeUserCard
 	sprFixedHideTimer as integer
 	sprFlagButton as integer
 	sprFlagIcon as integer
+	sprFreeUnlock as integer
 	sprFreezeLockButton as integer
 	sprFreezeLockIcon as integer
 	sprFreezeCard as integer

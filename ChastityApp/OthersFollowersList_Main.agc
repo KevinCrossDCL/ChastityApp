@@ -58,7 +58,7 @@ if (screenToView = constOthersFollowersListScreen)
 	if (othersFriends.followers.length >= 0 or OryUIFindNameInHTTPSQueue(httpsQueue, "GetOthersRelations"))
 		if (redrawScreen = 1)
 			OryUIUpdateSprite(sprOthersFollowersSearchBar, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor))
-			OryUIUpdateTextfield(editOthersFollowersSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:cancel")
+			OryUIUpdateTextfield(editOthersFollowersSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:clear")
 		endif
 		OryUIInsertTextFieldListener(editOthersFollowersSearch)
 		if (OryUIGetTextfieldTrailingIconReleased(editOthersFollowersSearch))

@@ -98,8 +98,6 @@ if (screenToView = constManageLockedUsersScreen)
 	OryUIUpdateSprite(sprFilterLockedUsersBarShadow, "position:" + str(screenNo * 100) + "," + str(GetViewOffsetY() + elementY# + GetSpriteHeight(sprFilterLockedUsersBar)))
 	elementY# = elementY# + GetSpriteHeight(sprFilterLockedUsersBar) //+ 2
 	
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
 		GetSharedLockUsersData(sharedLocks[sharedLockSelected, 0].shareID$, 1, 1)
@@ -354,38 +352,43 @@ if (screenToView = constManageLockedUsersScreen)
 			endif
 		else
 			if (sharedLocks[sharedLockSelected, 0].checkInFrequencyInSeconds > 0)
+				OryUISetMenuItemCount(menuSortLockedUsers, 8)
+				OryUIUpdateMenuItem(menuSortLockedUsers, 1, "name:SortLockedUsersByDurationLocked;text:Duration Locked;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 2, "name:SortLockedUsersByLastOnline;text:Last Online;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 3, "name:SortLockedUsersByLastUpdated;text:Last Updated;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 4, "name:SortLockedUsersByLateCheckIns;text:Late Check-Ins;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 5, "name:SortLockedUsersByRandom;text:Random;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 6, "name:SortLockedUsersByUsername;text:Username;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 7, "name:SortLockedUsersByUserRating;text:User Rating;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 8, "text: ;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";rightIconID:" + str(imgBlank))
+				if (sortLockedUsersBy$ = "SortLockedUsersByDurationLocked") then OryUIUpdateMenuItem(menuSortLockedUsers, 1, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByLastOnline") then OryUIUpdateMenuItem(menuSortLockedUsers, 2, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByLastUpdated") then OryUIUpdateMenuItem(menuSortLockedUsers, 3, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByLateCheckIns") then OryUIUpdateMenuItem(menuSortLockedUsers, 4, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByRandom")
+					OryUIUpdateMenuItem(menuSortLockedUsers, 5, "rightIconID:" + str(imgTickIcon))
+					OryUISetMenuItemCount(menuSortLockedUsers, 7)
+				endif
+				if (sortLockedUsersBy$ = "SortLockedUsersByUsername") then OryUIUpdateMenuItem(menuSortLockedUsers, 6, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByUserRating") then OryUIUpdateMenuItem(menuSortLockedUsers, 7, "rightIconID:" + str(imgTickIcon))
+			else
 				OryUISetMenuItemCount(menuSortLockedUsers, 7)
 				OryUIUpdateMenuItem(menuSortLockedUsers, 1, "name:SortLockedUsersByDurationLocked;text:Duration Locked;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 2, "name:SortLockedUsersByLastUpdated;text:Last Updated;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 3, "name:SortLockedUsersByLateCheckIns;text:Late Check-Ins;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 2, "name:SortLockedUsersByLastOnline;text:Last Online;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateMenuItem(menuSortLockedUsers, 3, "name:SortLockedUsersByLastUpdated;text:Last Updated;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateMenuItem(menuSortLockedUsers, 4, "name:SortLockedUsersByRandom;text:Random;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateMenuItem(menuSortLockedUsers, 5, "name:SortLockedUsersByUsername;text:Username;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateMenuItem(menuSortLockedUsers, 6, "name:SortLockedUsersByUserRating;text:User Rating;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateMenuItem(menuSortLockedUsers, 7, "text: ;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";rightIconID:" + str(imgBlank))
 				if (sortLockedUsersBy$ = "SortLockedUsersByDurationLocked") then OryUIUpdateMenuItem(menuSortLockedUsers, 1, "rightIconID:" + str(imgTickIcon))
-				if (sortLockedUsersBy$ = "SortLockedUsersByLastUpdated") then OryUIUpdateMenuItem(menuSortLockedUsers, 2, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByLastOnline") then OryUIUpdateMenuItem(menuSortLockedUsers, 2, "rightIconID:" + str(imgTickIcon))
+				if (sortLockedUsersBy$ = "SortLockedUsersByLastUpdated") then OryUIUpdateMenuItem(menuSortLockedUsers, 3, "rightIconID:" + str(imgTickIcon))
 				if (sortLockedUsersBy$ = "SortLockedUsersByRandom")
 					OryUIUpdateMenuItem(menuSortLockedUsers, 4, "rightIconID:" + str(imgTickIcon))
 					OryUISetMenuItemCount(menuSortLockedUsers, 6)
 				endif
 				if (sortLockedUsersBy$ = "SortLockedUsersByUsername") then OryUIUpdateMenuItem(menuSortLockedUsers, 5, "rightIconID:" + str(imgTickIcon))
 				if (sortLockedUsersBy$ = "SortLockedUsersByUserRating") then OryUIUpdateMenuItem(menuSortLockedUsers, 6, "rightIconID:" + str(imgTickIcon))
-			else
-				OryUISetMenuItemCount(menuSortLockedUsers, 6)
-				OryUIUpdateMenuItem(menuSortLockedUsers, 1, "name:SortLockedUsersByDurationLocked;text:Duration Locked;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 2, "name:SortLockedUsersByLastUpdated;text:Last Updated;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 3, "name:SortLockedUsersByRandom;text:Random;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 4, "name:SortLockedUsersByUsername;text:Username;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 5, "name:SortLockedUsersByUserRating;text:User Rating;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";rightIconID:" + str(imgBlank) + ";rightIconColoriD:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateMenuItem(menuSortLockedUsers, 6, "text: ;colorID:" + str(colorMode[colorModeSelected].menuColor) + ";rightIconID:" + str(imgBlank))
-				if (sortLockedUsersBy$ = "SortLockedUsersByDurationLocked") then OryUIUpdateMenuItem(menuSortLockedUsers, 1, "rightIconID:" + str(imgTickIcon))
-				if (sortLockedUsersBy$ = "SortLockedUsersByLastUpdated") then OryUIUpdateMenuItem(menuSortLockedUsers, 2, "rightIconID:" + str(imgTickIcon))
-				if (sortLockedUsersBy$ = "SortLockedUsersByRandom")
-					OryUIUpdateMenuItem(menuSortLockedUsers, 3, "rightIconID:" + str(imgTickIcon))
-					OryUISetMenuItemCount(menuSortLockedUsers, 5)
-				endif
-				if (sortLockedUsersBy$ = "SortLockedUsersByUsername") then OryUIUpdateMenuItem(menuSortLockedUsers, 4, "rightIconID:" + str(imgTickIcon))
-				if (sortLockedUsersBy$ = "SortLockedUsersByUserRating") then OryUIUpdateMenuItem(menuSortLockedUsers, 5, "rightIconID:" + str(imgTickIcon))
 			endif
 		endif
 		OryUIShowMenu(menuSortLockedUsers, OryUIGetButtonX(btnIconSortLockedUsers), OryUIGetButtonY(btnIconSortLockedUsers) + OryUIGetButtonHeight(btnIconSortLockedUsers))
@@ -484,6 +487,8 @@ if (screenToView = constManageLockedUsersScreen)
 		elementY# = elementY# + 2
 	endif
 	
+	startScrollBarY# = elementY# - 1
+	
 	// SORT LOCKED USERS
 	if (redrawScreen = 1 or len(OryUIGetTextFieldString(editLockedUsersSearch)) <> lastLockedUsersSearchLength)
 		lastLockedUsersSearchLength = len(OryUIGetTextFieldString(editLockedUsersSearch))
@@ -498,13 +503,13 @@ if (screenToView = constManageLockedUsersScreen)
 	
 	// NO LOCKED USERS
 	if (sharedLocks[sharedLockSelected, 0].lockedUsers = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoLockedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			OryUIUpdateText(txtNoLockedUsers, "text:No Locked Users;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		endif
 	elseif (filterCount = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoLockedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			if (filterLockedUsersExcludeTestLocks = 0)
@@ -617,6 +622,20 @@ if (screenToView = constManageLockedUsersScreen)
 							OryUIShowDialog(userCard[i].dialog)
 						endif
 						
+						// FREE UNLOCK
+						if (OryUIGetSpriteReleased() = userCard[i].sprFreeUnlock)
+							userSelected = sortedIteration
+							OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Free Unlock Enabled;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:You have allowed " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + " to unlock for free when they need to.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
+							OryUISetDialogButtonCount(userCard[i].dialog, 2)
+							OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+							OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreeUnlock;text:Cancel Free Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+							OryUIShowDialog(userCard[i].dialog)
+						endif
+						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "CancelFreeUnlock"))
+							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersKeyholderAllowsFreeUnlockModifiedBy[userSelected] = -1
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "", 0, 0, 0)
+						endif
+						
 						// FAKE LOCK
 						if (OryUIGetSpriteReleased() = userCard[i].sprFakeLock)
 							OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Fake Lock;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:This is one of the fake locks. When it ends the combination revealed will be a fake one. It's recommended that you also update fake locks so that the lockee has no idea which is the real one;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
@@ -654,37 +673,78 @@ if (screenToView = constManageLockedUsersScreen)
 									endif
 								else
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = -1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UnfrozeLock", 0, 1)
+									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UnfrozeLock", 0, 0, 1)
 								endif
 							else
-								if (freezeLockAlertHidden = 0)
+								autoResetPending = 0
+								noOfAutoResetsLeft = 0
+								if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMaxAutoResets[sortedIteration] > 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersResetFrequencyInSeconds[sortedIteration] > 0)
+									secondsSinceLastReset = 0
+									if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastAutoReset[sortedIteration] > 0 or sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[sortedIteration] > 0)
+										secondsSinceLastReset = timestampNow - MaxInt(sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastAutoReset[sortedIteration], sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastFullReset[sortedIteration])
+									else
+										secondsSinceLastReset = timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[sortedIteration]
+									endif
+									noOfAutoResetsPassedSinceLast = floor(secondsSinceLastReset / sharedLocks[sharedLockSelected, selectedManageUsersTab].usersResetFrequencyInSeconds[sortedIteration])
+									if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPaused[sortedIteration] = 0)
+										noOfAutoResetsLeft = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMaxAutoResets[sortedIteration] - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersNoOfTimesAutoReset[sortedIteration] - noOfAutoResetsPassedSinceLast
+										if (noOfAutoResetsPassedSinceLast > noOfAutoResetsLeft) then noOfAutoResetsPassedSinceLast = noOfAutoResetsLeft
+									else
+										noOfAutoResetsLeft = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMaxAutoResets[sortedIteration] - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersNoOfTimesAutoReset[sortedIteration]
+									endif
+									secondsLeftUntilAutoReset = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersResetFrequencyInSeconds[sortedIteration] - secondsSinceLastReset
+								endif
+								if (noOfAutoResetsLeft > 0 and sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPaused[sortedIteration] = 0)
 									dialogShown$ = "Freeze"
 									if (sharedLocks[sharedLockSelected, 0].fixed = 0)
-										OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen they will not be able to pick any cards until you unfreeze it.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:true;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
-										OryUISetDialogButtonCount(userCard[i].dialog, 2)
-										OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
-										OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen they will not be able to pick any cards until you unfreeze it." + chr(10) + chr(10) + "When this lock auto resets it will unfreeze the lock. To stop this from happening you will need to pause the auto resets first.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+										OryUISetDialogButtonCount(userCard[i].dialog, 3)
+										OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Freeze Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesPauseAutoResets;text:Pause Auto Resets;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialogButton(userCard[i].dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
 										OryUIShowDialog(userCard[i].dialog)
 									else
-										OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen the countdown timer will remain frozen until you unfreeze it.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:true;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
-										OryUISetDialogButtonCount(userCard[i].dialog, 2)
-										OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
-										OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen the countdown timer will remain frozen until you unfreeze it." + chr(10) + chr(10) + "When this lock auto resets it will unfreeze the lock. To stop this from happening you will need to pause the auto resets first.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+										OryUISetDialogButtonCount(userCard[i].dialog, 3)
+										OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Freeze Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesPauseAutoResets;text:Pause Auto Resets;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialogButton(userCard[i].dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
 										OryUIShowDialog(userCard[i].dialog)
 									endif
 								else
-									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = 1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:FrozeLock", 0, 1)
+									if (freezeLockAlertHidden = 0)
+										dialogShown$ = "Freeze"
+										if (sharedLocks[sharedLockSelected, 0].fixed = 0)
+											OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen they will not be able to pick any cards until you unfreeze it.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:true;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
+											OryUISetDialogButtonCount(userCard[i].dialog, 2)
+											OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+											OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+											OryUIShowDialog(userCard[i].dialog)
+										else
+											OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Once frozen the countdown timer will remain frozen until you unfreeze it.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:true;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
+											OryUISetDialogButtonCount(userCard[i].dialog, 2)
+											OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+											OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelFreezeUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+											OryUIShowDialog(userCard[i].dialog)
+										endif
+									else
+										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = 1
+										UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:FrozeLock", 0, 0, 1)
+									endif
 								endif
 							endif
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesUnfreezeUser"))
-							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = -1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UnfrozeLock", 0, 1)
+							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[userSelected] = -1
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UnfrozeLock", 0, 0, 1)
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesFreezeUser"))
-							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = 1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:FrozeLock", 0, 1)
+							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[userSelected] = 1
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:FrozeLock", 0, 0, 1)
+						endif
+						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesPauseAutoResets"))
+							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersAutoResetsPausedModifiedBy[userSelected] = 1
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:AutoResetsPaused", 0, 0, 1)
 						endif
 						if (OryUIGetDialogChecked(userCard[i].dialog) and dialogShown$ = "Freeze")
 							freezeLockAlertHidden = 1
@@ -705,7 +765,7 @@ if (screenToView = constManageLockedUsersScreen)
 									OryUIShowDialog(userCard[i].dialog)
 								else
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCardInfoHiddenModifiedBy[sortedIteration] = -1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedCardInfo", 0, 1)
+									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedCardInfo", 0, 0, 1)
 								endif
 							else
 								if (hideCardInfoAlertHidden = 0)
@@ -717,17 +777,17 @@ if (screenToView = constManageLockedUsersScreen)
 									OryUIShowDialog(userCard[i].dialog)
 								else
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCardInfoHiddenModifiedBy[sortedIteration] = 1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidCardInfo", 0, 1)
+									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidCardInfo", 0, 0, 1)
 								endif
 							endif
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesRevealCardInfo"))
 							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCardInfoHiddenModifiedBy[sortedIteration] = -1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedCardInfo", 0, 1)
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedCardInfo", 0, 0, 1)
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesHideCardInfo"))
 							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersCardInfoHiddenModifiedBy[sortedIteration] = 1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidCardInfo", 0, 1)
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidCardInfo", 0, 0, 1)
 						endif
 						if (OryUIGetDialogChecked(userCard[i].dialog) and dialogShown$ = "HideCardInfo")
 							hideCardInfoAlertHidden = 1
@@ -748,7 +808,7 @@ if (screenToView = constManageLockedUsersScreen)
 									OryUIShowDialog(userCard[i].dialog)
 								else
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimerHiddenModifiedBy[sortedIteration] = -1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedTimer", 0, 1)
+									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedTimer", 0, 0, 1)
 								endif
 							else
 								if (hideTimerAlertHidden = 0)
@@ -760,17 +820,17 @@ if (screenToView = constManageLockedUsersScreen)
 									OryUIShowDialog(userCard[i].dialog)
 								else
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimerHiddenModifiedBy[sortedIteration] = 1
-									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidTimer", 0, 1)
+									UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidTimer", 0, 0, 1)
 								endif
 							endif
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesRevealTimer"))
 							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimerHiddenModifiedBy[sortedIteration] = -1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedTimer", 0, 1)
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:RevealedTimer", 0, 0, 1)
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesHideTimer"))
 							sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimerHiddenModifiedBy[sortedIteration] = 1
-							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidTimer", 0, 1)
+							UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:HidTimer", 0, 0, 1)
 						endif
 						if (OryUIGetDialogChecked(userCard[i].dialog) and dialogShown$ = "HideTimer")
 							hideTimerAlertHidden = 1
@@ -899,19 +959,28 @@ if (screenToView = constManageLockedUsersScreen)
 						// RESET USER
 						if (OryUIGetSpriteReleased() = userCard[i].sprResetButton or OryUIGetSpriteReleased() = userCard[i].sprResetIcon)
 							if (sharedLocks[sharedLockSelected, 0].fixed = 0)
-								OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reset Users Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to reset the lock belonging to " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Resetting it will start the lock again with the initial settings and card counts. It will not reset the total time locked.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+								OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reset Users Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to reset the lock belonging to " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "?" + chr(10) + chr(10) + "Resetting it will start the lock again with the initial settings and card counts. It will not reset the total time locked.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 								OryUISetDialogButtonCount(userCard[i].dialog, 2)
 								OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesResetUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
 								OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelResetUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
 								OryUIShowDialog(userCard[i].dialog)
 								userSelected = sortedIteration
 							else
-								OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reset Users Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to reset the lock belonging to " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Resetting it will start the timer again. It will not reset the total time locked.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-								OryUISetDialogButtonCount(userCard[i].dialog, 2)
-								OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesResetUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
-								OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelResetUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
-								OryUIShowDialog(userCard[i].dialog)
-								userSelected = sortedIteration
+								if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)
+									OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reset Users Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to reset the lock belonging to " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "?" + chr(10) + chr(10) + "Resetting it will start the timer again with a random time between the minimum and maximum originally set on this parent lock. It will not reset the total time locked.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+									OryUISetDialogButtonCount(userCard[i].dialog, 2)
+									OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesResetUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelResetUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									OryUIShowDialog(userCard[i].dialog)
+									userSelected = sortedIteration
+								else
+									OryUIUpdateDialog(userCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reset Users Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to reset the lock belonging to " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[sortedIteration] + "? Resetting it will start the timer again. It will not reset the total time locked.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+									OryUISetDialogButtonCount(userCard[i].dialog, 2)
+									OryUIUpdateDialogButton(userCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesResetUser;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									OryUIUpdateDialogButton(userCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelResetUser;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									OryUIShowDialog(userCard[i].dialog)
+									userSelected = sortedIteration
+								endif
 							endif
 						endif
 						if (OryUIGetDialogButtonReleasedByName(userCard[i].dialog, "YesResetUser"))
@@ -959,16 +1028,17 @@ if (screenToView = constManageLockedUsersScreen)
 								if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByCard[sortedIteration] = 1 or sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholder[sortedIteration] = 1)
 									sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = -1
 								endif
-								UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:ResetLock", 0, 1)
+								UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:ResetLock", 0, 0, 1)
 							else
 								sharedLocks[sharedLockSelected, selectedManageUsersTab].usersReset[sortedIteration] = 1
 								if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)
 									minutesLocked as integer : minutesLocked = (timestampNow - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLocked[sortedIteration]) / 60
 									minutesLeft as integer : minutesLeft = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMinutes[sortedIteration] - minutesLocked + (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTotalTimeFrozen[sortedIteration] / 60)
+									randomMinutes as integer : randomMinutes = random2(sharedLocks[sharedLockSelected, 0].minRandomMinutes, sharedLocks[sharedLockSelected, 0].maxRandomMinutes)
 									if (minutesLeft > sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration])
-										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMinutesModifiedBy[sortedIteration] = -(minutesLeft - sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration])
+										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMinutesModifiedBy[sortedIteration] = -(minutesLeft - randomMinutes)//sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration])
 									elseif (minutesLeft < sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration])
-										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMinutesModifiedBy[sortedIteration] = sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration] - minutesLeft
+										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersMinutesModifiedBy[sortedIteration] = randomMinutes - minutesLeft //sharedLocks[sharedLockSelected, selectedManageUsersTab].usersInitialMinutes[sortedIteration] - minutesLeft
 									endif
 									if (sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholder[sortedIteration] = 1)
 										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = -1
@@ -985,7 +1055,7 @@ if (screenToView = constManageLockedUsersScreen)
 										sharedLocks[sharedLockSelected, selectedManageUsersTab].usersLockFrozenByKeyholderModifiedBy[sortedIteration] = -1
 									endif
 								endif
-								UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:ResetLock", 0, 1)
+								UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:ResetLock", 0, 0, 1)
 							endif
 						endif
 						

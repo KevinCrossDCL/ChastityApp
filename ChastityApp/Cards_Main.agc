@@ -5,7 +5,7 @@ if (screenToView = constCardsScreen)
 		cardIndexToSlideOutAfterMovedTo as integer : cardIndexToSlideOutAfterMovedTo = 0
 		OryUISetPaginationSelectedPage(cardPages, 1)
 		if (imgFeltBackground = 0) then imgFeltBackground = LoadImage("FeltBackground.jpg")
-		if (locks[lockSelected].lockFrozenByCard = 1 or locks[lockSelected].lockFrozenByKeyholder = 1)
+		if (locks[lockSelected].lockFrozenByCard = 1 or locks[lockSelected].lockFrozenByKeyholder = 1) // or locks[lockSelected].lockFrozenByLockee = 1)
 			SetScreenToView(constMyLocksScreen)
 		endif
 		showEndOfLockDialog as integer : showEndOfLockDialog = 0
@@ -494,14 +494,25 @@ if (screenToView = constCardsScreen)
 		DealDeck()
 	endif
 	chancesPassed as integer : chancesPassed = 0
-	if (locks[lockSelected].regularity# = 0.016667) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 60)
-	if (locks[lockSelected].regularity# = 0.25) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 900)
-	if (locks[lockSelected].regularity# = 0.5) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 1800)
-	if (locks[lockSelected].regularity# = 1) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 3600)	
-	if (locks[lockSelected].regularity# = 3) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 10800)	
-	if (locks[lockSelected].regularity# = 6) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 21600)	
-	if (locks[lockSelected].regularity# = 12) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 43200)	
-	if (locks[lockSelected].regularity# = 24) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 86400)
+	if (locks[lockSelected].timestampLastFullReset > locks[lockSelected].timestampLocked)
+		if (locks[lockSelected].regularity# = 0.016667) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 60)
+		if (locks[lockSelected].regularity# = 0.25) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 900)
+		if (locks[lockSelected].regularity# = 0.5) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 1800)
+		if (locks[lockSelected].regularity# = 1) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 3600)	
+		if (locks[lockSelected].regularity# = 3) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 10800)	
+		if (locks[lockSelected].regularity# = 6) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 21600)	
+		if (locks[lockSelected].regularity# = 12) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 43200)	
+		if (locks[lockSelected].regularity# = 24) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLastFullReset) / 86400)
+	else
+		if (locks[lockSelected].regularity# = 0.016667) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 60)
+		if (locks[lockSelected].regularity# = 0.25) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 900)
+		if (locks[lockSelected].regularity# = 0.5) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 1800)
+		if (locks[lockSelected].regularity# = 1) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 3600)	
+		if (locks[lockSelected].regularity# = 3) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 10800)	
+		if (locks[lockSelected].regularity# = 6) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 21600)	
+		if (locks[lockSelected].regularity# = 12) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 43200)	
+		if (locks[lockSelected].regularity# = 24) then chancesPassed = floor((timestampNow - locks[lockSelected].timestampLocked) / 86400)
+	endif
 	for i = 1 to noOfCardSprites + 4
 		if (GetSpriteExists(cards[i].sprite))
 			if (developerShowCards = 1)
@@ -675,6 +686,7 @@ if (screenToView = constCardsScreen)
 					locks[lockSelected].yellowCards = locks[lockSelected].noOfAdd1Cards + locks[lockSelected].noOfAdd2Cards + locks[lockSelected].noOfAdd3Cards + locks[lockSelected].noOfMinus1Cards + locks[lockSelected].noOfMinus2Cards
 					locks[lockSelected].goAgainCards = locks[lockSelected].goAgainCards * 2
 					if (locks[lockSelected].goAgainCards > cappedGoAgainCards) then locks[lockSelected].goAgainCards = cappedGoAgainCards
+					locks[lockSelected].timestampRealLastPicked = timestampNow
 					noOfCards = GetNoOfCards(lockSelected)
 					AddToDiscardPile("DoubleUp", 1)
 					UpdateLocksData(lockSelected)
@@ -685,6 +697,7 @@ if (screenToView = constCardsScreen)
 					inc locks[lockSelected].pickedCountSinceReset
 					inc locks[lockSelected].doubleUpCardsPicked
 					dec locks[lockSelected].doubleUpCards
+					locks[lockSelected].timestampRealLastPicked = timestampNow
 					AddToDiscardPile("DoubleUp", 1)
 					UpdateLocksData(lockSelected)
 					UpdateLocksDatabase(lockSelected, "action:PickedACard;actionedBy:Lockee;result:DoubleUpCard", 0)
@@ -714,8 +727,10 @@ if (screenToView = constCardsScreen)
 				if (locks[lockSelected].chancesAccumulatedBeforeFreeze < 0) then locks[lockSelected].chancesAccumulatedBeforeFreeze = 0
 				locks[lockSelected].lockFrozenByCard = 1
 				locks[lockSelected].lockFrozenByKeyholder = 0
+				//locks[lockSelected].lockFrozenByLockee = 0
 				locks[lockSelected].timestampFrozenByCard = timestampNow
 				locks[lockSelected].timestampLastPicked = timestampNow
+				locks[lockSelected].timestampRealLastPicked = timestampNow
 				if (locks[lockSelected].regularity# = 0.016667) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(120, 240)
 				if (locks[lockSelected].regularity# = 0.25) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(1800, 3600)
 				if (locks[lockSelected].regularity# = 0.5) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(3600, 7200)
@@ -735,6 +750,7 @@ if (screenToView = constCardsScreen)
 				DeleteSprite(cards[cardSpritesIndex].sprite)		
 			elseif (deck[shuffledDeck[cardChosen]].value$ = "GoAgain")
 				dec locks[lockSelected].goAgainCards
+				locks[lockSelected].timestampRealLastPicked = timestampNow
 				AddToDiscardPile("GoAgain", 1)
 				UpdateLocksData(lockSelected)
 				UpdateLocksDatabase(lockSelected, "action:PickedACard;actionedBy:Lockee;result:GoAgainCard", 0)
@@ -750,6 +766,7 @@ if (screenToView = constCardsScreen)
 				inc locks[lockSelected].pickedCountSinceReset
 				dec locks[lockSelected].greenCards
 				inc locks[lockSelected].greensPickedSinceReset
+				locks[lockSelected].timestampRealLastPicked = timestampNow
 				dec noOfCards
 				if (locks[lockSelected].multipleGreensRequired = 0)
 					locks[lockSelected].readyToUnlock = 1
@@ -832,6 +849,7 @@ if (screenToView = constCardsScreen)
 				else
 					locks[lockSelected].timestampLastPicked = timestampNow
 				endif
+				locks[lockSelected].timestampRealLastPicked = timestampNow
 				locks[lockSelected].dateLastPicked$ = dateFromServer$
 				if (locks[lockSelected].regularity# = 0.016667) then secondsLeft = (locks[lockSelected].timestampLastPicked + 60) - timestampNow
 				if (locks[lockSelected].regularity# = 0.25) then secondsLeft = (locks[lockSelected].timestampLastPicked + 900) - timestampNow
@@ -841,7 +859,6 @@ if (screenToView = constCardsScreen)
 				if (locks[lockSelected].regularity# = 6) then secondsLeft = (locks[lockSelected].timestampLastPicked + 21600) - timestampNow
 				if (locks[lockSelected].regularity# = 12) then secondsLeft = (locks[lockSelected].timestampLastPicked + 43200) - timestampNow
 				if (locks[lockSelected].regularity# = 24) then secondsLeft = (locks[lockSelected].timestampLastPicked + 86400) - timestampNow
-				locks[lockSelected].timestampRealLastPicked = timestampNow
 				AddToDiscardPile("Red", 1)
 				UpdateLocksData(lockSelected)
 				UpdateLocksDatabase(lockSelected, "action:PickedACard;actionedBy:Lockee;result:RedCard", 0)
@@ -963,6 +980,7 @@ if (screenToView = constCardsScreen)
 						if (locks[lockSelected].redCards < cappedRedCards - 2) then locks[lockSelected].redCards = locks[lockSelected].redCards + 3
 						AddToDiscardPile("YellowAdd3", 1)
 					endif
+					locks[lockSelected].timestampRealLastPicked = timestampNow
 					locks[lockSelected].yellowCards = locks[lockSelected].noOfAdd1Cards + locks[lockSelected].noOfAdd2Cards + locks[lockSelected].noOfAdd3Cards + locks[lockSelected].noOfMinus1Cards + locks[lockSelected].noOfMinus2Cards
 					UpdateLocksData(lockSelected)
 					UpdateLocksDatabase(lockSelected, "action:PickedACard;actionedBy:Lockee;result:" + deck[shuffledDeck[cardChosen]].value$ + "Card", 0)
@@ -983,6 +1001,7 @@ if (screenToView = constCardsScreen)
 						if (locks[lockSelected].redCards < 0) then locks[lockSelected].redCards = 0
 						AddToDiscardPile("YellowMinus2", 1)
 					endif
+					locks[lockSelected].timestampRealLastPicked = timestampNow
 					UpdateLocksData(lockSelected)
 					UpdateLocksDatabase(lockSelected, "action:PickedACard;actionedBy:Lockee;result:" + deck[shuffledDeck[cardChosen]].value$ + "Card", 0)
 				endif
@@ -1039,53 +1058,59 @@ if (screenToView = constCardsScreen)
 	if (showEndOfLockDialog = 1)
 		showEndOfLockDialog = 0
 		noOfCards = GetNoOfCards(lockSelected)
-		local showPutGreenBackOption as integer
-		if (noOfCards = 0 or locks[lockSelected].fixed = 1)
-			showPutGreenBackOption = 0
-		else
+		local showPutGreenBackOption as integer : showPutGreenBackOption = 0
+		local showDeclineUnlockOption as integer : showDeclineUnlockOption = 0
+		if (GetNoOfCards(lockSelected) > 0 and locks[lockSelected].greenCards = 0)
 			showPutGreenBackOption = 1
+		endif
+		if (GetNoOfCards(lockSelected) > locks[lockSelected].greenCards and locks[lockSelected].greenCards > 0)
+			showDeclineUnlockOption = 1
 		endif
 		if (locks[lockSelected].multipleGreensRequired = 0)
 			if (locks[lockSelected].keyholderDecisionDisabled = 0 and ((locks[lockSelected].keyholderBuildNumberInstalled >= 115 and locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0 and locks[lockSelected].removedByKeyholder = 0) or locks[lockSelected].botChosen > 0))
 				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Congratulations, you've found the green card needed to unlock. You can now reveal the combination!" + chr(10) + chr(10) + "Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-				OryUISetDialogButtonCount(dialog, 5 + showPutGreenBackOption)
+				OryUISetDialogButtonCount(dialog, 5 + showPutGreenBackOption + showDeclineUnlockOption)
 				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:RevealCombination;text:Reveal Combination;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ResetLock;text:Reset Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:SurpriseMe;text:Surprise Me;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateDialogButton(dialog, 4, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:LetKeyholderDecide;text:Let Keyholder Decide;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				if (showDeclineUnlockOption = 1) then OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Decline Unlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIShowDialog(dialog)
 			else
 				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Congratulations, you've found the green card needed to unlock. You can now reveal the combination!" + chr(10) + chr(10) + "Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-				OryUISetDialogButtonCount(dialog, 4 + showPutGreenBackOption)
+				OryUISetDialogButtonCount(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption)
 				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:RevealCombination;text:Reveal Combination;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ResetLock;text:Reset Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:SurpriseMe;text:Surprise Me;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
-				OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				if (showDeclineUnlockOption = 1) then OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + showDeclineUnlockOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeclineUnlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+				OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + showDeclineUnlockOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIShowDialog(dialog)
 			endif
 		else
 			if (locks[lockSelected].greenCards = 0)
-				if (locks[lockSelected].keyholderDecisionDisabled = 0 and (locks[lockSelected].keyholderBuildNumberInstalled >= 115 and locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0))
+				if (locks[lockSelected].keyholderDecisionDisabled = 0 and ((locks[lockSelected].keyholderBuildNumberInstalled >= 115 and locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0 and locks[lockSelected].removedByKeyholder = 0) or locks[lockSelected].botChosen > 0))
 					OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Congratulations, you've found all of the green cards needed to unlock. You can now reveal the combination!" + chr(10) + chr(10) + "Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-					OryUISetDialogButtonCount(dialog, 5 + showPutGreenBackOption)
+					OryUISetDialogButtonCount(dialog, 5 + showPutGreenBackOption + showDeclineUnlockOption)
 					OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:RevealCombination;text:Reveal Combination;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ResetLock;text:Reset Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:SurpriseMe;text:Surprise Me;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIUpdateDialogButton(dialog, 4, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:LetKeyholderDecide;text:Let Keyholder Decide;textColorID:" + str(colorMode[colorModeSelected].textColor))
-					if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Last Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
-					OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					if (showDeclineUnlockOption = 1) then OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeclineUnlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateDialogButton(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIShowDialog(dialog)
 				else
 					OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Congratulations, you've found all of the green cards needed to unlock. You can now reveal the combination!" + chr(10) + chr(10) + "Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
-					OryUISetDialogButtonCount(dialog, 4 + showPutGreenBackOption)
+					OryUISetDialogButtonCount(dialog, 4 + showPutGreenBackOption + showDeclineUnlockOption)
 					OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:RevealCombination;text:Reveal Combination;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ResetLock;text:Reset Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIUpdateDialogButton(dialog, 3, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:SurpriseMe;text:Surprise Me;textColorID:" + str(colorMode[colorModeSelected].textColor))
-					if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Last Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
-					OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					if (showPutGreenBackOption = 1) then OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					if (showDeclineUnlockOption = 1) then OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + showDeclineUnlockOption, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DeclineUnlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+					OryUIUpdateDialogButton(dialog, 3 + showPutGreenBackOption + showDeclineUnlockOption + 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
 					OryUIShowDialog(dialog)
 				endif
 			endif
@@ -1143,6 +1168,23 @@ if (screenToView = constCardsScreen)
 		OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
 		OryUIShowDialog(screen[screenNo].dialog)
 	endif
+	if (dialogButtonReleased$ = "DeclineUnlock")
+		if (locks[lockSelected].multipleGreensRequired = 0)
+			dialogButtonReleased$ = ""
+			OryUIUpdateDialog(screen[screenNo].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Are You Sure?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to continue the lock to find one green?;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+			OryUISetDialogButtonCount(screen[screenNo].dialog, 2)
+			OryUIUpdateDialogButton(screen[screenNo].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ConfirmedDeclineUnlock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIShowDialog(screen[screenNo].dialog)
+		else
+			dialogButtonReleased$ = ""
+			OryUIUpdateDialog(screen[screenNo].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Are You Sure?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to continue the lock to find the remaining greens?;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+			OryUISetDialogButtonCount(screen[screenNo].dialog, 2)
+			OryUIUpdateDialogButton(screen[screenNo].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ConfirmedDeclineUnlock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIShowDialog(screen[screenNo].dialog)
+		endif
+	endif
 	if (screenDialogButtonReleased$ = "CancelConfirm")
 		showEndOfLockDialog = 1
 	endif
@@ -1191,6 +1233,7 @@ if (screenToView = constCardsScreen)
 		inc locks[lockSelected].noOfTimesReset
 		locks[lockSelected].lockFrozenByCard = 0
 		locks[lockSelected].lockFrozenByKeyholder = 0	
+		//locks[lockSelected].lockFrozenByLockee = 0	
 		locks[lockSelected].readyToUnlock = 0
 		locks[lockSelected].pickedCountSinceReset = 0
 		locks[lockSelected].greenCards = locks[lockSelected].initialGreenCards
@@ -1265,6 +1308,27 @@ if (screenToView = constCardsScreen)
 		locks[lockSelected].readyToUnlock = 0
 		UpdateLocksData(lockSelected)
 		UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:PutGreenBack", 0)
+		cardSelected = 0
+		cardChosen = 0
+		ShuffleDeck(25)
+	endif
+	if (screenDialogButtonReleased$ = "ConfirmedDeclineUnlock")
+		screenDialogButtonReleased$ = ""
+		tweenSprite = CreateTweenSprite(0.2)
+		SetTweenSpriteSizeX(tweenSprite, GetSpriteWidth(largeCard.sprite), cardWidth# / GetDisplayAspect(), TweenLinear())
+		SetTweenSpriteSizeY(tweenSprite, GetSpriteHeight(largeCard.sprite), cardHeight#, TweenLinear())
+		SetTweenSpriteXByOffset(tweenSprite, GetSpriteXByOffset(largeCard.sprite), GetViewOffsetX() + 50, TweenLinear())
+		SetTweenSpriteYByOffset(tweenSprite, GetSpriteYByOffset(largeCard.sprite), GetViewOffsetY() + screenBoundsTop# + 50, TweenLinear())
+		PlayTweenSprite(tweenSprite, largeCard.sprite, 0)
+		while (GetTweenSpritePlaying(tweenSprite, largeCard.sprite))
+			UpdateAllTweens(GetFrameTime())
+			Sync()
+		endwhile
+		ClearLargeCard()
+		dec locks[lockSelected].greensPickedSinceReset
+		locks[lockSelected].readyToUnlock = 0
+		UpdateLocksData(lockSelected)
+		UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:DeclinedUnlock", 0)
 		cardSelected = 0
 		cardChosen = 0
 		ShuffleDeck(25)

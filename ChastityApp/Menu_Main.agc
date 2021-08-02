@@ -46,7 +46,7 @@ oryUIDefaults.navigationDrawerOptionTextColor#[2] = 255
 oryUIDefaults.navigationDrawerOptionTextColor#[3] = 255
 oryUIDefaults.navigationDrawerOptionTextColor#[4] = 255
 
-navigationDrawerItems as integer : navigationDrawerItems = 23 // 26
+navigationDrawerItems as integer : navigationDrawerItems = 26 // 26
 
 navigationDrawerItemCount as integer : navigationDrawerItemCount = 0
 if (disableCreationOfNewLocks = 0 and noOfLocks < 20 and offline = 0 and maintenance = 0 and timestampNow > 1500000000) then navigationDrawerItems = navigationDrawerItems + 2
@@ -54,6 +54,7 @@ if (disableCreationOfNewLocks = 0) then navigationDrawerItems = navigationDrawer
 if (offline = 0 and maintenance = 0 and timestampNow > 1500000000) then navigationDrawerItems = navigationDrawerItems + 3
 if (adsRemoved = 0 and offline = 0 and maintenance = 0) then navigationDrawerItems = navigationDrawerItems + 1
 if (GetDeviceBaseName() = "ios") then navigationDrawerItems = navigationDrawerItems + 1
+//~if (allowAccountTransfers = 1 and offline = 0 and maintenance = 0) then navigationDrawerItems = navigationDrawerItems + 1
 OryUISetNavigationDrawerItemCount(navigationDrawer, navigationDrawerItems)
 
 inc navigationDrawerItemCount
@@ -61,7 +62,15 @@ OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "it
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:Profile;itemType:option;text:Profile;rightText:;")
 inc navigationDrawerItemCount
+OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RecentActivity;itemType:option;text:Recent Activity;rightText:;")
+inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:Friends;itemType:option;text:Friends;rightText:;")
+//~if (allowAccountTransfers = 1 and offline = 0 and maintenance = 0)
+//~	inc navigationDrawerItemCount
+//~	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:TransferAccount;itemType:option;text:Transfer Account;rightText:;")
+//~endif
+inc navigationDrawerItemCount
+OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:ShowMyUserID;itemType:option;text:Show My User ID;rightText:;")
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:LogOut;itemType:option;text:Log Out;rightText:;")
 
@@ -77,7 +86,11 @@ inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:MyLocks;itemType:option;text:View Locks;rightText:;")
 if (noOfLocks < 20 and offline = 0 and maintenance = 0 and timestampNow > 1500000000)
 	inc navigationDrawerItemCount
-	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:MyLocksDeleted;itemType:option;text:Deleted Locks;rightText:;")
+	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:MyLocksDeleted;itemType:option;text:My Deleted Locks;rightText:;")
+endif
+if (offline = 0 and maintenance = 0 and timestampNow > 1500000000)
+	inc navigationDrawerItemCount
+	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RefreshLocksFromServer;itemType:option;text:Refresh Locks From Server;rightText:;")
 endif
 
 inc navigationDrawerItemCount
@@ -90,7 +103,7 @@ inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:SharedLocks;itemType:option;text:View My Shared Locks;rightText:;")
 if (offline = 0 and maintenance = 0 and timestampNow > 1500000000)
 	inc navigationDrawerItemCount
-	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:SharedLocksDeleted;itemType:option;text:Deleted Locks;rightText:;")
+	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:SharedLocksDeleted;itemType:option;text:Deleted Shared Locks;rightText:;")
 endif
 
 inc navigationDrawerItemCount
@@ -104,18 +117,24 @@ OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "na
 
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "itemType:subtitle;subtitleText:MORE")
+
+//~inc navigationDrawerItemCount
+//~OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:FindUsers;itemType:option;text:Find Users;rightText:;")
+
 if (disableCreationOfNewLocks = 0)
 	inc navigationDrawerItemCount
 	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:LockTemplates;itemType:option;text:Lock Templates;rightText:;")
 endif
+inc navigationDrawerItemCount
+OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RandomCombinations;itemType:option;text:Random Combinations;rightText:;")
 if (adsRemoved = 0 and offline = 0 and maintenance = 0)
 	inc navigationDrawerItemCount
 	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RemoveAds;itemType:option;text:Remove Ads;rightText:" + GetInAppPurchaseLocalPrice(0))
 endif
-if (GetDeviceBaseName() = "ios")
-	inc navigationDrawerItemCount
-	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RestorePurchases;itemType:option;text:Restore Purchases;rightText:;")
-endif
+//~if (GetDeviceBaseName() = "ios")
+//~	inc navigationDrawerItemCount
+//~	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RestorePurchases;itemType:option;text:Restore Purchases;rightText:;")
+//~endif
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:Settings;itemType:option;text:Settings;rightText:;")
 inc navigationDrawerItemCount
@@ -139,6 +158,10 @@ if (screenNo = constMyLocksScreen) then OryUISetNavigationDrawerItemSelectedByNa
 if (screenNo = constSharedLocksScreen) then OryUISetNavigationDrawerItemSelectedByName(navigationDrawer, "SharedLocks")
 
 OryUIInsertNavigationDrawerListener(navigationDrawer)
+if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "RecentActivity"))
+	GetRecentActivity(1)
+	SetScreenToView(constRecentActivityScreen)
+endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "NewMyLock"))
 	sharedID$ = ""
 	sharedLockName$ = ""
@@ -167,6 +190,11 @@ if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "MyLocksDeleted
 	GetMyLocksDeleted(1)
 	SetScreenToView(constMyLocksDeletedScreen)
 endif
+if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "RefreshLocksFromServer"))
+	RestoreAccount(userID$, 1)
+	//SetScreenToView(constMyLocksDeletedScreen)
+endif
+
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "NewSharedLock"))
 	sharedID$ = ""
 	sharedLockName$ = ""
@@ -189,6 +217,21 @@ endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "Friends"))
 	SetScreenToView(constYourFollowersListScreen)
 endif
+
+if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "ShowMyUserID"))
+	dialogShown$ = "ShowMyUserID"
+	OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Save Your User ID;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + userID$ + chr(10) + chr(10) + "All of your locks are backed up online with the above user id. Please take a note of this unique user id in case you need to restore these locks on a new device, or after a new install. You can restore locks from another user id from the main menu." + chr(10) + chr(10) + "Please note that your user id and username are different and that locks can't be restored without your user id, even if you remember your username." + chr(10) + chr(10) + "Do not share your user id with others.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
+	OryUISetDialogButtonCount(dialog, 2)
+	OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CopyUserID;text:Copy User ID;textColorID:" + str(colorMode[colorModeSelected].textColor))
+	OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+	OryUIShowDialog(dialog)
+endif
+if (OryUIGetDialogButtonReleasedByName(dialog, "CopyUserID"))
+	SetClipboardText(userID$)
+	OryUIUpdateTooltip(tooltip, "text:Copied to clipboard")
+	OryUIShowTooltip(tooltip, GetViewOffsetX() + 50, GetViewOffsetY() + screenBoundsTop# + 90)
+endif
+
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "Buy1Key"))
 	if (PurchaseInApp(1) = 1)
 		SavePurchasedKeys(1)
@@ -208,8 +251,14 @@ if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "Profile"))
 	GetProfileData(userDBRow, 1)			
 	SetScreenToView(constViewProfileScreen)
 endif
+//~if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "FindUsers"))
+//~	SetScreenToView(constFindUsersScreen)
+//~endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "LockTemplates"))
 	SetScreenToView(constLockGeneratorScreen)
+endif
+if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "RandomCombinations"))
+	SetScreenToView(constRandomCombinationsToolScreen)
 endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "Settings"))
 	SetScreenToView(constSettingsScreen)
@@ -242,6 +291,9 @@ if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "RestorePurchas
 		endif
 	endif
 endif
+//~if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "TransferAccount"))
+//~	SetScreenToView(constTransferAccountScreen)
+//~endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "LogOut"))
 	if (logoutAlertHidden = 0)
 		if (oryUIDialogVisible = 0)

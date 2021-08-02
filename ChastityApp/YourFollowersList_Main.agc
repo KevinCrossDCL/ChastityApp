@@ -5,7 +5,12 @@ if (screenToView = constYourFollowersListScreen)
 		iterationOffset = 0
 		lastFilterCount = -1
 		lastYourFollowersSearchLength as integer : lastYourFollowersSearchLength = 0
-		OryUIUpdateTextfield(editYourFollowersSearch, "inputText:;")
+		if (searchStringFromPreviousScreen$ <> "")
+			OryUIUpdateTextfield(editYourFollowersSearch, "inputText:" + searchStringFromPreviousScreen$)
+		else
+			OryUIUpdateTextfield(editYourFollowersSearch, "inputText:;")
+		endif
+		searchStringFromPreviousScreen$ = ""
 	endif
 	screenNo = constYourFollowersListScreen
 	
@@ -50,8 +55,6 @@ if (screenToView = constYourFollowersListScreen)
 	
 	elementY# = elementY# + OryUIGetTabsHeight(screen[screenNo].tabs)
 	
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
 		GetYourRelations(1)
@@ -62,7 +65,7 @@ if (screenToView = constYourFollowersListScreen)
 	if (yourFriends.followers.length >= 0 or OryUIFindNameInHTTPSQueue(httpsQueue, "GetYourRelations"))
 		if (redrawScreen = 1)
 			OryUIUpdateSprite(sprYourFollowersSearchBar, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor))
-			OryUIUpdateTextfield(editYourFollowersSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:cancel")
+			OryUIUpdateTextfield(editYourFollowersSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor) + ";showTrailingIcon:true;trailingIcon:clear")
 		endif
 		OryUIInsertTextFieldListener(editYourFollowersSearch)
 		if (OryUIGetTextfieldTrailingIconReleased(editYourFollowersSearch))
@@ -82,6 +85,8 @@ if (screenToView = constYourFollowersListScreen)
 		elementY# = elementY# + 2
 	endif
 
+	startScrollBarY# = elementY# + 1
+	
 	// PAGE
 	if (redrawScreen = 1)
 		OryUIUpdateSprite(screen[screenNo].sprPage, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";alpha:0")

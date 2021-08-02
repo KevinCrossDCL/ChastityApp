@@ -4,7 +4,7 @@ screenNo = constRandomCombinationsScreen
 TextToSpeechSetup()
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text: ;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text: ;textAlignment:center;depth:10")
 if (GetTextToSpeechReady())
 	OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Audio")
 endif

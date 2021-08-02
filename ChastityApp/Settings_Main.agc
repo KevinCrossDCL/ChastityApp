@@ -122,12 +122,12 @@ if (screenToView = constSettingsScreen)
 	if (OryUIGetButtonGroupItemSelectedIndex(grpSettingsFramesPerSecond) = 1 and fps <> 30)
 		fps = 30
 		SaveLocalVariable("fps", str(fps))
-		SetSyncRate(30, 0)
+		OryUISetSyncRate(30, 0)
 	endif
 	if (OryUIGetButtonGroupItemSelectedIndex(grpSettingsFramesPerSecond) = 2 and fps <> 60)
 		fps = 60
 		SaveLocalVariable("fps", str(fps))
-		SetSyncRate(60, 0)
+		OryUISetSyncRate(60, 0)
 	endif
 	elementY# = elementY# + OryUIGetButtonGroupHeight(grpSettingsFramesPerSecond) + 2
 	

@@ -23,7 +23,7 @@ if (screenToView = constSharedLocksDeletedScreen)
 	
 	// TOP BAR
 	if (redrawScreen = 1)
-		OryUIUpdateTopBar(screen[screenNo].topBar, "text:Deleted Locks" + chr(10) + "Last 30 Days;position:" + str(screenNo * 100) + ",0;colorID:" + str(colorMode[colorModeSelected].topBar))
+		OryUIUpdateTopBar(screen[screenNo].topBar, "text:Deleted Shared Locks" + chr(10) + "Last 30 Days;position:" + str(screenNo * 100) + ",0;colorID:" + str(colorMode[colorModeSelected].topBar))
 	endif
 	OryUIInsertTopBarListener(screen[screenNo].topBar)
 	if (lower(OryUIGetTopBarNavigationReleasedName(screen[screenNo].topBar)) = "back" or (GetRawKeyPressed(27) and OryUITextfieldIDFocused = -1 and OryUIInputSpinnerIDFocused = -1))

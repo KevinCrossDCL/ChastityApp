@@ -6,13 +6,238 @@ if (screenToView = constLockOptionsScreen)
 		if (imgBot02 = 0) then imgBot02 = LoadImage("Bot02.png")
 		if (imgBot03 = 0) then imgBot03 = LoadImage("Bot03.png")
 		if (imgBot04 = 0) then imgBot04 = LoadImage("Bot04.png")
+		maxDD as integer
+		maxHH as integer
+		maxMM as integer
+		minDD as integer
+		minHH as integer
+		minMM as integer
 		simulationRan as integer : simulationRan = 0
 	endif
 	screenNo = screenToView
 
 	userText$ as string : userText$ = ""
 	
-	if (generatedLockSelected > 0)
+	if (sharedLockToClone > 0)
+		OryUISetButtonGroupItemSelectedByIndex(grpIsThisATestLock, 2)
+		OryUISetButtonGroupItemSelectedByIndex(grpWouldYouLikeABotToKeyhold, 2)
+		OryUISetButtonGroupItemSelectedByIndex(grpWhichBot, 1)
+		OryUISetButtonGroupItemSelectedByIndex(grpDoYouTrustTheKeyholder, 2)
+		if (sharedLocks[sharedLockToClone, 0].fixed = 0) then OryUISetButtonGroupItemSelectedByIndex(grpTypeOfLock, 1)
+		if (sharedLocks[sharedLockToClone, 0].fixed = 1) then OryUISetButtonGroupItemSelectedByIndex(grpTypeOfLock, 2)
+		if (sharedLocks[sharedLockToClone, 0].fixed = 0)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 24) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 1)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 12) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 2)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 6) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 3)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 3) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 4)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 1) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 5)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.5) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 6)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.25) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 7)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.016667) then OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 8)
+		endif
+		if (sharedLocks[sharedLockToClone, 0].fixed = 1)
+			if (sharedLocks[sharedLockToClone, 0].regularity# <> 0.016667)
+				OryUISetButtonGroupItemSelectedByIndex(grpRegularity, 8)
+			endif
+		endif
+		if (sharedLocks[sharedLockToClone, 0].cumulative = 0) then OryUISetButtonGroupItemSelectedByIndex(grpCumulativeChances, 2)
+		if (sharedLocks[sharedLockToClone, 0].cumulative = 1) then OryUISetButtonGroupItemSelectedByIndex(grpCumulativeChances, 1)
+		if (sharedLocks[sharedLockToClone, 0].maxRandomReds > 0)
+			if (sharedLocks[sharedLockToClone, 0].fixed = 0)
+				OryUIUpdateInputSpinner(spinMinNumberOfRedCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomReds))
+				OryUIUpdateInputSpinner(spinMaxNumberOfRedCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomReds))
+			endif
+			if (sharedLocks[sharedLockToClone, 0].fixed = 1)
+				minDD = floor((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)) / 60 / 24)
+				minHH = floor(mod((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)) / 60, 24))
+				minMM = floor(mod((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)), 60))
+				maxDD = floor((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)) / 60 / 24)
+				maxHH = floor(mod((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)) / 60, 24))
+				maxMM = floor(mod((sharedLocks[sharedLockToClone, 0].minRandomReds * (sharedLocks[sharedLockToClone, 0].regularity# * 60)), 60))						
+				OryUIUpdateInputSpinner(spinMinNumberOfDays, "inputText:" + str(minDD))
+				OryUIUpdateInputSpinner(spinMinNumberOfHours, "inputText:" + str(minHH))
+				OryUIUpdateInputSpinner(spinMinNumberOfMinutes, "inputText:" + str(minMM))
+				OryUIUpdateInputSpinner(spinMaxNumberOfDays, "inputText:" + str(maxDD))
+				OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:" + str(maxHH))
+				OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:" + str(maxMM))
+			endif
+		else
+			if (sharedLocks[sharedLockToClone, 0].fixed = 0)
+				OryUIUpdateInputSpinner(spinMinNumberOfRedCards, "inputText:0")
+				OryUIUpdateInputSpinner(spinMaxNumberOfRedCards, "inputText:0")
+			endif
+			if (sharedLocks[sharedLockToClone, 0].fixed = 1)
+				OryUIUpdateInputSpinner(spinMinNumberOfDays, "inputText:0")
+				OryUIUpdateInputSpinner(spinMinNumberOfHours, "inputText:0")
+				OryUIUpdateInputSpinner(spinMinNumberOfMinutes, "inputText:0")
+				OryUIUpdateInputSpinner(spinMaxNumberOfDays, "inputText:0")
+				OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:0")
+				OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:0")
+			endif
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomMinutes > 0)
+			minDD = floor(sharedLocks[sharedLockToClone, 0].minRandomMinutes / 60 / 24)
+			minHH = floor(mod(sharedLocks[sharedLockToClone, 0].minRandomMinutes / 60, 24))
+			minMM = floor(mod(sharedLocks[sharedLockToClone, 0].minRandomMinutes, 60))
+			maxDD = floor(sharedLocks[sharedLockToClone, 0].maxRandomMinutes / 60 / 24)
+			maxHH = floor(mod(sharedLocks[sharedLockToClone, 0].maxRandomMinutes / 60, 24))
+			maxMM = floor(mod(sharedLocks[sharedLockToClone, 0].maxRandomMinutes, 60))						
+			OryUIUpdateInputSpinner(spinMinNumberOfDays, "inputText:" + str(minDD))
+			OryUIUpdateInputSpinner(spinMinNumberOfHours, "inputText:" + str(minHH))
+			OryUIUpdateInputSpinner(spinMinNumberOfMinutes, "inputText:" + str(minMM))
+			OryUIUpdateInputSpinner(spinMaxNumberOfDays, "inputText:" + str(maxDD))
+			OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:" + str(maxHH))
+			OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:" + str(maxMM))
+		else
+			OryUIUpdateInputSpinner(spinMinNumberOfDays, "inputText:0")
+			OryUIUpdateInputSpinner(spinMinNumberOfHours, "inputText:0")
+			OryUIUpdateInputSpinner(spinMinNumberOfMinutes, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfDays, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:0")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomYellows > 0 or sharedLocks[sharedLockToClone, 0].maxRandomYellowsAdd > 0 or sharedLocks[sharedLockToClone, 0].maxRandomYellowsMinus > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddYellowCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfRandomYellowCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomYellows))
+			OryUIUpdateInputSpinner(spinMaxNumberOfRandomYellowCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomYellows))
+			OryUIUpdateInputSpinner(spinMinNumberOfYellowMinusCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomYellowsMinus))
+			OryUIUpdateInputSpinner(spinMaxNumberOfYellowMinusCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomYellowsMinus))
+			OryUIUpdateInputSpinner(spinMinNumberOfYellowAddCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomYellowsAdd))
+			OryUIUpdateInputSpinner(spinMaxNumberOfYellowAddCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomYellowsAdd))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddYellowCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfRandomYellowCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfRandomYellowCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMinNumberOfYellowMinusCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfYellowMinusCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMinNumberOfYellowAddCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfYellowAddCards, "inputText:0")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomStickies > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomStickies))
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomStickies))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomFreezes > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddFreezeCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfFreezeCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomFreezes))
+			OryUIUpdateInputSpinner(spinMaxNumberOfFreezeCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomFreezes))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddFreezeCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfFreezeCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfFreezeCards, "inputText:0")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomDoubleUps > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddDoubleUpCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfDoubleUpCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomDoubleUps))
+			OryUIUpdateInputSpinner(spinMaxNumberOfDoubleUpCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomDoubleUps))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddDoubleUpCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfDoubleUpCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfDoubleUpCards, "inputText:0")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomResets > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddResetCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfResetCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomResets))
+			OryUIUpdateInputSpinner(spinMaxNumberOfResetCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomResets))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddResetCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfResetCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfResetCards, "inputText:0")
+		endif
+		OryUIUpdateInputSpinner(spinMinNumberOfGreenCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomGreens))
+		OryUIUpdateInputSpinner(spinMaxNumberOfGreenCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomGreens))
+		if (sharedLocks[sharedLockToClone, 0].multipleGreensRequired = 0) then OryUISetButtonGroupItemSelectedByIndex(grpMultipleGreensRequired, 2)
+		if (sharedLocks[sharedLockToClone, 0].multipleGreensRequired = 1) then OryUISetButtonGroupItemSelectedByIndex(grpMultipleGreensRequired, 1)
+		if (sharedLocks[sharedLockToClone, 0].cardInfoHidden = 0) then OryUISetButtonGroupItemSelectedByIndex(grpHideCardInformation, 2)
+		if (sharedLocks[sharedLockToClone, 0].cardInfoHidden = 1) then OryUISetButtonGroupItemSelectedByIndex(grpHideCardInformation, 1)
+		if (sharedLocks[sharedLockToClone, 0].timerHidden = 0) then OryUISetButtonGroupItemSelectedByIndex(grpHideTimer, 2)
+		if (sharedLocks[sharedLockToClone, 0].timerHidden = 1) then OryUISetButtonGroupItemSelectedByIndex(grpHideTimer, 1)
+		if (sharedLocks[sharedLockToClone, 0].maxRandomCopies > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpCreateFakeCombination, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfFakeCombinationCopies, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomCopies))
+			OryUIUpdateInputSpinner(spinMaxNumberOfFakeCombinationCopies, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomCopies))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpCreateFakeCombination, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfFakeCombinationCopies, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfFakeCombinationCopies, "inputText:1")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpScheduleAutoResets, 1)
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 24) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 86400))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 12) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 43200))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 6) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 21600))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 3) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 10800))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 1) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 3600))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.5) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 1800))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.25) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 900))
+			if (sharedLocks[sharedLockToClone, 0].regularity# = 0.016667) then OryUIUpdateInputSpinner(spinResetFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].resetFrequencyInSeconds / 60))
+			OryUIUpdateInputSpinner(spinMaxNumberOfAutoResets, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxAutoResets))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpScheduleAutoResets, 2)
+			OryUIUpdateInputSpinner(spinResetFrequency, "inputText:1")
+			OryUIUpdateInputSpinner(spinMaxNumberOfAutoResets, "inputText:1")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpCheckInsRequired, 1)
+			if (sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds <= 2700)
+				OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:" + str(sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds / 900))
+			elseif (sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds <= 89100)
+				OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:" + str(((sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds - 2700) / 3600) + 4))
+			else
+				OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:" + str(((sharedLocks[sharedLockToClone, 0].checkInFrequencyInSeconds - 89100) / 86400) + 29))
+			endif
+			if (sharedLocks[sharedLockToClone, 0].lateCheckInWindowInSeconds <= 2700)
+				OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:" + str(sharedLocks[sharedLockToClone, 0].lateCheckInWindowInSeconds / 900))
+			elseif (sharedLocks[sharedLockToClone, 0].lateCheckInWindowInSeconds <= 89100)
+				OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:" + str(((sharedLocks[sharedLockToClone, 0].lateCheckInWindowInSeconds - 2700) / 3600) + 4))
+			else
+				OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:" + str(((sharedLocks[sharedLockToClone, 0].lateCheckInWindowInSeconds - 89100) / 86400) + 29))
+			endif
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpCheckInsRequired, 2)
+			OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:4")
+			OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:1")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].keyDisabled = 0) then OryUISetButtonGroupItemSelectedByIndex(grpEnableEarlyReleaseWithAPurchasedKey, 1)
+		if (sharedLocks[sharedLockToClone, 0].keyDisabled = 1) then OryUISetButtonGroupItemSelectedByIndex(grpEnableEarlyReleaseWithAPurchasedKey, 2)
+		OryUIUpdateInputSpinner(spinNumberOfKeysRequired, "inputText:1")
+		if (sharedLocks[sharedLockToClone, 0].startLockFrozen = 0) then OryUISetButtonGroupItemSelectedByIndex(grpStartLockFrozen, 2)
+		if (sharedLocks[sharedLockToClone, 0].startLockFrozen = 1) then OryUISetButtonGroupItemSelectedByIndex(grpStartLockFrozen, 1)
+		if (sharedLocks[sharedLockToClone, 0].keyholderDecisionDisabled = 0) then OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 2)
+		if (sharedLocks[sharedLockToClone, 0].keyholderDecisionDisabled = 1) then OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 1)
+		if (sharedLocks[sharedLockToClone, 0].maxUsers > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpLimitNumberOfUsers, 1)
+			OryUIUpdateInputSpinner(spinMaximumNumberOfUsers, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxUsers))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpLimitNumberOfUsers, 2)
+			OryUIUpdateInputSpinner(spinMaximumNumberOfUsers, "inputText:40")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].blockTestLocks = 0) then OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 2)
+		if (sharedLocks[sharedLockToClone, 0].blockTestLocks = 1) then OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 1)
+		if (sharedLocks[sharedLockToClone, 0].minRatingRequired > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithSpecificRating, 1)
+			OryUIUpdateInputSpinner(spinMinimumRatingRequired, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRatingRequired))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithSpecificRating, 2)
+			OryUIUpdateInputSpinner(spinMinimumRatingRequired, "inputText:1")
+		endif
+		if (sharedLocks[sharedLockToClone, 0].blockUsersAlreadyLocked = 0) then OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersAlreadyLocked, 2)
+		if (sharedLocks[sharedLockToClone, 0].blockUsersAlreadyLocked = 1) then OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersAlreadyLocked, 1)
+		if (sharedLocks[sharedLockToClone, 0].blockUsersWithStatsHidden = 0) then OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithStatsHidden, 2)
+		if (sharedLocks[sharedLockToClone, 0].blockUsersWithStatsHidden = 1) then OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithStatsHidden, 1)
+		if (sharedLocks[sharedLockToClone, 0].forceTrust = 0) then OryUISetButtonGroupItemSelectedByIndex(grpForceTrust, 2)
+		if (sharedLocks[sharedLockToClone, 0].forceTrust = 1) then OryUISetButtonGroupItemSelectedByIndex(grpForceTrust, 1)
+		if (sharedLocks[sharedLockToClone, 0].requireDM = 0) then OryUISetButtonGroupItemSelectedByIndex(grpRequireDM, 2)
+		if (sharedLocks[sharedLockToClone, 0].requireDM = 1) then OryUISetButtonGroupItemSelectedByIndex(grpRequireDM, 1)
+		OryUISetButtonGroupItemSelectedByIndex(grpContactedKeyholder, 2)
+		showFakeCombinationOptions = 0
+		sharedLockToClone = 0
+	elseif (generatedLockSelected > 0)
 		OryUISetButtonGroupItemSelectedByIndex(grpIsThisATestLock, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpWouldYouLikeABotToKeyhold, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpWhichBot, 1)
@@ -103,10 +328,12 @@ if (screenToView = constLockOptionsScreen)
 		OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:4")
 		OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:1")
 		OryUISetButtonGroupItemSelectedByIndex(grpEnableEarlyReleaseWithAPurchasedKey, 1)
-		OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 2)
 		OryUIUpdateInputSpinner(spinNumberOfKeysRequired, "inputText:1")
+		OryUISetButtonGroupItemSelectedByIndex(grpStartLockFrozen, 2)
+		OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpLimitNumberOfUsers, 2)
 		OryUIUpdateInputSpinner(spinMaximumNumberOfUsers, "inputText:40")
+		OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithSpecificRating, 2)
 		OryUIUpdateInputSpinner(spinMinimumRatingRequired, "inputText:1")
 		OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersAlreadyLocked, 2)
@@ -166,10 +393,12 @@ if (screenToView = constLockOptionsScreen)
 		OryUIUpdateInputSpinner(spinCheckInFrequency, "inputText:4")
 		OryUIUpdateInputSpinner(spinLateCheckIns, "inputText:1")
 		OryUISetButtonGroupItemSelectedByIndex(grpEnableEarlyReleaseWithAPurchasedKey, 1)
-		OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 2)
 		OryUIUpdateInputSpinner(spinNumberOfKeysRequired, "inputText:1")
+		OryUISetButtonGroupItemSelectedByIndex(grpStartLockFrozen, 2)
+		OryUISetButtonGroupItemSelectedByIndex(grpDisableKeyholderDecision, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpLimitNumberOfUsers, 2)
 		OryUIUpdateInputSpinner(spinMaximumNumberOfUsers, "inputText:40")
+		OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 2)
 		OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersWithSpecificRating, 2)
 		OryUIUpdateInputSpinner(spinMinimumRatingRequired, "inputText:1")
 		OryUISetButtonGroupItemSelectedByIndex(grpBlockUsersAlreadyLocked, 2)
@@ -472,7 +701,7 @@ if (screenToView = constLockOptionsScreen)
 	endif
 
 	// IS THIS A TEST LOCK?
-	if ((loadingSharedLock = 0 and creatingSharedLock = 0) or (loadingSharedLock = 1 and sharedID$ <> "" and ((fixed = 0 and regularity# >= 0.25) or fixed = 1)))
+	if ((loadingSharedLock = 0 and creatingSharedLock = 0) or (loadingSharedLock = 1 and sharedID$ <> "" and blockTestLocks = 0 and ((fixed = 0 and regularity# >= 0.25) or fixed = 1)))
 		if (redrawScreen = 1)
 			if (loadingSharedLock = 0)
 				OryUIUpdateTextCard(crdIsThisATestLock, "supportingText:Test locks will run like real locks but won't be included in your lock history and stats.;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -725,7 +954,7 @@ if (screenToView = constLockOptionsScreen)
 			endif
 		endif
 		elementY# = elementY# + OryUIGetTextCardHeight(crdRegularity)
-		if (creatingSharedLock = 1 and OryUIGetButtonGroupItemSelectedName(grpRegularity) = "1M")
+		if (creatingSharedLock = 1 and fixed = 0 and OryUIGetButtonGroupItemSelectedName(grpRegularity) = "1M")
 			if (redrawScreen = 1)
 				OryUIUpdateTextCard(crdTestRegularity, "headerText:;supportingText:One minute draw intervals are for testing purposes only. Locks completed with it will not be included in yours or other users lock history and stats.;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColor:192,57,43,255")
 			endif
@@ -2118,10 +2347,10 @@ if (screenToView = constLockOptionsScreen)
 		if (OryUIGetInputSpinnerChangedValue(spinCheckInFrequency) = 1) then simulationCount = 0
 		if (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) < 4)
 			checkInFrequencyInSeconds = val(OryUIGetInputSpinnerString(spinCheckInFrequency)) * 900
-		elseif (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) < 28)
+		elseif (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) < 52) // 28
 			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) - 3) * 3600
 		else
-			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) - 27) * 86400
+			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinCheckInFrequency)) - 49) * 86400 // 27
 		endif
 		OryUIUpdateText(txtCheckInFrequency, "text:Every " + ConvertSecondsToText(checkInFrequencyInSeconds, 1))
 	else
@@ -2154,17 +2383,17 @@ if (screenToView = constLockOptionsScreen)
 		if (OryUIGetInputSpinnerChangedValue(spinLateCheckIns) = 1) then simulationCount = 0
 		if (val(OryUIGetInputSpinnerString(spinLateCheckIns)) < 4)
 			lateCheckInWindowInSeconds = val(OryUIGetInputSpinnerString(spinLateCheckIns)) * 900
-		elseif (val(OryUIGetInputSpinnerString(spinLateCheckIns)) < 28)
+		elseif (val(OryUIGetInputSpinnerString(spinLateCheckIns)) < 52) // 28
 			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinLateCheckIns)) - 3) * 3600
 		else
-			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinLateCheckIns)) - 27) * 86400
+			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinLateCheckIns)) - 49) * 86400 // 27
 		endif
 		OryUIUpdateText(txtLateCheckIns, "text:Every " + ConvertSecondsToText(lateCheckInWindowInSeconds, 1))
 	else
 		if (redrawScreen = 1)
 			if (loadingSharedLock = 0) then lateCheckInWindowInSeconds = 0
 			OryUIUpdateTextCard(crdLateCheckIns, "position:-1000,-1000")
-			OryUIUpdateInputSpinner(spinCheckInFrequency, "position:-1000,-1000")
+			OryUIUpdateInputSpinner(spinLateCheckIns, "position:-1000,-1000")
 			OryUIUpdateText(txtLateCheckIns, "position:-1000,-1000")
 		endif
 	endif
@@ -2372,6 +2601,39 @@ if (screenToView = constLockOptionsScreen)
 			if (loadingSharedLock = 0) then maxUsers = 0
 			OryUIUpdateTextCard(crdMaximumNumberOfUsers, "position:-1000,-1000")
 			OryUIUpdateInputSpinner(spinMaximumNumberOfUsers, "inputText:40;position:-1000,-1000")
+		endif
+	endif
+
+	// BLOCK TEST LOCKS?
+	if (creatingSharedLock = 1 and testLock = 0)
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdBlockTestLocks, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (OryUIGetButtonGroupItemSelectedName(grpBlockTestLocks) = "Yes")
+				blockTestLocks = 1
+			endif
+			if (OryUIGetButtonGroupItemSelectedName(grpBlockTestLocks) = "No")
+				blockTestLocks = 0
+			endif
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdBlockTestLocks)
+		if (redrawScreen = 1)
+			OryUIUpdateButtonGroup(grpBlockTestLocks, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+			OryUISetButtonGroupItemCount(grpBlockTestLocks, 2)
+			OryUIUpdateButtonGroupItem(grpBlockTestLocks, 1, "name:Yes;text:Yes")
+			OryUIUpdateButtonGroupItem(grpBlockTestLocks, 2, "name:No;text:No")
+			if (OryUIGetButtonGroupItemSelectedIndex(grpBlockTestLocks) = 0) then OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 2)
+		endif
+		OryUIInsertButtonGroupListener(grpBlockTestLocks)
+		if (OryUIGetButtonGroupItemReleasedIndex(grpBlockTestLocks) > 0)
+			screen[screenNo].lastViewY# = GetViewOffsetY()
+			SetScreenToView(constLockOptionsScreen)
+		endif
+		elementY# = elementY# + OryUIGetButtonGroupHeight(grpBlockTestLocks) + 2
+	else
+		if (redrawScreen = 1)
+			if (loadingSharedLock = 0) then blockTestLocks = 0
+			OryUIUpdateTextCard(crdBlockTestLocks, "position:-1000,-1000")
+			OryUIUpdateButtonGroup(grpBlockTestLocks, "position:-1000,-1000")
 		endif
 	endif
 
@@ -2634,7 +2896,7 @@ if (screenToView = constLockOptionsScreen)
 		endif
 
 		if (simulationCount > 0)
-			RunSimulation()
+			RunSimulation(1)
 		endif
 		if (simulationCount <= simulationsToTry)
 			if (simulationMinutesLocked < simulationBestCaseMinutesLocked) then simulationBestCaseMinutesLocked = simulationMinutesLocked
@@ -2768,7 +3030,7 @@ if (screenToView = constLockOptionsScreen)
 	endif
 	if (OryUIGetButtonReleased(btnRerunSimulation))
 		simulationCount = 0
-		RunSimulation()
+		RunSimulation(1)
 	endif
 	
 	// NEXT BUTTON
@@ -2846,6 +3108,9 @@ if (screenToView = constLockOptionsScreen)
 									if (forceTrust = 1)
 										dialogMessage$ = dialogMessage$ + "• You trust them, which will remove all limitations from them as your keyholder and means that they can add/remove as much time as they want, and as often as they want." + chr(10)
 									endif
+									if (blockTestLocks = 1)
+										dialogMessage$ = dialogMessage$ + "• You are loading this lock as a real lock, and will be locking something away." + chr(10)
+									endif	
 									dialogMessage$ = dialogMessage$ + chr(10) + "Do you agree to the above?"
 									OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Do You Agree?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + dialogMessage$ + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 									OryUISetDialogButtonCount(dialog, 2)

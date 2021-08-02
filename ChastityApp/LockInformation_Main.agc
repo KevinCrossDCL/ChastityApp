@@ -14,6 +14,11 @@ if (screenToView = constLockInformationScreen)
 		else
 			OryUISetButtonGroupItemSelectedByIndex(grpTrustTheKeyholder, 1)
 		endif
+		if (locks[lockSelected].blockBotFromUnlocking = 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpBlockBotFromUnlockingEarly, 2)
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpBlockBotFromUnlockingEarly, 1)
+		endif
 		if (locks[lockSelected].keyDisabled = 0)
 			OryUISetButtonGroupItemSelectedByIndex(grpDisableKeys, 2)
 		else
@@ -561,6 +566,65 @@ if (screenToView = constLockInformationScreen)
 		endif
 	endif
 	
+//~	// FREEZE LOCK?
+//~	if ((locks[lockSelected].sharedID$ = "" or locks[lockSelected].botChosen > 0) and locks[lockSelected].lockFrozenByCard = 0 and locks[lockSelected].lockFrozenByKeyholder = 0)
+//~		if (redrawScreen = 1)
+//~			OryUIUpdateTextCard(crdFreezeLock, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Freeze Lock?;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Pressing the 'Freeze Lock' button below will freeze the lock for a random amount of time between " + lower(ReplaceString(ConvertMinutesRangeToText(locks[lockSelected].regularity# * 60, locks[lockSelected].regularity# * 60 * 8), "-", "and", -1)) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+//~		endif
+//~		elementY# = elementY# + OryUIGetTextCardHeight(crdFreezeLock)
+//~		if (redrawScreen = 1)
+//~			OryUIUpdateButton(btnFreezeLock, "text:Freeze Lock;position:" + str((screenNo * 100) + 50) + "," + str(elementY#) + ";colorID:" + str(theme[themeSelected].color[3]) + ";textColor:255,255,255,255")
+//~		endif
+//~		elementY# = elementY# + OryUIGetButtonHeight(btnFreezeLock) + 2
+//~		if (OryUIGetButtonReleased(btnFreezeLock))
+//~			OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Freeze Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to freeze the lock for a random amount of time between " + lower(ReplaceString(ConvertMinutesRangeToText(locks[lockSelected].regularity# * 60, locks[lockSelected].regularity# * 60 * 8), "-", "and", -1)) + "?;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+//~			OryUISetDialogButtonCount(dialog, 2)
+//~			OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesFreezeLock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+//~			OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+//~			OryUIShowDialog(dialog)
+//~		endif
+//~		if (OryUIGetDialogButtonReleasedByName(dialog, "YesFreezeLock"))
+//~			noOfChances = 0
+//~			if (locks[lockSelected].regularity# = 0.016667)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60)
+//~			elseif (locks[lockSelected].regularity# = 0.25)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 15)
+//~			elseif (locks[lockSelected].regularity# = 0.5)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 30)
+//~			elseif (locks[lockSelected].regularity# = 1)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 60)
+//~			elseif (locks[lockSelected].regularity# = 3)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 60 / 3)
+//~			elseif (locks[lockSelected].regularity# = 6)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 60 / 6)
+//~			elseif (locks[lockSelected].regularity# = 12)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 60 / 12)
+//~			elseif (locks[lockSelected].regularity# = 24)
+//~				noOfChances = floor((timestampNow - locks[lockSelected].timestampLastPicked) / 60 / 60 / 24)
+//~			endif
+//~			if (locks[lockSelected].cumulative = 0 and noOfChances > 1) then noOfChances = 1
+//~			locks[lockSelected].chancesAccumulatedBeforeFreeze = noOfChances
+//~			if (locks[lockSelected].chancesAccumulatedBeforeFreeze < 0) then locks[lockSelected].chancesAccumulatedBeforeFreeze = 0
+//~			locks[lockSelected].lockFrozenByCard = 1
+//~			locks[lockSelected].timestampFrozenByCard = timestampNow
+//~			if (locks[lockSelected].regularity# = 0.016667) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(60, 480)
+//~			if (locks[lockSelected].regularity# = 0.25) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(900, 7200)
+//~			if (locks[lockSelected].regularity# = 0.5) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(1800, 14400)
+//~			if (locks[lockSelected].regularity# = 1) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(3600, 43200)
+//~			if (locks[lockSelected].regularity# = 3) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(10800, 86400)
+//~			if (locks[lockSelected].regularity# = 6) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(21600, 172800)
+//~			if (locks[lockSelected].regularity# = 12) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(43200, 345600)
+//~			if (locks[lockSelected].regularity# = 24) then locks[lockSelected].timestampUnfreezes = timestampNow + random2(86400, 691200)
+//~			UpdateLocksData(lockSelected)
+//~			UpdateLocksDatabase(lockSelected, "action:LockeeUpdate;actionedBy:Lockee;result:FrozeLock", 0)
+//~			screen[screenNo].lastViewY# = GetViewOffsetY()
+//~			SetScreenToView(constLockInformationScreen)
+//~		endif
+//~	else
+//~		OryUIUpdateTextCard(crdFreezeLock, "position:-1000,-1000")
+//~		OryUIUpdateButton(btnFreezeLock, "position:-1000,-1000")
+//~	endif
+	
 	// CARD COUNTS
 	if (locks[lockSelected].fixed = 0 and locks[lockSelected].unlocked = 0)
 		if (redrawScreen = 1)
@@ -689,7 +753,7 @@ if (screenToView = constLockInformationScreen)
 		
 		// ADD GREEN CARD
 		if (OryUIGetButtonReleased(btnCardsInLockAdd[1]))
-			if (locks[lockSelected].greenCards <= cappedGreenCards - 1 and totalCards# <= cappedTotalCards - 1 and locks[lockSelected].multipleGreensRequired = 1)
+			if (locks[lockSelected].greenCards + locks[lockSelected].greensPickedSinceReset <= cappedGreenCards - 1 and totalCards# <= cappedTotalCards - 1 and locks[lockSelected].multipleGreensRequired = 1)
 				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Add 1 Green Card?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to add 1 green card to the deck? This may increase the duration of the lock and can't be undone.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
 				OryUISetDialogButtonCount(dialog, 2)
 				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:AddGreen;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -956,6 +1020,17 @@ if (screenToView = constLockInformationScreen)
 			multipleGreensRequired = locks[lockSelected].multipleGreensRequired
 			regularity# = locks[lockSelected].regularity#
 			resetFrequencyInSeconds = locks[lockSelected].resetFrequencyInSeconds
+			simulationInitialDoubleUps = locks[lockSelected].initialDoubleUpCards
+			simulationInitialFreezes = locks[lockSelected].initialFreezeCards
+			simulationInitialGreens = locks[lockSelected].initialGreenCards
+			simulationInitialReds = locks[lockSelected].initialRedCards
+			simulationInitialResets = locks[lockSelected].initialResetCards
+			simulationInitialStickies = locks[lockSelected].initialStickyCards
+			simulationInitialYellowsAdd1 = locks[lockSelected].initialYellowAdd1Cards
+			simulationInitialYellowsAdd2 = locks[lockSelected].initialYellowAdd2Cards
+			simulationInitialYellowsAdd3 = locks[lockSelected].initialYellowAdd3Cards
+			simulationInitialYellowsMinus1 = locks[lockSelected].initialYellowMinus1Cards
+			simulationInitialYellowsMinus2 = locks[lockSelected].initialYellowMinus2Cards
 			simulationAverageMinutesLocked = 0
 			simulationAverageNoOfTurns = 0
 			simulationAverageNoOfCardsDrawn = 0
@@ -964,6 +1039,8 @@ if (screenToView = constLockInformationScreen)
 			simulationBestCaseNoOfTurns = 9999999999
 			simulationBestCaseNoOfCardsDrawn = 9999999999
 			simulationBestCaseNoOfLockResets = 9999999999
+			simulationSecondsUntilUnfreezes = 0
+			if (locks[lockSelected].lockFrozenByCard = 1 and locks[lockSelected].timestampUnfreezes > timestampNow) then simulationSecondsUntilUnfreezes = locks[lockSelected].timestampUnfreezes - timestampNow
 			simulationWorstCaseMinutesLocked = 0
 			simulationWorstCaseNoOfTurns = 0
 			simulationWorstCaseNoOfCardsDrawn = 0
@@ -974,13 +1051,19 @@ if (screenToView = constLockInformationScreen)
 				simulationMinimumRedCards = 1
 			else
 				simulationMinimumRedCards = locks[lockSelected].minimumRedCards
-				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - locks[lockSelected].timestampLocked) / (locks[lockSelected].regularity# * 3600))
-				if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 1
+				//simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - locks[lockSelected].timestampLocked) / (locks[lockSelected].regularity# * 3600))
+				//if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 1
 			endif
+			if (locks[lockSelected].timestampLastFullReset > locks[lockSelected].timestampLocked)
+				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - locks[lockSelected].timestampLastFullReset) / (locks[lockSelected].regularity# * 3600))	
+			else
+				simulationMinimumRedCards = simulationMinimumRedCards - floor((timestampNow - locks[lockSelected].timestampLocked) / (locks[lockSelected].regularity# * 3600))
+			endif
+			if (simulationMinimumRedCards < 1) then simulationMinimumRedCards = 0
 		endif
 		
 		if (simulationCount > 0)
-			RunSimulation()
+			RunSimulation(0)
 		endif
 		if (simulationCount <= simulationsToTry)
 			if (simulationMinutesLocked < simulationBestCaseMinutesLocked) then simulationBestCaseMinutesLocked = simulationMinutesLocked
@@ -1114,7 +1197,7 @@ if (screenToView = constLockInformationScreen)
 	endif
 	if (OryUIGetButtonReleased(btnRerunCurrentLockSimulation))
 		simulationCount = 0
-		RunSimulation()
+		RunSimulation(0)
 	endif
 	
 	// ADD TIME
@@ -1312,7 +1395,7 @@ if (screenToView = constLockInformationScreen)
 	endif
 
 	// TEST LOCK?
-	if ((locks[lockSelected].keyholderUsername$ = "" or locks[lockSelected].botChosen > 0) and ((fixed = 0 and regularity# >= 0.25) or fixed = 1) and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
+	if ((locks[lockSelected].keyholderUsername$ = "" or locks[lockSelected].botChosen > 0) and ((locks[lockSelected].fixed = 0 and locks[lockSelected].regularity# >= 0.25) or locks[lockSelected].fixed = 1) and ((locks[lockSelected].test = 0 and timestampNow - locks[lockSelected].timestampLocked <= 86400) or locks[lockSelected].test = 1) and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
 		if (redrawScreen = 1)
 			OryUIUpdateTextCard(crdTestLock, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
 			if (OryUIGetButtonGroupItemSelectedName(grpTestLock) = "Yes")
@@ -1364,6 +1447,29 @@ if (screenToView = constLockInformationScreen)
 	else
 		OryUIUpdateTextCard(crdTrustTheKeyholder, "position:-1000,-1000")
 		OryUIUpdateButtonGroup(grpTrustTheKeyholder, "position:-1000,-1000")
+	endif
+
+	// BLOCK BOT FROM UNLOCKING
+	if (locks[lockSelected].botChosen > 0 and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdBlockBotFromUnlockingEarly, "headerText:Block " + locks[lockSelected].keyholderUsername$ + " from unlocking you?;supportingText:If yes, " + locks[lockSelected].keyholderUsername$ + " won't unlock this lock. This is useful if you don't want the bot to unlock you too early. You can change this option at any time.;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdBlockBotFromUnlockingEarly)
+		if (redrawScreen = 1)
+			OryUIUpdateButtonGroup(grpBlockBotFromUnlockingEarly, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+		endif
+		OryUIInsertButtonGroupListener(grpBlockBotFromUnlockingEarly)
+		if (OryUIGetButtonGroupItemReleasedIndex(grpBlockBotFromUnlockingEarly) > 0)
+			screen[screenNo].lastViewY# = GetViewOffsetY()
+			SetScreenToView(constLockInformationScreen)
+		endif
+		if ((OryUIGetButtonGroupItemSelectedName(grpBlockBotFromUnlockingEarly) = "Yes" and locks[lockSelected].blockBotFromUnlocking = 0) or (OryUIGetButtonGroupItemSelectedName(grpBlockBotFromUnlockingEarly) = "No" and locks[lockSelected].blockBotFromUnlocking = 1))
+			OryUIShowFloatingActionButton(fabSaveLockInformation)
+		endif
+		elementY# = elementY# + OryUIGetButtonGroupHeight(grpBlockBotFromUnlockingEarly) + 2
+	else
+		OryUIUpdateTextCard(crdBlockBotFromUnlockingEarly, "position:-1000,-1000")
+		OryUIUpdateButtonGroup(grpBlockBotFromUnlockingEarly, "position:-1000,-1000")
 	endif
 	
 	// DISABLE KEYS?
@@ -1447,16 +1553,13 @@ if (screenToView = constLockInformationScreen)
 		validUpdate as integer : validUpdate = 1
 		logUpdate$ as string : logUpdate$ = ""
 		if (OryUIGetTextfieldString(editBoxLockName) <> locks[lockSelected].lockName$)
-			if (StripString(OryUIGetTextfieldString(editBoxLockName), " 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") <> "")
+			if (FindString(OryUIGetTextfieldString(editBoxLockName), "&") or FindString(OryUIGetTextfieldString(editBoxLockName), "="))
 				validUpdate = 0
-				newLockName$ = ""
-				for i = 1 to len(OryUIGetTextfieldString(editBoxLockName))
-					if (FindString(" 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", mid(OryUIGetTextfieldString(editBoxLockName), i, 1)) > 0)
-						newLockName$ = newLockName$ + mid(OryUIGetTextfieldString(editBoxLockName), i, 1)
-					endif
-				next
+				newLockName$ = OryUIGetTextfieldString(editBoxLockName)
+				newLockName$ = ReplaceString(newLockName$, "&", "", -1)
+				newLockName$ = ReplaceString(newLockName$, "=", "", -1)
 				OryUIUpdateTextfield(editBoxLockName, "inputText:" + newLockName$)
-				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Invalid Lock Name;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Lock names should only contain alphanumeric characters and spaces." + chr(10) + chr(10) + "For your convenience all other characters have been removed.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Invalid Lock Name;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Lock names can't contain the following characters[colon] & and =." + chr(10) + chr(10) + "For your convenience all instances of these characters have been removed (but not yet saved).;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 				OryUISetDialogButtonCount(dialog, 1)
 				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIShowDialog(dialog)
@@ -1475,7 +1578,7 @@ if (screenToView = constLockInformationScreen)
 				newLockName$ = OryUIGetTextfieldString(editBoxLockName)
 				locks[lockSelected].lockName$ = newLockName$
 			endif
-			if ((locks[lockSelected].keyholderUsername$ = "" or locks[lockSelected].botChosen > 0) and ((fixed = 0 and regularity# >= 0.25) or fixed = 1) and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
+			if ((locks[lockSelected].keyholderUsername$ = "" or locks[lockSelected].botChosen > 0) and ((locks[lockSelected].fixed = 0 and locks[lockSelected].regularity# >= 0.25) or locks[lockSelected].fixed = 1) and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
 				if (locks[lockSelected].test = 0 and OryUIGetButtonGroupItemSelectedName(grpTestLock) = "Yes")
 					locks[lockSelected].test = 1
 				elseif (locks[lockSelected].test = 1 and OryUIGetButtonGroupItemSelectedName(grpTestLock) = "No")
@@ -1490,6 +1593,13 @@ if (screenToView = constLockInformationScreen)
 							locks[i].trustKeyholder = 1
 						endif
 					next
+				endif
+			endif
+			if (locks[lockSelected].botChosen > 0 and locks[lockSelected].unlocked = 0 and locks[lockSelected].readyToUnlock = 0)
+				if (locks[lockSelected].blockBotFromUnlocking = 0 and OryUIGetButtonGroupItemSelectedName(grpBlockBotFromUnlockingEarly) = "Yes")
+					locks[lockSelected].blockBotFromUnlocking = 1
+				elseif (locks[lockSelected].blockBotFromUnlocking = 1 and OryUIGetButtonGroupItemSelectedName(grpBlockBotFromUnlockingEarly) = "No")
+					locks[lockSelected].blockBotFromUnlocking = 0
 				endif
 			endif
 			if (locks[lockSelected].keyDisabled = 0)

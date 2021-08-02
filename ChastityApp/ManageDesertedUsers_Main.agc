@@ -80,8 +80,6 @@ if (screenToView = constManageDesertedUsersScreen)
 	OryUIUpdateSprite(sprFilterDesertedUsersBarShadow, "position:" + str(screenNo * 100) + "," + str(GetViewOffsetY() + elementY# + GetSpriteHeight(sprFilterDesertedUsersBar)))
 	elementY# = elementY# + GetSpriteHeight(sprFilterDesertedUsersBar) //+ 2
 	
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
 		GetSharedLockUsersData(sharedLocks[sharedLockSelected, 0].shareID$, 3, 1)
@@ -307,7 +305,7 @@ if (screenToView = constManageDesertedUsersScreen)
 	endif
 	
 	// DESERTED USERS LOCKS SEARCH BAR
-	if (sharedLocks[sharedLockSelected, 0].desertedUsers > 0 or OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+	if (sharedLocks[sharedLockSelected, 0].desertedUsers > 0 or OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 		if (redrawScreen = 1)
 			OryUIUpdateSprite(sprDesertedUsersSearchBar, "position:" + str(screenNo * 100) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor))
 			OryUIUpdateTextfield(editDesertedUsersSearch, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";maxLength:15;backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";textColorID:" + str(colorMode[colorModeSelected].textColor) + ";strokeColorID:" + str(colorMode[colorModeSelected].textfieldStrokeColor))
@@ -332,6 +330,8 @@ if (screenToView = constManageDesertedUsersScreen)
 		OryUIUpdateTextfield(editDesertedUsersSearch, "position:-1000,-1000")
 		elementY# = elementY# + 2
 	endif
+	
+	startScrollBarY# = elementY# - 1
 
 	// SORT DESERTED USERS
 	if (redrawScreen = 1 or len(OryUIGetTextFieldString(editDesertedUsersSearch)) <> lastDesertedUsersSearchLength)
@@ -347,13 +347,13 @@ if (screenToView = constManageDesertedUsersScreen)
 	
 	// NO DESERTED USERS
 	if (sharedLocks[sharedLockSelected, 0].desertedUsers = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoDesertedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			OryUIUpdateText(txtNoDesertedUsers, "text:No Deserted Users;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		endif
 	elseif (filterCount = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoDesertedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			if (filterDesertedUsersExcludeTestLocks = 0)

@@ -2,7 +2,7 @@
 screenNo = constRestoreAccountScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Restore Account;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Restore Account;textAlignment:center;depth:10")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;depth:20")
@@ -19,7 +19,7 @@ tooltipCopiedUserID = OryUICreateTooltip("text:Copied to clipboard")
 txtRestoreScreenParagraph[4] = OryUICreateText("text:" + OryUIWrapText("Enter previous user id", 3.4, 90) + ";size:3.4;position:-1000,-1000;alignment:center;depth:19")
 btnPasteText = OryUICreateButton("size:-1,5;text: ;offset:center;color:255,255,255,255;position:-1000,-1000;image:" + str(imgPasteText) + ";depth:18")
 btnCloudText = OryUICreateButton("size:-1,5;text: ;offset:center;color:255,255,255,255;position:-1000,-1000;image:" + str(imgCloudText) + ";depth:18")
-editBoxEnterUserID = OryUICreateTextfield("labelText:User ID;showHelperText:false;helperText:Hyphens not required and case-insensitive;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:cancel;depth:19")
+editBoxEnterUserID = OryUICreateTextfield("labelText:User ID;showHelperText:false;helperText:Hyphens not required and case-insensitive;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:clear;depth:19")
 
 // RESTORE BUTTON
 screen[screenNo].btnNext = OryUICreateButton("size:30,7;offset:center;text:Restore;position:-1000,-1000;depth:19")

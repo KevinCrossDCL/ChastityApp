@@ -80,8 +80,6 @@ if (screenToView = constManageUnlockedUsersScreen)
 	OryUIUpdateSprite(sprFilterUnlockedUsersBarShadow, "position:" + str(screenNo * 100) + "," + str(GetViewOffsetY() + elementY# + GetSpriteHeight(sprFilterUnlockedUsersBar)))
 	elementY# = elementY# + GetSpriteHeight(sprFilterUnlockedUsersBar) //+ 2
 	
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
 		GetSharedLockUsersData(sharedLocks[sharedLockSelected, 0].shareID$, 2, 1)
@@ -343,6 +341,8 @@ if (screenToView = constManageUnlockedUsersScreen)
 		elementY# = elementY# + 2
 	endif
 	
+	startScrollBarY# = elementY# - 1
+	
 	// SORT UNLOCKED USERS
 	if (redrawScreen = 1 or len(OryUIGetTextFieldString(editUnlockedUsersSearch)) <> lastUnlockedUsersSearchLength)
 		lastUnlockedUsersSearchLength = len(OryUIGetTextFieldString(editUnlockedUsersSearch))
@@ -357,13 +357,13 @@ if (screenToView = constManageUnlockedUsersScreen)
 	
 	// NO UNLOCKED USERS
 	if (sharedLocks[sharedLockSelected, 0].unlockedUsers = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoUnlockedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			OryUIUpdateText(txtNoUnlockedUsers, "text:No Unlocked Users;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		endif
 	elseif (filterCount = 0)
-		if (OryUIFindScriptInHTTPSQueue(httpsQueue, "app/v" + ReplaceString(constVersionNumber$, " ", ".", -1) + "/agkgetsharedlockusers.php"))
+		if (OryUIFindScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetSharedLockUsersData))
 			OryUIUpdateText(txtNoUnlockedUsers, "text:Loading Data...;position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 2) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		else
 			if (filterUnlockedUsersExcludeTestLocks = 0)

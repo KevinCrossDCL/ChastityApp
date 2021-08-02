@@ -3,7 +3,7 @@ screenNo = constSharedLocksScreen
 
 // TOP BAR
 screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:menu;navigationName:Menu;text:" + constAppName$ + ";depth:10")
-OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Profile;icon:profile")
+OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Profile;icon:account_box")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Refresh;icon:refresh")
 sprSharedLocksStatusIcon as integer : sprSharedLocksStatusIcon = OryUICreateSprite("size:-1,2;position:-1000,-1000;depth:9")
 
@@ -31,7 +31,7 @@ if (sortSharedLocksOrder$ = "DESC") then OryUISetButtonGroupItemSelectedByIndex(
 
 // SEARCH BAR
 sprSharedLocksSearchBar as integer : sprSharedLocksSearchBar = OryUICreateSprite("size:100,5.02;position:-1000,-1000;depth:19")
-global editSharedLocksSearch : editSharedLocksSearch = OryUICreateTextfield("labelText:Search your locks and lockees...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:cancel;depth:18")
+global editSharedLocksSearch : editSharedLocksSearch = OryUICreateTextfield("labelText:Search your locks and lockees...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:clear;depth:18")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;depth:20")

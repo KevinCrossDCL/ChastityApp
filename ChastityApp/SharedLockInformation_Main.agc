@@ -113,6 +113,11 @@ if (screenToView = constSharedLockInformationScreen)
 			OryUISetButtonGroupItemSelectedByIndex(grpSharedLockLimitNumberOfUsers, 1)
 		endif
 		OryUIUpdateInputSpinner(spinSharedLockMaximumNumberOfUsers, "inputText:" + str(sharedLocks[sharedLockSelected, 0].maxUsers))
+		if (sharedLocks[sharedLockSelected, 0].blockTestLocks = 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpSharedLockBlockTestLocks, 2)
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpSharedLockBlockTestLocks, 1)
+		endif
 		if (sharedLocks[sharedLockSelected, 0].minRatingRequired = 0)
 			OryUISetButtonGroupItemSelectedByIndex(grpSharedLockBlockUsersWithSpecificRating, 2)
 			OryUIUpdateInputSpinner(spinSharedLockMinimumRatingRequired, "inputText:1")
@@ -216,8 +221,8 @@ if (screenToView = constSharedLockInformationScreen)
 		loadingSharedLock = 0
 		sharedLockSettings$ as string : sharedLockSettings$ = BuildSharedLockSettingsString()
 		OryUIUpdateTextCard(crdSharedLockConfiguration, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerText:Lock Configuration;headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + sharedLockSettings$ + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextAlignment:center")
-		elementY# = elementY# + OryUIGetTextCardHeight(crdSharedLockConfiguration)
 	endif
+	elementY# = elementY# + OryUIGetTextCardHeight(crdSharedLockConfiguration)
 
 	// TEMPORARILY DISABLE LOCK?
 	if (redrawScreen = 1)
@@ -568,6 +573,7 @@ if (screenToView = constSharedLockInformationScreen)
 		endif
 		elementY# = elementY# + OryUIGetButtonGroupHeight(grpSharedLockAgreeToCheckInChange) + 2
 	else
+		agreeToCheckInChange = 1
 		OryUIUpdateTextCard(crdSharedLockAgreeToCheckInChange, "position:-1000,-1000")
 		OryUIUpdateButtonGroup(grpSharedLockAgreeToCheckInChange, "position:-1000,-1000")
 	endif
@@ -592,10 +598,10 @@ if (screenToView = constSharedLockInformationScreen)
 		endif
 		if (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) < 4)
 			checkInFrequencyInSeconds = val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) * 900
-		elseif (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) < 28)
+		elseif (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) < 52) // 28
 			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) - 3) * 3600
 		else
-			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) - 27) * 86400
+			checkInFrequencyInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockCheckInFrequency)) - 49) * 86400 // 27
 		endif
 		if (checkInFrequencyInSeconds <> sharedLocks[sharedLockSelected, 0].checkInFrequencyInSeconds)
 			OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
@@ -630,10 +636,13 @@ if (screenToView = constSharedLockInformationScreen)
 		endif
 		if (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) < 4)
 			lateCheckInWindowInSeconds = val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) * 900
-		elseif (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) < 28)
+		elseif (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) < 52) // 28
 			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) - 3) * 3600
 		else
-			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) - 27) * 86400
+			lateCheckInWindowInSeconds = (val(OryUIGetInputSpinnerString(spinSharedLockLateCheckIns)) - 49) * 86400 // 27
+		endif
+		if (lateCheckInWindowInSeconds <> sharedLocks[sharedLockSelected, 0].lateCheckInWindowInSeconds)
+			OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
 		endif
 		OryUIUpdateText(txtSharedLockLateCheckIns, "text:Every " + ConvertSecondsToText(lateCheckInWindowInSeconds, 1))
 	else
@@ -777,6 +786,40 @@ if (screenToView = constSharedLockInformationScreen)
 		endif
 	endif
 	
+	// BLOCK TEST LOCKS?
+	if ((sharedLocks[sharedLockSelected, 0].fixed = 0 and sharedLocks[sharedLockSelected, 0].regularity# >= 0.25) or sharedLocks[sharedLockSelected, 0].fixed = 1)
+		if (redrawScreen = 1)
+			OryUIUpdateTextCard(crdSharedLockBlockTestLocks, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (OryUIGetButtonGroupItemSelectedName(grpSharedLockBlockTestLocks) = "Yes")
+				blockTestLocks = 1
+			endif
+			if (OryUIGetButtonGroupItemSelectedName(grpSharedLockBlockTestLocks) = "No")
+				blockTestLocks = 0
+			endif
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdSharedLockBlockTestLocks)
+		if (redrawScreen = 1)
+			OryUIUpdateButtonGroup(grpSharedLockBlockTestLocks, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+		endif
+		OryUIInsertButtonGroupListener(grpSharedLockBlockTestLocks)
+		if (OryUIGetButtonGroupItemReleasedIndex(grpSharedLockBlockTestLocks) > 0)
+			screen[screenNo].lastViewY# = GetViewOffsetY()
+			SetScreenToView(constSharedLockInformationScreen)
+		endif
+		elementY# = elementY# + OryUIGetButtonGroupHeight(grpSharedLockBlockTestLocks) + 2
+		if (blockTestLocks = 1 and sharedLocks[sharedLockSelected, 0].blockTestLocks = 0)
+			OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
+		elseif (blockTestLocks = 0 and sharedLocks[sharedLockSelected, 0].blockTestLocks = 1)
+			OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
+		endif	
+	else
+		if (redrawScreen = 1)
+			blockTestLocks = 0
+			OryUIUpdateTextCard(crdSharedLockBlockTestLocks, "position:-1000,-1000")
+			OryUIUpdateButtonGroup(grpSharedLockBlockTestLocks, "inputText:1;position:-1000,-1000")
+		endif
+	endif
+	
 	// BLOCK USERS WITH A SPECIFIC RATING?
 	if (redrawScreen = 1)
 		OryUIUpdateTextCard(crdSharedLockBlockUsersWithSpecificRating, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -801,7 +844,7 @@ if (screenToView = constSharedLockInformationScreen)
 		OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
 	elseif (blockUsersWithSpecificRating = 0 and sharedLocks[sharedLockSelected, 0].minRatingRequired > 1)
 		OryUIShowFloatingActionButton(fabSaveSharedLockInformation)
-	endif	
+	endif
 	
 	// MINIMUM RATING REQUIRED?
 	if (blockUsersWithSpecificRating = 1)
@@ -933,19 +976,16 @@ if (screenToView = constSharedLockInformationScreen)
 		validName as integer : validName = 1
 		newLockName$ = sharedLocks[sharedLockSelected, 0].lockName$
 		if (OryUIGetTextfieldString(editBoxSharedLockName) <> sharedLocks[sharedLockSelected, 0].lockName$)
-			if (StripString(OryUIGetTextfieldString(editBoxSharedLockName), " 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") <> "")
-				newLockName$ = ""
-				for i = 1 to len(OryUIGetTextfieldString(editBoxSharedLockName))
-					if (FindString(" 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", mid(OryUIGetTextfieldString(editBoxSharedLockName), i, 1)) > 0)
-						newLockName$ = newLockName$ + mid(OryUIGetTextfieldString(editBoxSharedLockName), i, 1)
-					endif
-				next
+			if (FindString(OryUIGetTextfieldString(editBoxSharedLockName), "&") or FindString(OryUIGetTextfieldString(editBoxSharedLockName), "="))
+				validName = 0
+				newLockName$ = OryUIGetTextfieldString(editBoxSharedLockName)
+				newLockName$ = ReplaceString(newLockName$, "&", "", -1)
+				newLockName$ = ReplaceString(newLockName$, "=", "", -1)
 				OryUIUpdateTextfield(editBoxSharedLockName, "inputText:" + newLockName$)
-				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Invalid Lock Name;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Lock names should only contain alphanumeric characters and spaces." + chr(10) + chr(10) + "For your convenience all other characters have been removed.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Invalid Lock Name;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Lock names can't contain the following characters[colon] & and =." + chr(10) + chr(10) + "For your convenience all instances of these characters have been removed (but not yet saved).;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 				OryUISetDialogButtonCount(dialog, 1)
 				OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
 				OryUIShowDialog(dialog)
-				validName = 0
 			elseif (len(OryUIGetTextfieldString(editBoxSharedLockName)) > 25)
 				OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Invalid Lock Name;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Lock names should be less than 26 characters.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 				OryUISetDialogButtonCount(dialog, 1)

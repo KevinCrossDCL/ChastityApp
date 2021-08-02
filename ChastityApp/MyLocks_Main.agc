@@ -5,7 +5,12 @@ if (screenToView = constMyLocksScreen)
 		filterMyLocksByFlagLabel$ as string : filterMyLocksByFlagLabel$ = ""
 		filterMyLocksByLabel$ as string : filterMyLocksByLabel$ = ""
 		lastMyLocksSearchLength as integer : lastMyLocksSearchLength = 0
-		OryUIUpdateTextfield(editMyLocksSearch, "inputText:;")
+		if (searchStringFromPreviousScreen$ <> "")
+			OryUIUpdateTextfield(editMyLocksSearch, "inputText:" + searchStringFromPreviousScreen$)
+		else
+			OryUIUpdateTextfield(editMyLocksSearch, "inputText:;")
+		endif
+		searchStringFromPreviousScreen$ = ""
 		sortMyLocksByLabel$ as string : sortMyLocksByLabel$ = ""
 	endif
 	screenNo = constMyLocksScreen
@@ -92,8 +97,6 @@ if (screenToView = constMyLocksScreen)
 	OryUIUpdateButton(btnTextSortedMyLocksBy, "text:" + sortMyLocksByLabel$ + " (" + sortMyLocksOrder$ + ");textColorID:" + str(colorMode[colorModeSelected].textColor) + ";colorID:" + str(colorMode[colorModeSelected].barColor) + ";position:" + str(OryUIGetButtonX(btnIconSortMyLocks) - OryUIGetButtonWidth(btnTextSortedMyLocksBy)) + "," + str(GetViewOffsetY() + elementY# + (GetSpriteHeight(sprFilterMyLocksBar) / 2)))
 	OryUIUpdateSprite(sprFilterMyLocksBarShadow, "position:" + str(screenNo * 100) + "," + str(GetViewOffsetY() + elementY# + GetSpriteHeight(sprFilterMyLocksBar)))
 	elementY# = elementY# + GetSpriteHeight(sprFilterMyLocksBar) //+ 2
-	
-	startScrollBarY# = elementY# + 1
 	
 	// PULL DOWN TO REFRESH
 	if (oryUIScrimVisible = 0)
@@ -307,6 +310,8 @@ if (screenToView = constMyLocksScreen)
 		elementY# = elementY# + 2
 	endif
 	
+	startScrollBarY# = elementY# - 1
+	
 	// SORT MY LOCKS
 	if (redrawScreen = 1 or len(OryUIGetTextFieldString(editMyLocksSearch)) <> lastMyLocksSearchLength)
 		lastMyLocksSearchLength = len(OryUIGetTextFieldString(editMyLocksSearch))
@@ -387,7 +392,7 @@ if (screenToView = constMyLocksScreen)
 	
 					if (OryUIGetSwipingVertically() = 0)
 						
-						if (OryUIGetSpriteReleased() = lockCard[i].sprOverlay)
+						if (OryUIGetSpriteReleased() = lockCard[i].sprOverlay and locks[sortedIteration].checkingForUpdates = 0 and noOfLockUpdatesAvailable = 0)
 							lockSelected = sortedIteration
 							if (locks[lockSelected].regularity# = 0.016667) then secondsLeft = (locks[lockSelected].timestampLastPicked + 60) - timestampNow
 							if (locks[lockSelected].regularity# = 0.25) then secondsLeft = (locks[lockSelected].timestampLastPicked + 900) - timestampNow
@@ -424,14 +429,12 @@ if (screenToView = constMyLocksScreen)
 									resetLockVisible as integer : resetLockVisible = 0
 									surpriseMeVisible as integer : surpriseMeVisible = 0
 									letKeyholderDecideVisible as integer : letKeyholderDecideVisible = 0
-									putGreenBackVisible as integer : putGreenBackVisible = 1
+									putGreenBackVisible as integer : putGreenBackVisible = 0
+									declineUnlockVisible as integer : declineUnlockVisible = 0
 									decideLaterVisible as integer : decideLaterVisible = 1
 									if (locks[lockSelected].fixed = 0)
 										resetLockVisible = 1
 										surpriseMeVisible = 1
-									endif
-									if (locks[lockSelected].fixed = 1)
-										putGreenBackVisible = 0
 									endif
 									if (locks[lockSelected].fixed = 1 and locks[lockSelected].regularity# = 0.016667)
 										resetLockVisible = 1
@@ -443,7 +446,13 @@ if (screenToView = constMyLocksScreen)
 									if (locks[lockSelected].keyholderDecisionDisabled = 0 and (locks[lockSelected].fixed = 1 and locks[lockSelected].regularity# = 0.016667 and (locks[lockSelected].botChosen > 0 or (locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0 and locks[lockSelected].removedByKeyholder = 0))))
 										letKeyholderDecideVisible = 1
 									endif
-									totalDialogButtons as integer : totalDialogButtons = revealCombinationVisible + resetLockVisible + surpriseMeVisible + letKeyholderDecideVisible + putGreenBackVisible + decideLaterVisible
+									if (locks[lockSelected].fixed = 0 and GetNoOfCards(lockSelected) > 0 and locks[lockSelected].greenCards = 0)
+										putGreenBackVisible = 1
+									endif
+									if (locks[lockSelected].fixed = 0 and GetNoOfCards(lockSelected) > locks[lockSelected].greenCards and locks[lockSelected].greenCards > 0)
+										declineUnlockVisible = 1
+									endif
+									totalDialogButtons as integer : totalDialogButtons = revealCombinationVisible + resetLockVisible + surpriseMeVisible + letKeyholderDecideVisible + putGreenBackVisible + declineUnlockVisible + decideLaterVisible
 									if (resetLockVisible = 1)
 										OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 									else
@@ -470,6 +479,10 @@ if (screenToView = constMyLocksScreen)
 									if (putGreenBackVisible = 1)
 										inc dialogButtonCount
 										OryUIUpdateDialogButton(lockCard[i].dialog, dialogButtonCount, "colorID:" + str(colorMode[colorModeSelected].backgroundColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									endif
+									if (declineUnlockVisible = 1)
+										inc dialogButtonCount
+										OryUIUpdateDialogButton(lockCard[i].dialog, dialogButtonCount, "colorID:" + str(colorMode[colorModeSelected].backgroundColor) + ";name:DeclineUnlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
 									endif
 									if (decideLaterVisible = 1)
 										inc dialogButtonCount
@@ -545,7 +558,13 @@ if (screenToView = constMyLocksScreen)
 								if (locks[lockSelected].fixed = 0 and locks[lockSelected].regularity# >= 6) then maxWaitTime = 3600 * 6
 								if (locks[lockSelected].fixed = 1 and locks[lockSelected].regularity# = 0.016667 and (locks[lockSelected].botChosen > 0 or (locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0 and locks[lockSelected].removedByKeyholder = 0))) then maxWaitTime = 3600 * 3
 								if (locks[lockSelected].readyToUnlock = 0 or (locks[lockSelected].readyToUnlock = 1 and maxWaitTime - (timestampNow - locks[lockSelected].timestampRequestedKeyholdersDecision) > 0))
-									if (locks[lockSelected].timestampHiddenFromOwner >= locks[lockSelected].timestampLocked and locks[lockSelected].hiddenFromOwnerAlertHidden = 0)
+									if (locks[lockSelected].keyholderAllowsFreeUnlock = 1)
+										OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Unlock For Free?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:This free unlock is available because the keyholder has trusted you with the option to unlock when needed. Perhaps you've discussed with them the need to be unlocked because of an upcoming appointment. " + chr(10) + chr(10) + "This will finish the lock and reveal your combination. And once unlocked, the lock cannot be continued!" + chr(10) + chr(10) + "It would be a good idea to discuss this with your keyholder (if you haven't already) before using this option.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
+										OryUISetDialogButtonCount(lockCard[i].dialog, 2)
+										OryUIUpdateDialogButton(lockCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:FreeKeyholderUnlock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIUpdateDialogButton(lockCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+										OryUIShowDialog(lockCard[i].dialog)
+									elseif (locks[lockSelected].timestampHiddenFromOwner >= locks[lockSelected].timestampLocked and locks[lockSelected].hiddenFromOwnerAlertHidden = 0)
 										if (locks[lockSelected].keyDisabled = 1 or locks[lockSelected].keyholderDisabledKey = 1)
 											OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Unlock For Free?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:The keyholder no longer manages this lock so you can unlock for free if you want." + chr(10) + chr(10) + "If you choose 'No' the key(s) will be enabled but they will need to be purchased to unlock early. You can also decide later if you want to wait." + chr(10) + chr(10) + "The free unlock option will disappear if the keyholder restores the deleted lock. It may have been deleted by mistake.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
 										else
@@ -644,6 +663,7 @@ if (screenToView = constMyLocksScreen)
 									surpriseMeVisible = 0
 									letKeyholderDecideVisible = 0
 									putGreenBackVisible = 0
+									declineUnlockVisible = 0
 									decideLaterVisible = 1
 									if (locks[lockSelected].fixed = 0)
 										resetLockVisible = 1
@@ -659,10 +679,13 @@ if (screenToView = constMyLocksScreen)
 									if (locks[lockSelected].keyholderDecisionDisabled = 0 and (locks[lockSelected].fixed = 1 and locks[lockSelected].regularity# = 0.016667 and (locks[lockSelected].botChosen > 0 or (locks[lockSelected].keyholderUsername$ <> "" and locks[lockSelected].hiddenFromOwner = 0 and locks[lockSelected].removedByKeyholder = 0))))
 										letKeyholderDecideVisible = 1
 									endif
-									if (locks[lockSelected].fixed = 0 and GetNoOfCards(lockSelected) > 0)
+									if (locks[lockSelected].fixed = 0 and GetNoOfCards(lockSelected) > 0 and locks[lockSelected].greenCards = 0)
 										putGreenBackVisible = 1
 									endif
-									totalDialogButtons = revealCombinationVisible + resetLockVisible + surpriseMeVisible + letKeyholderDecideVisible + putGreenBackVisible + decideLaterVisible
+									if (locks[lockSelected].fixed = 0 and GetNoOfCards(lockSelected) > locks[lockSelected].greenCards and locks[lockSelected].greenCards > 0)
+										declineUnlockVisible = 1
+									endif
+									totalDialogButtons = revealCombinationVisible + resetLockVisible + surpriseMeVisible + letKeyholderDecideVisible + putGreenBackVisible + declineUnlockVisible + decideLaterVisible
 									if (resetLockVisible = 1)
 										OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reveal Combination?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Would you like to reveal the combination or reset the lock and start again?" + chr(10) + chr(10) + "Resetting the lock will not change the combination.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 									else
@@ -690,6 +713,10 @@ if (screenToView = constMyLocksScreen)
 										inc dialogButtonCount
 										OryUIUpdateDialogButton(lockCard[i].dialog, dialogButtonCount, "colorID:" + str(colorMode[colorModeSelected].backgroundColor) + ";name:PutGreenBack;text:Put Green Back;textColorID:" + str(colorMode[colorModeSelected].textColor))
 									endif
+									if (declineUnlockVisible = 1)
+										inc dialogButtonCount
+										OryUIUpdateDialogButton(lockCard[i].dialog, dialogButtonCount, "colorID:" + str(colorMode[colorModeSelected].backgroundColor) + ";name:DeclineUnlock;text:Decline Unlock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+									endif
 									if (decideLaterVisible = 1)
 										inc dialogButtonCount
 										OryUIUpdateDialogButton(lockCard[i].dialog, dialogButtonCount, "colorID:" + str(colorMode[colorModeSelected].backgroundColor) + ";name:DecideLater;text:Decide Later;textColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -699,7 +726,7 @@ if (screenToView = constMyLocksScreen)
 							endif
 						endif
 						surpriseMe as integer : surpriseMe = 0
-						if (OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "FreeUnlock"))
+						if (OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "FreeUnlock") or OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "FreeKeyholderUnlock"))
 							UnlockLock(lockSelected, "Lockee", "FreeUnlock")
 						endif
 						if (OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "NoFreeUnlock"))
@@ -790,6 +817,23 @@ if (screenToView = constMyLocksScreen)
 							OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
 							OryUIShowDialog(screen[screenNo].dialog)
 						endif
+						if (OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "DeclineUnlock"))
+							if (locks[lockSelected].multipleGreensRequired = 0)
+								dialogButtonReleased$ = ""
+								OryUIUpdateDialog(screen[screenNo].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Are You Sure?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to continue the lock to find one green?;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+								OryUISetDialogButtonCount(screen[screenNo].dialog, 2)
+								OryUIUpdateDialogButton(screen[screenNo].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ConfirmedDeclineUnlock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIShowDialog(screen[screenNo].dialog)
+							else
+								dialogButtonReleased$ = ""
+								OryUIUpdateDialog(screen[screenNo].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Are You Sure?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Are you sure you want to continue the lock to find the remaining greens?;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+								OryUISetDialogButtonCount(screen[screenNo].dialog, 2)
+								OryUIUpdateDialogButton(screen[screenNo].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ConfirmedDeclineUnlock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIUpdateDialogButton(screen[screenNo].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CancelConfirm;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIShowDialog(screen[screenNo].dialog)
+							endif
+						endif
 	
 						// END OF LOCK ACTIONS CONFIRMED
 						surpriseMe = 0
@@ -811,6 +855,14 @@ if (screenToView = constMyLocksScreen)
 							locks[lockSelected].readyToUnlock = 0
 							UpdateLocksData(lockSelected)
 							UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:PutGreenBack", 1)
+							screen[screenNo].lastViewY# = GetViewOffsetY()
+							SetScreenToView(constMyLocksScreen)
+						endif
+						if (OryUIGetDialogButtonReleasedByName(screen[screenNo].dialog, "ConfirmedDeclineUnlock"))
+							dec locks[lockSelected].greensPickedSinceReset
+							locks[lockSelected].readyToUnlock = 0
+							UpdateLocksData(lockSelected)
+							UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:DeclineUnlock", 1)
 							screen[screenNo].lastViewY# = GetViewOffsetY()
 							SetScreenToView(constMyLocksScreen)
 						endif
@@ -857,7 +909,7 @@ if (screenToView = constMyLocksScreen)
 								endif
 								// FIXED LOCK VERSION 2.5.0+ (USING MINUTES)
 								if (locks[lockSelected].regularity# = 0.016667)
-									locks[lockSelected].minutes = floor((timestampNow - locks[lockSelected].timestampLocked) / 60) + locks[lockSelected].initialMinutes
+									locks[lockSelected].minutes = floor((timestampNow - locks[lockSelected].timestampLocked) / 60) + random2(locks[lockSelected].minimumMinutes, locks[lockSelected].maximumMinutes) //locks[lockSelected].initialMinutes
 								endif
 							endif
 							
@@ -888,6 +940,29 @@ if (screenToView = constMyLocksScreen)
 							UseKeys(i, lockSelected)
 						endif
 
+						// RESTART LOCK BUTTON
+						if (OryUIGetSpriteReleased() = lockCard[i].sprRestartButton or OryUIGetSpriteReleased() = lockCard[i].sprRestartIcon)
+							lockSelected = sortedIteration
+							if (noOfLocks = 20)
+								OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Too Many Locks;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:You currently have too many locks in your list of active locks and so can not reload this one. Please delete any completed or test locks and try again when ready.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+								OryUISetDialogButtonCount(lockCard[i].dialog, 1)
+								OryUIUpdateDialogButton(lockCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIShowDialog(lockCard[i].dialog)
+							else
+								OryUIUpdateDialog(lockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Reload Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:This will reload and start a new lock with the settings the keyholder set up for this lock.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+								OryUISetDialogButtonCount(lockCard[i].dialog, 2)
+								OryUIUpdateDialogButton(lockCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:ReloadLock;text:Reload Lock;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIUpdateDialogButton(lockCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+								OryUIShowDialog(lockCard[i].dialog)
+							endif
+						endif
+						if (OryUIGetDialogButtonReleasedByName(lockCard[i].dialog, "ReloadLock"))
+							sharedID$ = locks[lockSelected].sharedID$
+							GetSharedLockInformation(sharedID$, 1)
+							selectedLockOptionsTab = 2
+							SetScreenToView(constLockOptionsScreen)
+						endif
+						
 						// CHECK-IN
 						if (OryUIGetSpriteReleased() = lockCard[i].sprCheckInButton or OryUIGetSpriteReleased() = lockCard[i].sprCheckInIcon or OryUIGetSpriteReleased() = lockCard[i].sprCheckInCooldown)
 							lockSelected = sortedIteration

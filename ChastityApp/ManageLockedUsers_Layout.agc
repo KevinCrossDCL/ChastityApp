@@ -2,7 +2,7 @@
 screenNo = constManageLockedUsersScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:ABCDEFGHIJKLM;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:ABCDEFGHIJKLM;textAlignment:center;depth:10")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:Refresh;icon:refresh")
 
 // TABS
@@ -33,7 +33,7 @@ if (sortLockedUsersOrder$ = "DESC") then OryUISetButtonGroupItemSelectedByIndex(
 
 // SEARCH BAR
 sprLockedUsersSearchBar as integer : sprLockedUsersSearchBar = OryUICreateSprite("size:100,5.02;position:-1000,-1000;depth:19")
-editLockedUsersSearch as integer : editLockedUsersSearch = OryUICreateTextfield("labelText:Search locked lockees...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:cancel;depth:18")
+editLockedUsersSearch as integer : editLockedUsersSearch = OryUICreateTextfield("labelText:Search locked lockees...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:clear;depth:18")
 
 // LAST REFRESHED BAR
 sprLockedUsersLastRefreshedBar as integer : sprLockedUsersLastRefreshedBar = OryUICreateSprite("size:100,3;position:-1000,-1000;depth:15")

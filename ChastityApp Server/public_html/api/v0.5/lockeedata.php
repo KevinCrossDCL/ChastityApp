@@ -114,6 +114,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         $mainRole = "Unknown";
         if ($row["main_role"] == 1) { $mainRole = "Keyholder"; }
         if ($row["main_role"] == 2) { $mainRole = "Lockee"; }
+        $originalLockeeLevel = $row["lockee_level"];
         
         if ($row["status"] == 0 || $row["status"] == 1) {
             if (time() - $row["timestamp_last_active"] <= 900) {
@@ -176,11 +177,13 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
             if ($unlocked == 1) { $noOfLocksCompleted++; }
             if ($secondsLocked > $longestSecondsLocked && $unlocked == 1) { $longestSecondsLocked = $secondsLocked; }
             if ($timestampLocked >= $lastTimestampLocked && $timestampUnlocked <= $lastTimestampUnlocked) { continue; }
+            if ($timestampUnlocked <= $lastTimestampUnlocked) { continue; }
             if ($timestampLocked <= $lastTimestampUnlocked) {
                 $timestampLocked = $lastTimestampUnlocked;
                 $secondsLocked = $timestampUnlocked - $timestampLocked;
             }
             if ($timestampLocked >= $lastTimestampLocked && $timestampUnlocked > $lastTimestampUnlocked) { $cumulativeSecondsLocked = $cumulativeSecondsLocked + $secondsLocked; }
+            //if ($secondsLocked > $longestSecondsLocked && $unlocked == 1) { $longestSecondsLocked = $secondsLocked; }
             $lastTimestampLocked = $timestampLocked;
             $lastTimestampUnlocked = $timestampUnlocked;
         }
@@ -219,6 +222,12 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         elseif ($cumulativeMonthsLocked >= 6 && $cumulativeMonthsLocked < 12) { $lockeeLevel = 3; }
         elseif ($cumulativeMonthsLocked >= 2 && $cumulativeMonthsLocked < 6) { $lockeeLevel = 2; }
         else { $lockeeLevel = 1; }
+        
+        // UPDATE RECORD IF LEVEL HAS CHANGED
+        if ($lockeeLevel != $originalLockeeLevel) {
+            $query2 = $pdo->prepare("update `UserIDs_V2` set lockee_level = :lockeeLevel where user_id = :userID");
+            $query2->execute(array('lockeeLevel' => $lockeeLevel, 'userID' => $row["user_id"]));
+        }
     
         $query2 = $pdo->prepare("select id from Relations where 
             user_two_id = :userTwoID and 
@@ -341,6 +350,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
             l.red_cards as l_red_cards,
             l.regularity as l_regularity,
             l.ready_to_unlock as l_ready_to_unlock,
+            l.removed_by_keyholder as l_removed_by_keyholder,
             l.reset_cards as l_reset_cards,
             l.reset_frequency_in_seconds as l_reset_frequency_in_seconds,
             l.shared_id as l_shared_id,
@@ -356,6 +366,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
             l.timestamp_last_picked as l_timestamp_last_picked,
             l.timestamp_locked as l_timestamp_locked, 
             l.timestamp_real_last_picked as l_timestamp_real_last_picked,
+            l.timestamp_requested_keyholders_decision as l_timestamp_requested_keyholders_decision,
             l.timestamp_unlocked as l_timestamp_unlocked, 
             l.total_time_frozen as l_total_time_frozen,
             l.trust_keyholder as l_trust_keyholder, 
@@ -393,7 +404,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                 } elseif ($row["l_shared_id"] == "BOT04") {
                     $lockedBy = "Chase";
                 } else {
-                    $query2 = $pdo->prepare("select u.id as u_id, u.user_id as u_user_id, u.username as u_username, u.display_in_stats as u_display_in_stats, s.share_id as s_shared_id, s.name as s_name, s.share_in_api as s_share_in_api, s.user_id as s_user_id, s.hide_from_owner as s_hide_from_owner, s.timestamp_hidden as s_timestamp_hidden, l.id as l_id, l.user_id as l_user_id, l.shared_id as l_shared_id from UserIDs_V2 as u, ShareableLocks_V2 as s, Locks_V2 as l where l.id = :id and l.shared_id = s.share_id and s.user_id = u.user_id");
+                    $query2 = $pdo->prepare("select u.id as u_id, u.user_id as u_user_id, u.username as u_username, u.display_in_stats as u_display_in_stats, s.share_id as s_shared_id, s.name as s_name, s.share_in_api as s_share_in_api, s.user_id as s_user_id, s.hide_from_owner as s_hide_from_owner, s.timestamp_hidden as s_timestamp_hidden, l.id as l_id, l.user_id as l_user_id, l.shared_id as l_shared_id, l.removed_by_keyholder as l_removed_by_keyholder from UserIDs_V2 as u, ShareableLocks_V2 as s, Locks_V2 as l where l.id = :id and l.shared_id = s.share_id and s.user_id = u.user_id");
                     $query2->execute(array('id' => $row["l_id"]));
                     if ($query2->rowCount() == 1) {
                         foreach ($query2 as $row2) {
@@ -415,7 +426,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                                 $sharedLockQRCode = $appName."-Shareable-Lock-".$row["l_shared_id"];
                                 $sharedLockURL = $appServerDomain."/sharedlock/".$row["l_shared_id"];
                             }
-                            if ($row2["s_hide_from_owner"] == 1) {
+                            if ($row2["s_hide_from_owner"] == 1 || $row2["l_removed_by_keyholder"] == 1) {
                                 $lockedBy = "";
                                 $sharedLockID = "";
                                 $sharedLockQRCode = "";
@@ -447,8 +458,17 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                 
                 if ($row["l_unlocked"] == 0) {
                     if ($row["l_ready_to_unlock"] == 1) {
-                        $lockStatus = "ReadyToUnlock";
-                        $combination = "";
+                        $maxWaitTime = 0;
+					    if ($row["l_fixed"] == 0 && $row["l_regularity"] <= 3) { $maxWaitTime = 3600 * 3; }
+					    if ($row["l_fixed"] == 0 && $row["l_regularity"] >= 6) { $maxWaitTime = 3600 * 6; }
+					    if ($row["l_fixed"] == 1 && $row["l_regularity"] == 0.016667) { $maxWaitTime = 3600 * 3; }
+					    if ($maxWaitTime - (time() - $row["l_timestamp_requested_keyholders_decision"]) > 0) {
+					        $lockStatus = "AwaitingKeyholdersDecision";
+                            $combination = "";
+                        } else {
+                            $lockStatus = "ReadyToUnlock";
+                            $combination = "";
+                        }
                     } else {
                         if ($apiUserID != $lockedByUserID) {
                             if ($row["l_fake"] == 0) {
@@ -522,7 +542,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                     'lockGroupID' => (int)$lockGroupID,
                     'lockID' => (int)$lockID,
                     'lockedBy' => $lockedBy,
-                    'lockName' => $lockName,
+                    'lockName' => RemoveEmoji($lockName),
                     'sharedLockID' => $sharedLockID,
                     'sharedLockQRCode' => $sharedLockQRCode,
                     'sharedLockURL' => $sharedLockURL,
@@ -568,6 +588,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                     'timestampLocked' => (int)$row["l_timestamp_locked"],
                     'timestampNextPick' => (int)$timestampNextPick,
                     'timestampRealLastPicked' => (int)$row["l_timestamp_real_last_picked"],
+                    'timestampRequestedKeyholdersDecision' => (int)$row["l_timestamp_requested_keyholders_decision"],
                     'timestampUnlocked' => (int)$row["l_timestamp_unlocked"],
                     'totalTimeFrozen' => $totalTimeFrozen,
                     'trustKeyholder' => (int)$row["l_trust_keyholder"],

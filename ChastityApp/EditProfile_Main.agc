@@ -14,7 +14,18 @@ if (screenToView = constEditProfileScreen)
 		else
 			OryUISetButtonGroupItemSelectedByIndex(grpPrivateProfile, 2)
 		endif
-		
+		if (showKeyholderStatsOnProfile = 1 and showLockeeStatsOnProfile = 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpShowStatsOnProfile, 1)
+		endif
+		if (showKeyholderStatsOnProfile = 0 and showLockeeStatsOnProfile = 1)
+			OryUISetButtonGroupItemSelectedByIndex(grpShowStatsOnProfile, 2)
+		endif
+		if (showKeyholderStatsOnProfile = 1 and showLockeeStatsOnProfile = 1)
+			OryUISetButtonGroupItemSelectedByIndex(grpShowStatsOnProfile, 3)
+		endif
+		if (showKeyholderStatsOnProfile = 0 and showLockeeStatsOnProfile = 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpShowStatsOnProfile, 4)
+		endif
 		resetOptions = 0
 	endif
 		
@@ -119,6 +130,29 @@ if (screenToView = constEditProfileScreen)
 	endif
 	elementY# = elementY# + OryUIGetButtonGroupHeight(grpMainRole) + 2
 
+	// SHOW STATS ON PROFILE
+	if (redrawScreen = 1)
+		OryUIUpdateTextCard(crdShowStatsOnProfile, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+	endif
+	elementY# = elementY# + OryUIGetTextCardHeight(crdShowStatsOnProfile)
+	if (redrawScreen = 1)
+		OryUIUpdateButtonGroup(grpShowStatsOnProfile, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+	endif
+	OryUIInsertButtonGroupListener(grpShowStatsOnProfile)
+	if (OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 1 and (showKeyholderStatsOnProfile = 0 or showLockeeStatsOnProfile = 1))
+		OryUIShowFloatingActionButton(fabSaveProfile)
+	endif
+	if (OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 2 and (showLockeeStatsOnProfile = 0 or showKeyholderStatsOnProfile = 1))
+		OryUIShowFloatingActionButton(fabSaveProfile)
+	endif
+	if (OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 3 and (showKeyholderStatsOnProfile = 0 or showLockeeStatsOnProfile = 0))
+		OryUIShowFloatingActionButton(fabSaveProfile)
+	endif
+	if (OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 4 and (showKeyholderStatsOnProfile = 1 or showLockeeStatsOnProfile = 1))
+		OryUIShowFloatingActionButton(fabSaveProfile)
+	endif
+	elementY# = elementY# + OryUIGetButtonGroupHeight(grpShowStatsOnProfile) + 2
+	
 	// APP USER ID
 	if (redrawScreen = 1)
 		appUserIDVisible as integer : appUserIDVisible = 0
@@ -184,7 +218,7 @@ if (screenToView = constEditProfileScreen)
 		endif
 	endif
 	OryUIInsertListListener(listConnectDiscord)
-	if (OryUIGetListItemRightIconReleased(listConnectDiscord) >= 0 and OryUIGetListItemRightIconReleasedType(listConnectDiscord) = "Delete")
+	if (OryUIGetListItemRightIconReleased(listConnectDiscord) >= 0 and lower(OryUIGetListItemRightIconReleasedType(listConnectDiscord)) = "custom")
 		OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Disconnect Discord?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Disconnecting Discord might make it harder to find you on Discord.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 		OryUISetDialogButtonCount(dialog, 2)
 		OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesDisconnectDiscord;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -204,7 +238,7 @@ if (screenToView = constEditProfileScreen)
 		endif
 	endif
 	OryUIInsertListListener(listConnectTwitter)
-	if (OryUIGetListItemRightIconReleased(listConnectTwitter) >= 0 and OryUIGetListItemRightIconReleasedType(listConnectTwitter) = "Delete")
+	if (OryUIGetListItemRightIconReleased(listConnectTwitter) >= 0 and lower(OryUIGetListItemRightIconReleasedType(listConnectTwitter)) = "custom")
 		OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Disconnect Twitter?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Disconnecting Twitter will remove your Twitter handle from your profile and account.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
 		OryUISetDialogButtonCount(dialog, 2)
 		OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesDisconnectTwitter;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
@@ -260,12 +294,34 @@ if (screenToView = constEditProfileScreen)
 				CheckNewUsername(newUsername$, 1)
 			endif
 		endif
+		
 		if (OryUIGetButtonGroupItemSelectedIndex(grpPrivateProfile) = 1)
 			privateProfile = 1
 		else
 			privateProfile = 0
 		endif
-		SaveLocalVariable("privateProfile", str(privateProfile))
+		
+		if (OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 1)
+			showKeyholderStatsOnProfile = 1
+			SaveLocalVariable("showKeyholderStatsOnProfile", str(showKeyholderStatsOnProfile))
+			showLockeeStatsOnProfile = 0
+			SaveLocalVariable("showLockeeStatsOnProfile", str(showLockeeStatsOnProfile))
+		elseif (	OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 2)
+			showKeyholderStatsOnProfile = 0
+			SaveLocalVariable("showKeyholderStatsOnProfile", str(showKeyholderStatsOnProfile))
+			showLockeeStatsOnProfile = 1
+			SaveLocalVariable("showLockeeStatsOnProfile", str(showLockeeStatsOnProfile))
+		elseif (	OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 3)
+			showKeyholderStatsOnProfile = 1
+			SaveLocalVariable("showKeyholderStatsOnProfile", str(showKeyholderStatsOnProfile))
+			showLockeeStatsOnProfile = 1
+			SaveLocalVariable("showLockeeStatsOnProfile", str(showLockeeStatsOnProfile))
+		elseif (	OryUIGetButtonGroupItemSelectedIndex(grpShowStatsOnProfile) = 4)
+			showKeyholderStatsOnProfile = 0
+			SaveLocalVariable("showKeyholderStatsOnProfile", str(showKeyholderStatsOnProfile))
+			showLockeeStatsOnProfile = 0
+			SaveLocalVariable("showLockeeStatsOnProfile", str(showLockeeStatsOnProfile))
+		endif
 		
 		statusSelected = OryUIGetButtonGroupItemSelectedIndex(grpSetStatus)
 		SaveLocalVariable("statusSelected", str(statusSelected))

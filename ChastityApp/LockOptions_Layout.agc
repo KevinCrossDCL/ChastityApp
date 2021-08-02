@@ -2,7 +2,7 @@
 screenNo = constLockOptionsScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Lock Options;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Lock Options;textAlignment:center;depth:10")
 
 // TABS
 screen[screenNo].tabs = OryUICreateTabs("position:-1000,-1000;scrollable:false;depth:10")
@@ -316,6 +316,13 @@ OryUISetButtonGroupItemSelectedByIndex(grpLimitNumberOfUsers, 2)
 // MAXIMUM NUMBER OF USERS
 crdMaximumNumberOfUsers as integer : crdMaximumNumberOfUsers = OryUICreateTextCard("width:94;headerText:Maximum number of users?;supportingText:Fake locks aren't included in this count.;position:-1000,-1000;autoHeight:true;depth:19")
 spinMaximumNumberOfUsers as integer : spinMaximumNumberOfUsers = OryUICreateInputSpinner("size:27,5;min:1;max:100;step:1;defaultValue:40;maxLength:1;autoCorrectIfOutOfRange:true;position:-1000,-1000;depth:18")
+
+// BLOCK TEST LOCKS?
+crdBlockTestLocks as integer : crdBlockTestLocks = OryUICreateTextCard("width:94;headerText:Block test locks?;supportingText:If 'Yes' then the user won't be able to load your lock as a test lock. You may still get users loading the lock without actually locking anything away which isn't something that can be stopped. Blocking test locks means the lock will be flagged as a real one, and will be included in the users stats/history.;position:-1000,-1000;autoHeight:true;depth:19")
+grpBlockTestLocks as integer : grpBlockTestLocks = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
+OryUIInsertButtonGroupItem(grpBlockTestLocks, -1, "name:Yes;text:Yes")
+OryUIInsertButtonGroupItem(grpBlockTestLocks, -1, "name:No;text:No")
+OryUISetButtonGroupItemSelectedByIndex(grpBlockTestLocks, 2)
 
 // BLOCK USERS WITH A SPECIFIC RATING?
 crdBlockUsersWithSpecificRating as integer : crdBlockUsersWithSpecificRating = OryUICreateTextCard("width:94;headerText:Block users with a specific rating?;supportingText:If yes, you can restrict the lock so that only users with a certain rating and above can load the lock which is useful if you want to block users that have been rated badly by other users. Doing so may however lower your chances of finding people to load it, and it will also block all new users which haven't been rated yet, or haven't enough ratings to calculate a fair average rating.;position:-1000,-1000;autoHeight:true;depth:19")

@@ -164,8 +164,22 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
         }
         $userID = $row["user_id"];
     }
-    $query = $pdo->prepare("select l.id from Locks_V2 as l where l.user_id = :userID and l.lock_id = :logID and l.lock_group_id = :lockID");
-    $query->execute(array('userID' => $userID, 'logID' => $postData['logid'], 'lockID' => $postData['lockid']));
+    $lockGroupID = 0;
+    $lockID = 0;
+    $lockName = "";
+    if ($postData['lockid'] > 0) {
+        if (strlen($postData['lockid']) == 12) {
+            $lockID = (integer)substr($postData['lockid'], 0, 10) + (integer)substr($postData['lockid'], 11, 2);
+        } else {
+            $lockGroupID = (integer)$postData['lockid'];
+        }
+    } elseif ($postData['lockname'] <> '') {
+        $lockName = (string)$postData['lockname'];
+    } elseif ($postData['lockgroupid'] > 0) {
+        $lockGroupID = (integer)$postData['lockgroupid'];
+    }
+    $query = $pdo->prepare("select l.id from Locks_V2 as l where l.user_id = :userID and ((l.lock_group_id > 0 and :lockGroupID = 0 and :lockID = 0) or (l.lock_group_id = :lockGroupID and :lockGroupID > 0) or (l.lock_id = :lockID and :lockID > 0))");
+    $query->execute(array('userID' => $userID, 'lockGroupID' => $lockGroupID, 'lockID' => $lockID));
     if ($query->rowCount() == 1) {
         if ($limit > 0) { $limitString = " limit ".$limit; }
         else { $limitString = ""; }

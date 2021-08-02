@@ -2,7 +2,7 @@
 screenNo = constViewProfileScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Profile;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Profile;textAlignment:center;depth:10")
 
 // MORE MENU
 screen[screenNo].menuMore = OryUICreateMenu("width:60;depth:5")
@@ -39,7 +39,10 @@ next
 txtProfileRating as integer : txtProfileRating = OryUICreateText("string:X.X out of X (XXX);size:2;alignment:center;position:-1000,-1000;depth:14")
 
 // LAST ONLINE
-txtProfileLastOnline as integer : txtProfileLastOnline = OryUICreateText("string:;alignment:center;size:2.4;position:-1000,-1000")
+txtProfileLastOnline as integer : txtProfileLastOnline = OryUICreateText("string:;alignment:center;size:2.4;position:-1000,-1000;depth:14")
+
+// JOINED
+txtProfileJoined as integer : txtProfileJoined = OryUICreateText("string:;alignment:center;size:2.4;position:-1000,-1000;depth:14")
 
 // PRIVATE ACCOUNT
 txtPrivateAccountLine1 as integer : txtPrivateAccountLine1 = OryUICreateText("text:Private Account;size:3;bold:true;position:-1000,-1000;alignment:center;depth:14")
@@ -73,7 +76,20 @@ txtDiscordName as integer : txtDiscordName = OryUICreateText("text: ;size:3;posi
 // TWITTER LOGO
 sprTwitterLogo as integer : sprTwitterLogo = OryUICreateSprite("size:-1,4;position:-1000,-1000;image:" + str(imgTwitterLogo) + ";color:29,161,242,255;depth:14")
 sprTwitterHandleButton as integer : sprTwitterHandleButton = OryUICreateSprite("size:5,5;position:-1000,-1000;alpha:0;depth:15")
-txtTwitterHandle as integer : txtTwitterHandle = OryUICreateText("text: ;size:3;position:-1000,-1000")
+txtTwitterHandle as integer : txtTwitterHandle = OryUICreateText("text: ;size:3;position:-1000,-1000;depth:14")
+
+// STATS
+crdStats as integer[9]
+txtKeyholderStats as integer : txtKeyholderStats = OryUICreateText("size:2.8;text:Keyholder Stats;alignment:center;bold:true;position:-1000,-1000;depth:19")
+crdStats[1] = OryUICreateTextCard("size:45.5,10;headerText:Stat 1;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+crdStats[2] = OryUICreateTextCard("size:45.5,10;headerText:Stat 2;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+txtLockeeStats as integer : txtLockeeStats = OryUICreateText("size:2.8;text:Lockee Stats;alignment:center;bold:true;position:-1000,-1000;depth:19")
+crdStats[3] = OryUICreateTextCard("size:45.5,10;headerText:Stat 3;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+crdStats[4] = OryUICreateTextCard("size:45.5,10;headerText:Stat 4;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+crdStats[5] = OryUICreateTextCard("size:45.5,10;headerText:Stat 5;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+crdStats[6] = OryUICreateTextCard("size:45.5,10;headerText:Stat 6;headerTextAlignment:center;headerTextSize:2.0;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:3.7;position:-1000,-1000;depth:19")
+//~crdStats[7] = OryUICreateTextCard("size:45.5,10;headerText:Stat 7;headerTextAlignment:center;headerTextSize:2.5;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:4;position:-1000,-1000;depth:19")
+//~crdStats[8] = OryUICreateTextCard("size:45.5,10;headerText:Stat 8;headerTextAlignment:center;headerTextSize:2.5;supportingText:XXd XXh XXm;supportingTextAlignment:center;supportingTextSize:4;position:-1000,-1000;depth:19")
 
 // SCROLL TO TOP
 screen[screenNo].scrollToTop = OryUICreateScrollToTop("")

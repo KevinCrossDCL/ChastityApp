@@ -2,13 +2,13 @@
 screenNo = constAPIProjectSettingsScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:API Project;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:API Project;textAlignment:center;depth:10")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;depth:20")
 
 // PROJECT NAME
-editBoxAPIProjectName as integer : editBoxAPIProjectName = OryUICreateTextfield("labelText:Project Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:cancel;depth:19")
+editBoxAPIProjectName as integer : editBoxAPIProjectName = OryUICreateTextfield("labelText:Project Name;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:clear;depth:19")
 
 // WHAT ARE YOU BUILDING?
 crdWhatAreYouBuilding as integer : crdWhatAreYouBuilding = OryUICreateTextCard("width:94;headerText:What are you building?;headerTextAlignment:center;supportingText:;supportingTextAlignment:center;position:-1000,-1000;autoHeight:true;depth:19")

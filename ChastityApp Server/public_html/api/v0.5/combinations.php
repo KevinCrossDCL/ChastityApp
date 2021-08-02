@@ -185,7 +185,7 @@ if ($query->rowCount() == 0 || $query->rowCount() > 1) {
                 'lockGroupID' => (int)$lockGroupID,
                 'lockID' => (int)$lockID,
                 'lockedBy' => $lockedBy,
-                'lockName' => $lockName,
+                'lockName' => RemoveEmoji($lockName),
                 'build' => (int)$lockBuild,
                 'combination' => $row["l_combination"],
                 'test' => (int)$row["l_test"],

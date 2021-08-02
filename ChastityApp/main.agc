@@ -1,6 +1,6 @@
 
 //   Created: 10/12/2016
-//	 Updated: 09/11/2020
+//	 Updated: 02/08/2021
 
 #option_explicit
 
@@ -61,6 +61,8 @@ tmpVersionNumber$ = ReplaceString(tmpVersionNumber$, ".", "_", -1)
 #constant constLockGeneratorScreen 38
 #constant constLockGeneratorInformationScreen 39
 #constant constLockGeneratorResultsScreen 40
+#constant constRecentActivityScreen 50
+#constant constRandomCombinationsToolScreen 70
 #constant constCardsScreen 100
 #constant constLoginScreen 200
 #constant constRegisterScreen 300
@@ -68,6 +70,7 @@ tmpVersionNumber$ = ReplaceString(tmpVersionNumber$, ".", "_", -1)
 #insert "..\OryUI Framework\OryUI.agc"
 #insert "..\OryUI Framework\OryUIButton.agc"
 #insert "..\OryUI Framework\OryUIButtonGroup.agc"
+#insert "..\OryUI Framework\OryUICheckbox.agc"
 #insert "..\OryUI Framework\OryUIDialog.agc"
 #insert "..\OryUI Framework\OryUIEditAvatarScreen.agc"
 #insert "..\OryUI Framework\OryUIFloatingActionButton.agc"
@@ -82,6 +85,7 @@ tmpVersionNumber$ = ReplaceString(tmpVersionNumber$, ".", "_", -1)
 #insert "..\OryUI Framework\OryUIScrollBar.agc"
 #insert "..\OryUI Framework\OryUIScrollToTop.agc"
 #insert "..\OryUI Framework\OryUISprite.agc"
+#insert "..\OryUI Framework\OryUISwitch.agc"
 #insert "..\OryUI Framework\OryUITabs.agc"
 #insert "..\OryUI Framework\OryUIText.agc"
 #insert "..\OryUI Framework\OryUITextCard.agc"
@@ -121,35 +125,60 @@ if (debugMode = 1)
 endif
 
 if (GetDeviceBaseName() = "android")
+	LoadConsentStatusAdMob("pub-xxxxxxxxxxxxxxxx", constAppMarketingDomain$ + "/privacy-policy")
+	while (GetConsentStatusAdMob() < 0)
+		Sync()
+	endwhile
+	if (GetConsentStatusAdMob() = 0) 
+		RequestConsentAdMob()
+		local timeout# as float : timeout# = Timer() + 1
+		while (GetConsentStatusAdMob() < 0 and Timer() < timeout#)
+			Sync()
+		endwhile
+	endif
+
 	store$ = "Google Play"
 	SetAdMobDetails(constAdMobAndroid$)
 	SetPushNotificationKeys("SenderID", constPushNotificationSenderID$)
 	InAppPurchaseSetTitle(constAppName$)
-	InAppPurchaseSetKeys(constInAppPurchaseSetKeyAndroid$, "")
+	//InAppPurchaseSetKeys(constInAppPurchaseSetKeyAndroid$, "")
 	InAppPurchaseAddProductID("remove_ads", 0)
-	InAppPurchaseAddProductID("1_key", 1)
-	InAppPurchaseAddProductID("2_keys", 1)
-	InAppPurchaseAddProductID("5_keys", 1)
-	InAppPurchaseAddProductID("10_keys", 1)
-	InAppPurchaseAddProductID("25_keys", 1)
-	InAppPurchaseAddProductID("50_keys", 1)
+	InAppPurchaseAddProductID("1_key", 0)
+	InAppPurchaseAddProductID("2_keys", 0)
+	InAppPurchaseAddProductID("5_keys", 0)
+	InAppPurchaseAddProductID("10_keys", 0)
+	InAppPurchaseAddProductID("25_keys", 0)
+	InAppPurchaseAddProductID("50_keys", 0)
 	InAppPurchaseSetup()
 elseif (GetDeviceBaseName() = "ios")
+//~	LoadConsentStatusAdMob("pub-xxxxxxxxxxxxxxxx", constAppMarketingDomain$ + "/privacy-policy")
+//~	while (GetConsentStatusAdMob() < 0)
+//~		Sync()
+//~	endwhile
+//~	if (GetConsentStatusAdMob() = 0) 
+//~		RequestConsentAdMob()
+//~		timeout# = Timer() + 2
+//~		while (GetConsentStatusAdMob() < 0 and Timer() < timeout#)
+//~			Sync()
+//~		endwhile
+//~	endif
+
 	store$ = "App Store"
-	SetAdMobDetails(constAdMobiOS$)
+//~	SetAdMobDetails(constAdMobiOS$)
 	SetPushNotificationKeys("SenderID", constPushNotificationSenderID$)
 	InAppPurchaseSetTitle(constAppName$)
 	InAppPurchaseAddProductID("remove_ads", 0)
-	InAppPurchaseAddProductID("1_key", 1)
-	InAppPurchaseAddProductID("2_keys", 1)
-	InAppPurchaseAddProductID("5_keys", 1)
-	InAppPurchaseAddProductID("10_keys", 1)
-	InAppPurchaseAddProductID("25_keys", 1)
-	InAppPurchaseAddProductID("50_keys", 1)
+	InAppPurchaseAddProductID("1_key", 0)
+	InAppPurchaseAddProductID("2_keys", 0)
+	InAppPurchaseAddProductID("5_keys", 0)
+	InAppPurchaseAddProductID("10_keys", 0)
+	InAppPurchaseAddProductID("25_keys", 0)
+	InAppPurchaseAddProductID("50_keys", 0)
 	InAppPurchaseSetup()
 elseif (GetDeviceBaseName() = "mac")
 	store$ = "Mac Store"
 	SetWindowSize(405, 832, 0)
+	//SetWindowSize(428, 926, 0)
 	SetDisplayAspect(-1)
 	SetWindowTitle(constAppName$)
 endif
@@ -227,6 +256,9 @@ Sync()
 #insert "LockGeneratorResults_Layout.agc"
 #insert "Cards_Layout.agc"
 Sync()
+#insert "RecentActivity_Layout.agc"
+#insert "RandomCombinationsTool_Layout.agc"
+Sync()
 
 SetSpritePosition(sprPreSplashScreenGradient, -1000,-1000)
 
@@ -239,6 +271,8 @@ shownDeactivatingAlertThisSession as integer : shownDeactivatingAlertThisSession
 shownSaveYourUserIDAlertThisSession as integer : shownSaveYourUserIDAlertThisSession = 0
 
 screenToView = constSplashScreen
+
+OryUIDisableFlickScroll()
 
 do
 	if (debugMode = 1)
@@ -266,8 +300,8 @@ do
 	
 	OryUIInsertDialogListener(dialog)
 	
+	secondsRunning = GetSeconds()
 	if (screenNo <> constSplashScreen and screenNo <> constLoginScreen)
-		secondsRunning = GetSeconds()
 		if (GetInternetState() = 0)
 			SetOfflineValue(1)
 		elseif (offline = 1)
@@ -346,6 +380,10 @@ do
 	#insert "LockGeneratorInformation_Main.agc"
 	#insert "LockGeneratorResults_Main.agc"
 	#insert "Cards_Main.agc"
+	#insert "RecentActivity_Main.agc"
+	#insert "TransferAccount_Main.agc"
+	#insert "RandomCombinationsTool_Main.agc"
+	#insert "FindUsers_Main.agc"
 
 	#insert "HTTPSQueueResponse.agc"
 	
@@ -380,11 +418,17 @@ do
 		if (userID$ <> GetCloudDataVariable(lower(constAppName$) + ".userID", ""))
 			dialogShown$ = "SaveUserID"
 			OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Save Your User ID;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:" + userID$ + chr(10) + chr(10) + "All of your locks are backed up online with the above user id. Please take a note of this unique user id in case you need to restore these locks on a new device, or after a new install. You can restore locks from another user id from the main menu." + chr(10) + chr(10) + "Please note that your user id and username are different and that locks can't be restored without your user id, even if you remember your username." + chr(10) + chr(10) + "Do not share your user id with others.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:true;checkboxColorID:" + str(colorMode[colorModeSelected].textColor) + ";checkboxText:Do not show again;checkBoxTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";stackButtons:true;flexButtons:true;decisionRequired:true")
-			OryUISetDialogButtonCount(dialog, 1)
-			OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUISetDialogButtonCount(dialog, 2)
+			OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CopyUserID;text:Copy User ID;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Ok;text:Ok;textColorID:" + str(colorMode[colorModeSelected].textColor))
 			OryUIShowDialog(dialog)
 		endif
 		shownSaveYourUserIDAlertThisSession = 1
+	endif
+	if (OryUIGetDialogButtonReleasedByName(dialog, "CopyUserID"))
+		SetClipboardText(userID$)
+		OryUIUpdateTooltip(tooltip, "text:Copied to clipboard")
+		OryUIShowTooltip(tooltip, GetViewOffsetX() + 50, GetViewOffsetY() + screenBoundsTop# + 90)
 	endif
 	if (OryUIGetDialogChecked(dialog) and dialogShown$ = "SaveUserID")
 		saveYourUserIDAlertHidden = 1
@@ -581,7 +625,13 @@ do
 	endif
 	
 	// PLEASE WAIT WHEEL
-	if (redrawScreen = 1) then OryUIUpdateProgressIndicator(pleaseWait, "colorID:" + str(theme[themeSelected].color[3]))
+	if (redrawScreen = 1)
+		if (screenNo = constSplashScreen or screenNo = constLoginScreen or screenNo = constRegisterScreen)
+			OryUIUpdateProgressIndicator(pleaseWait, "size:-1,15;colorID:" + str(theme[themeSelected].color[3]))
+		else
+			OryUIUpdateProgressIndicator(pleaseWait, "size:-1,10;colorID:" + str(theme[themeSelected].color[3]))
+		endif
+	endif
 	showPleaseWaitWheel = 0
 	if (OryUIGetHTTPSQueueItemCount(httpsQueue) > 0 and offline = 0) then showPleaseWaitWheel = 1
 	if (screenNo <> constSplashScreen)
@@ -625,7 +675,7 @@ do
 	if (offline = 1 and GetInternetState() = 1) then offlineReason$ = "Connection Problem"
 	if (offline = 1 and GetInternetState() = 0) then offlineReason$ = "No Internet Connection"
 	if (maintenance = 1) then offlineReason$ = "Server Maintenance"
-	if ((maintenance = 1 or offline = 1) and OryUIGetNavigationDrawerVisible(navigationDrawer) = 0)
+	if ((maintenance = 1 or offline = 1 and oryUIDialogVisible = 0) and OryUIGetNavigationDrawerVisible(navigationDrawer) = 0)
 		SetAdvertVisible(0)
 		OryUIUpdateSprite(sprOfflineMode, "position:" + str(GetViewOffsetX()) + "," + str(GetViewOffsetY() + screenBoundsTop# + 91))
 		if (GetInternetState() = 0)
@@ -666,9 +716,9 @@ syncScreen:
 	OryUIEndTrackingTouch()
 
 	redrawScreen = 0
-    UpdateAllTweens(GetFrameTime())
-    Sync()
-    
+	UpdateAllTweens(GetFrameTime())
+	Sync()
+
     if (notificationsOn = 2)
 		pushNotificationToken$ = ""
 	else
@@ -682,12 +732,14 @@ syncScreen:
 		if (timestampResumed - timestampBeforeResumed >= 300)
 			if (OryUIHTTPSQueueCollection[httpsQueue].http > 0)
 				OryUIDeleteHTTPSQueue(httpsQueue)
-				OryUIHTTPSQueueCollection[httpsQueue].http = CreateHTTPConnection()
-				SetHTTPHost(OryUIHTTPSQueueCollection[httpsQueue].http, OryUIHTTPSQueueCollection[httpsQueue].domain$, OryUIHTTPSQueueCollection[httpsQueue].ssl)
-				SetHTTPTimeout(OryUIHTTPSQueueCollection[httpsQueue].http, OryUIHTTPSQueueCollection[httpsQueue].timeout)
+				httpsQueue = OryUICreateHTTPSQueue("domain:" + domain$ + ";ssl:" + str(ssl) + ";delay:0.05;timeout:10000")
+				//OryUIHTTPSQueueCollection[httpsQueue].http = CreateHTTPConnection()
+				//SetHTTPHost(OryUIHTTPSQueueCollection[httpsQueue].http, OryUIHTTPSQueueCollection[httpsQueue].domain$, OryUIHTTPSQueueCollection[httpsQueue].ssl)
+				//SetHTTPTimeout(OryUIHTTPSQueueCollection[httpsQueue].http, OryUIHTTPSQueueCollection[httpsQueue].timeout)
 			endif
 		endif
 		if (screenNo = constCardsScreen and ((timestampResumed - timestampBeforeResumed >= 30) or timestampNow < 1500000000))
+			OryUIHideDialog(dialog)
 			ClearLargeCard()
 			OryUIUpdateButton(btnCancelCard, "position:-1000,-1000")
 			OryUIUpdateButton(btnViewCard, "position:-1000,-1000")
@@ -698,15 +750,19 @@ syncScreen:
 			timestampFromServer = 0
 			timestampNow = 0
 			GetServerVariables(1)
-			SetScreenToView(selectedLocksTab)
-		endif
-		if (timestampResumed - timestampBeforeResumed >= 15)
+			ClearBreadcrumbs()
+			screenToView = selectedLocksTab
+			changingScreen = 1
+			AddBreadcrumb(selectedLocksTab)
+		elseif (timestampResumed - timestampBeforeResumed >= 15)
 			if (OryUIGetNavigationDrawerVisible(navigationDrawer)) then OryUIHideNavigationDrawer(navigationDrawer)
 			secondsLast5MinuteRefresh = GetSeconds()
 			secondsLast1MinuteRefresh = GetSeconds()
-			timestampFromServer = 0
-			timestampNow = 0
 			GetServerVariables(1)
+			if (screenNo = constMyLocksScreen or screenNo = constSharedLocksScreen) then ClearBreadcrumbs()
+			screenToView = screenNo
+			changingScreen = 1
+			AddBreadcrumb(screenNo)
 		endif
 	endif
 	if (screenNo <> constSplashScreen and screenNo <> constLoginScreen and screenNo <> constSetCombinationScreen and screenNo <> constRandomCombinationsScreen)
@@ -715,7 +771,7 @@ syncScreen:
 			GetLocksData()
 			GetAccountData(0)
 			if (screenNo = constSharedLocksScreen)
-				GetSharedLocksData(0)
+				GetSharedLocksData(1)
 				if (OryUIGetNavigationDrawerVisible(navigationDrawer) = 0 and noOfLocks > 0)
 					GetKeyholdersData(0)
 					GetLockUpdates(0)
@@ -728,6 +784,12 @@ syncScreen:
 				GetSharedLocksData(0)
 			endif
 			UpdateAccount(0)
+			if (screenNo = constMyLocksScreen)
+				ClearBreadcrumbs()
+				screenToView = screenNo
+				changingScreen = 1
+				AddBreadcrumb(screenNo)
+			endif
 		endif
 		if (resumed = 0)
 			if (OryUIGetSwipingVertically() = 0 and OryUIGetSwipingHorizontally() = 0)
@@ -775,12 +837,16 @@ syncScreen:
 				GetServerVariables(1)
 			endif
 			if (screenNo = constCardsScreen)
+				OryUIHideDialog(dialog)
 				ClearLargeCard()
 				OryUIUpdateButton(btnCancelCard, "position:-1000,-1000")
 				OryUIUpdateButton(btnViewCard, "position:-1000,-1000")
 				cardChosen = 0
 				cardSelected = 0
-				SetScreenToView(selectedLocksTab)
+				ClearBreadcrumbs()
+				screenToView = selectedLocksTab
+				changingScreen = 1
+				AddBreadcrumb(selectedLocksTab)
 			endif
 		endif
 	endif
@@ -867,6 +933,8 @@ syncScreen:
 			loadingSharedLock = 1
 			sharedID$ = upper(GetStringToken(Mid(GetURLSchemeText(), FindString(GetURLSchemeText(), "sharedlock", 1, 0) + 10, -1), "/", 1))
 			sharedLockName$ = ""
+			sharedLockError$ = ""
+			sharedLockInfo$ = ""
 			GenerateCombination(noOfDigits, 1)
 			GetSharedLockInformation(sharedID$, 1)
 		endif

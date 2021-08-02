@@ -432,6 +432,7 @@ function BuildSharedLockSettingsString()
 		minCopies = absoluteMinCopies
 	endif
 	if (screenNo = constShareLockScreen or screenNo = constSharedLockInformationScreen)
+		blockTestLocks = sharedLocks[sharedLockSelected, 0].blockTestLocks
 		blockUsersAlreadyLocked = sharedLocks[sharedLockSelected, 0].blockUsersAlreadyLocked
 		blockUsersWithStatsHidden = sharedLocks[sharedLockSelected, 0].blockUsersWithStatsHidden
 		cardInfoHidden = sharedLocks[sharedLockSelected, 0].cardInfoHidden
@@ -502,6 +503,11 @@ function BuildSharedLockSettingsString()
 		startLockSettingsTestLockRedFont = len(lockSettings$)
 		lockSettings$ = lockSettings$ + "TEST LOCK" + chr(10) + chr(10)
 		endLockSettingsTestLockRedFont = startLockSettingsTestLockRedFont + 9
+	endif
+	if (loadingSharedLock = 1 and blockTestLocks = 1 and hiddenFromOwner = 0 and keyholderUsername$ <> username$)
+		startLockSettingsTestLockRedFont = len(lockSettings$)
+		lockSettings$ = lockSettings$ + "NO TEST LOCKS" + chr(10) + chr(10)
+		endLockSettingsTestLockRedFont = startLockSettingsTestLockRedFont + 13
 	endif
 	startLockSettingsBlueFont = len(lockSettings$)
 	if (requireDM = 1 and hiddenFromOwner = 0 and keyholderUsername$ <> username$)
@@ -604,10 +610,10 @@ function BuildSharedLockSettingsString()
 						if (minYellowsAdd + minYellowsMinus + minYellowsRandom = 1)
 							lockSettings$ = lockSettings$ + "1 Yellow Card" + chr(10)
 						else
-							lockSettings$ = lockSettings$ + str(maxYellowsAdd + maxYellowsMinus + maxYellowsRandom) + " Random Yellow Cards" + chr(10)
+							lockSettings$ = lockSettings$ + str(maxYellowsAdd + maxYellowsMinus + maxYellowsRandom) + " Yellow Cards" + chr(10)
 						endif
 					else
-						lockSettings$ = lockSettings$ + str(minYellowsAdd + minYellowsMinus + minYellowsRandom) + "-" + str(maxYellowsAdd + maxYellowsMinus + maxYellowsRandom) + " Random Yellow Cards" + chr(10)
+						lockSettings$ = lockSettings$ + str(minYellowsAdd + minYellowsMinus + minYellowsRandom) + "-" + str(maxYellowsAdd + maxYellowsMinus + maxYellowsRandom) + " Yellow Cards" + chr(10)
 					endif
 				endif
 			endif
@@ -1416,6 +1422,7 @@ function CreateItemsInLockedUsersCard(cardNo as integer)
 		userCard[cardNo].txtUsername = OryUICreateText("text: ;size:2.8;bold:true;alignment:center;position:-1000,-1000;depth:27")
 		userCard[cardNo].sprStatus = OryUICreateSprite("size:-1,2.8;offset:center;image:" + str(imgStatusOfflineIcon) + ";position:-1000,-1000;depth:28")
 		userCard[cardNo].sprKeysDisabled = OryUICreateSprite("size:-1,2.8;offset:center;image:" + str(imgKeyDisabled) + ";position:-1000,-1000;depth:28")
+		userCard[cardNo].sprFreeUnlock = OryUICreateSprite("size:-1,4;offset:center;image:" + str(imgUnlockIcon) + ";color:#009051;position:-1000,-1000;depth:28")
 		userCard[cardNo].sprFakeLock = OryUICreateSprite("size:-1,2.8;offset:center;image:" + str(imgFakeLock) + ";position:-1000,-1000;depth:28")
 		userCard[cardNo].sprTestLock = OryUICreateSprite("size:-1,2.8;offset:center;image:" + str(imgTestLock) + ";position:-1000,-1000;depth:28")
 		userCard[cardNo].sprEmojiIcon = OryUICreateSprite("size:-1,4.5;offset:center;image:" + str(imgEmojiIcon) + ";position:-1000,-1000;depth:27")	
@@ -1559,6 +1566,8 @@ function CreateItemsInMyLockCard(cardNo as integer)
 		lockCard[cardNo].sprDeleteIcon = OryUICreateSprite("size:" + str(4.8 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(imgDeleteIcon) + ";position:-1000,-1000;depth:17")
 		lockCard[cardNo].sprUnlockButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		lockCard[cardNo].sprUnlockIcon = OryUICreateSprite("size:" + str(4.8 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(imgUnlockIcon) + ";position:-1000,-1000;depth:17")
+		lockCard[cardNo].sprRestartButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
+		lockCard[cardNo].sprRestartIcon = OryUICreateSprite("size:" + str(3.8 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(OryUIReturnIconID("replay")) + ";position:-1000,-1000;depth:17")
 		lockCard[cardNo].sprEmptyLeftButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		lockCard[cardNo].sprCheckInButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		lockCard[cardNo].shaderCooldown = LoadSpriteShader("CooldownMask.ps")
@@ -1613,6 +1622,8 @@ function CreateItemsInSharedLockCard(cardNo as integer)
 		sharedLockCard[cardNo].sprButtonBar = OryUICreateSprite("size:100,5.2;position:-1000,-1000;depth:19")
 		sharedLockCard[cardNo].sprDeleteButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		sharedLockCard[cardNo].sprDeleteIcon = OryUICreateSprite("size:" + str(4.8 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(imgDeleteIcon) + ";position:-1000,-1000;depth:17")
+		sharedLockCard[cardNo].sprCloneButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
+		sharedLockCard[cardNo].sprCloneIcon = OryUICreateSprite("size:" + str(3.2 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(OryUIReturnIconID("content_copy")) + ";position:-1000,-1000;depth:17")
 		sharedLockCard[cardNo].sprLeftEmptyButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		sharedLockCard[cardNo].sprManageButton = OryUICreateSprite("size:10,5;position:-1000,-1000;depth:18")
 		sharedLockCard[cardNo].sprManageIcon = OryUICreateSprite("size:" + str(4.8 / GetDisplayAspect()) + ",-1;offset:center;image:" + str(imgManageUsersIcon) + ";position:-1000,-1000;depth:17")
@@ -1745,6 +1756,8 @@ function CreateNewLock(combination$, fake, id, noOfLocksInGroup)
 	inc noOfLocks
 	SaveLocalVariable("noOfLocks", str(noOfLocks))
 	lockNo = noOfLocks
+	
+	if (lockGroupID > 1500000000) then timestampNow = lockGroupID
 	
 	// Bot settings
 	if (botControlled = 1)
@@ -1977,6 +1990,7 @@ function CreateNewLock(combination$, fake, id, noOfLocksInGroup)
 	// Set and save lock data
 	locks[lockNo].sortKey$ = ""
 	locks[lockNo].autoResetsPaused = 0
+	locks[lockNo].blockBotFromUnlocking = 0
 	locks[lockNo].blockUsersAlreadyLocked = blockUsersAlreadyLocked
 	locks[lockNo].botChosen = botChosen
 	locks[lockNo].build = constBuildNumber
@@ -2050,6 +2064,7 @@ function CreateNewLock(combination$, fake, id, noOfLocksInGroup)
 	locks[lockNo].initialYellowMinus2Cards = noOfYellowsMinus2
 	locks[lockNo].iteration = lockNo
 	locks[lockNo].keyDisabled = keyDisabled
+	locks[lockNo].keyholderAllowsFreeUnlock = 0
 	locks[lockNo].keyholderBuildNumberInstalled = 0
 	locks[lockNo].keyholderDecisionDisabled = keyholderDecisionDisabled
 	locks[lockNo].keyholderDisabledKey = keyholderDisabledKey
@@ -2066,6 +2081,7 @@ function CreateNewLock(combination$, fake, id, noOfLocksInGroup)
 	locks[lockNo].lateCheckInWindowInSeconds = lateCheckInWindowInSeconds
 	locks[lockNo].lockFrozenByCard = 0
 	locks[lockNo].lockFrozenByKeyholder = startLockFrozen
+	//locks[lockNo].lockFrozenByLockee = 0
 	locks[lockNo].lockLog.length = -1
 	locks[lockNo].lockName$ = sharedLockName$
 	locks[lockNo].maximumAutoResets = maxAutoResets
@@ -2140,11 +2156,13 @@ function CreateNewLock(combination$, fake, id, noOfLocksInGroup)
 	else
 		locks[lockNo].timestampFrozenByKeyholder = timestampNow
 	endif
+	//locks[lockNo].timestampFrozenByLockee = 0
 	locks[lockNo].timestampHiddenFromOwner = 0
 	locks[lockNo].timestampKeyholderRated = 0
 	locks[lockNo].timestampLastAutoReset = 0
 	locks[lockNo].timestampLastCardReset = 0
 	locks[lockNo].timestampLastCheckedIn = 0
+	locks[lockNo].timestampLastCheckedUpdates = 0
 	locks[lockNo].timestampLastFullReset = 0
 	if (regularity# = 0.016667)
 		locks[lockNo].timestampLastPicked = timestampNow - 60
@@ -2244,8 +2262,10 @@ function CreateNewSharedLock(addToFront)
 	if (startLockFrozen = 1) then minVersionRequired$ = "2.6.2.alpha.1"
 	if (checkInFrequencyInSeconds > 0) then minVersionRequired$ = "2.6.3.alpha.1"
 	if (lateCheckInWindowInSeconds > 0) then minVersionRequired$ = "2.6.8.alpha.1"
+	if (blockTestLocks = 1) then minVersionRequired$ = "2.7.2.alpha.1"
 	
 	postData$ = ""
+	postData$ = postData$ + "&blockTestLocks=" + str(blockTestLocks)
 	postData$ = postData$ + "&blockUsersAlreadyLocked=" + str(blockUsersAlreadyLocked)
 	postData$ = postData$ + "&blockUsersWithStatsHidden=" + str(blockUsersWithStatsHidden)
 	postData$ = postData$ + "&build=" + str(constBuildNumber)
@@ -2299,7 +2319,7 @@ function CreateNewSharedLock(addToFront)
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:CreateNewSharedLock;script:" + URLs[0].URLPath + "/" + URLs[0].CreateNewSharedLock + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
 
-function CreateSimulationDeck()
+function CreateSimulationDeck(newLock as integer)
 	local i as integer
 	local randomYellow as integer
 	
@@ -2491,17 +2511,19 @@ function CreateSimulationDeck()
 		AddCardToSimulationDeck("YellowMinus2")
 	next
 
-	simulationInitialDoubleUps = simulationNoOfDoubleUps
-	simulationInitialFreezes = simulationNoOfFreezes
-	simulationInitialGreens = simulationNoOfGreens
-	simulationInitialReds = simulationNoOfReds
-	simulationInitialResets = simulationNoOfResets
-	simulationInitialStickies = simulationNoOfStickies
-	simulationInitialYellowsAdd1 = simulationNoOfYellowsAdd1
-	simulationInitialYellowsAdd2 = simulationNoOfYellowsAdd2
-	simulationInitialYellowsAdd3 = simulationNoOfYellowsAdd3
-	simulationInitialYellowsMinus1 = simulationNoOfYellowsMinus1
-	simulationInitialYellowsMinus2 = simulationNoOfYellowsMinus2
+	if (newLock = 1)
+		simulationInitialDoubleUps = simulationNoOfDoubleUps
+		simulationInitialFreezes = simulationNoOfFreezes
+		simulationInitialGreens = simulationNoOfGreens
+		simulationInitialReds = simulationNoOfReds
+		simulationInitialResets = simulationNoOfResets
+		simulationInitialStickies = simulationNoOfStickies
+		simulationInitialYellowsAdd1 = simulationNoOfYellowsAdd1
+		simulationInitialYellowsAdd2 = simulationNoOfYellowsAdd2
+		simulationInitialYellowsAdd3 = simulationNoOfYellowsAdd3
+		simulationInitialYellowsMinus1 = simulationNoOfYellowsMinus1
+		simulationInitialYellowsMinus2 = simulationNoOfYellowsMinus2
+	endif
 endfunction
 
 function DealDeck()
@@ -2565,13 +2587,19 @@ function DeleteLock(lockNo as integer, addToFront as integer)
 	if (maintenance = 1) then exitfunction
 	
 	local postData$ as string
+	local abandonedLock as integer : abandonedLock = 0
 	
+	if (locks[lockNo].fake = 0 and locks[lockNo].unlocked = 0) then abandonedLock = 1
 	locks[lockNo].deleting = 1
+	
 	postData$ = ""
+	postData$ = postData$ + "&abandonedLock=" + str(abandonedLock)
 	postData$ = postData$ + "&dateDeleted=" + dateFromServer$
 	postData$ = postData$ + "&deleteLock=1"
 	postData$ = postData$ + "&lockID=" + str(locks[lockNo].id)
 	postData$ = postData$ + "&platform=" + GetDeviceBaseName()
+	postData$ = postData$ + "&sharedID=" + locks[lockNo].sharedID$
+	postData$ = postData$ + "&test=" + str(locks[lockNo].test)
 	postData$ = postData$ + "&timestampDeleted=" + str(timestampNow)
 	postData$ = postData$ + "&userID1=" + userID$
 	postData$ = postData$ + "&userID2=" + userID$
@@ -2665,6 +2693,7 @@ function DestroyItemsInLockedUsersCard(cardNo as integer)
 	DeleteText(userCard[cardNo].txtUsername)
 	DeleteSprite(userCard[cardNo].sprStatus)
 	DeleteSprite(userCard[cardNo].sprKeysDisabled)
+	DeleteSprite(userCard[cardNo].sprFreeUnlock)
 	DeleteSprite(userCard[cardNo].sprFakeLock)
 	DeleteSprite(userCard[cardNo].sprTestLock)
 	DeleteSprite(userCard[cardNo].sprEmojiIcon)
@@ -2803,6 +2832,8 @@ function DestroyItemsInMyLockCard(cardNo as integer)
 	DeleteSprite(lockCard[cardNo].sprDeleteIcon)
 	DeleteSprite(lockCard[cardNo].sprUnlockButton)
 	DeleteSprite(lockCard[cardNo].sprUnlockIcon)
+	DeleteSprite(lockCard[cardNo].sprRestartButton)
+	DeleteSprite(lockCard[cardNo].sprRestartIcon)
 	DeleteSprite(lockCard[cardNo].sprEmptyLeftButton)
 	DeleteSprite(lockCard[cardNo].sprCheckInButton)
 	DeleteSprite(lockCard[cardNo].sprCheckInIcon)
@@ -2852,6 +2883,8 @@ function DestroyItemsInSharedLockCard(cardNo as integer)
 	DeleteSprite(sharedLockCard[cardNo].sprButtonBar)
 	DeleteSprite(sharedLockCard[cardNo].sprDeleteButton)
 	DeleteSprite(sharedLockCard[cardNo].sprDeleteIcon)
+	DeleteSprite(sharedLockCard[cardNo].sprCloneButton)
+	DeleteSprite(sharedLockCard[cardNo].sprCloneIcon)
 	DeleteSprite(sharedLockCard[cardNo].sprLeftEmptyButton)
 	DeleteSprite(sharedLockCard[cardNo].sprManageButton)
 	DeleteSprite(sharedLockCard[cardNo].sprManageIcon)
@@ -2890,6 +2923,7 @@ function DestroyItemsInUnlockedUsersCard(cardNo as integer)
 	DeleteSprite(userCard[cardNo].sprUsernameButton)
 	DeleteText(userCard[cardNo].txtUsername)
 	DeleteSprite(userCard[cardNo].sprStatus)
+	DeleteSprite(userCard[cardNo].sprTestLock)
 	DeleteSprite(userCard[cardNo].sprRatingRibbon)
 	DeleteText(userCard[cardNo].txtRatingRibbon)
 	DeleteText(userCard[cardNo].txtTicker)
@@ -2958,7 +2992,7 @@ function DisconnectTwitter(addToFront)
 	postData$ = ""
 	postData$ = postData$ + "&userID1=" + userID$
 	postData$ = postData$ + "&userID2=" + userID$
-	if (URLs[0].DisconnectDiscord = "disconnecttwitter.php")
+	if (URLs[0].DisconnectTwitter = "disconnecttwitter.php")
 		OryUIAddItemToHTTPSQueue(httpsQueue, "name:DisconnectTwitter;script:oauth2/twitter/disconnect.php;postData:" + postData$ + ";addToFront:" + str(addToFront))
 	else
 		OryUIAddItemToHTTPSQueue(httpsQueue, "name:DisconnectTwitter;script:" + URLs[0].URLPath + "/" + URLs[0].DisconnectTwitter + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
@@ -3107,6 +3141,7 @@ function GetLocksData()
 	local a as integer
 	local fileID as integer
 	local i as integer
+	local j as integer
 	local lineRead$ as string
 	local lockCount as integer
 	local tmpCombination$ as string
@@ -3135,6 +3170,7 @@ function GetLocksData()
 				value$ = GetStringToken(lineRead$, ":", 2)
 				if (variable$ = "sortKey") then locks[i].sortKey$ = value$
 				if (variable$ = "autoResetsPaused") then locks[i].autoResetsPaused = val(value$)
+				if (variable$ = "blockBotFromUnlocking") then locks[i].blockBotFromUnlocking = val(value$)
 				if (variable$ = "blockUsersAlreadyLocked") then locks[i].blockUsersAlreadyLocked = val(value$)
 				if (variable$ = "botChosen") then locks[i].botChosen = val(value$)
 				if (variable$ = "build") then locks[i].build = val(value$)
@@ -3202,6 +3238,7 @@ function GetLocksData()
 				if (variable$ = "initialYellowMinus2Cards") then locks[i].initialYellowMinus2Cards = val(value$)
 				if (variable$ = "iteration") then locks[i].iteration = val(value$)
 				if (variable$ = "keyDisabled") then locks[i].keyDisabled = val(value$)
+				if (variable$ = "keyholderAllowsFreeUnlock") then locks[i].keyholderAllowsFreeUnlock = val(value$)
 				if (variable$ = "keyholderBuildNumberInstalled") then locks[i].keyholderBuildNumberInstalled = val(value$)
 				if (variable$ = "keyholderDecisionDisabled") then locks[i].keyholderDecisionDisabled = val(value$)
 				if (variable$ = "keyholderDisabledKey") then locks[i].keyholderDisabledKey = val(value$)
@@ -3218,6 +3255,7 @@ function GetLocksData()
 				if (variable$ = "lateCheckInWindowInSeconds") then locks[i].lateCheckInWindowInSeconds = val(value$)
 				if (variable$ = "lockFrozenByCard") then locks[i].lockFrozenByCard = val(value$)
 				if (variable$ = "lockFrozenByKeyholder") then locks[i].lockFrozenByKeyholder = val(value$)
+				//if (variable$ = "lockFrozenByLockee") then locks[i].lockFrozenByLockee = val(value$)
 				if (variable$ = "lockName") then locks[i].lockName$ = value$
 				if (variable$ = "maximumAutoResets") then locks[i].maximumAutoResets = val(value$)
 				if (variable$ = "maximumMinutes") then locks[i].maximumMinutes = val(value$)
@@ -3269,10 +3307,12 @@ function GetLocksData()
 				if (variable$ = "timestampEndedCleanTime") then locks[i].timestampEndedCleanTime = val(value$)
 				if (variable$ = "timestampFrozenByCard") then locks[i].timestampFrozenByCard = val(value$)
 				if (variable$ = "timestampFrozenByKeyholder") then locks[i].timestampFrozenByKeyholder = val(value$)
+				//if (variable$ = "timestampFrozenByLockee") then locks[i].timestampFrozenByLockee = val(value$)
 				if (variable$ = "timestampHiddenFromOwner") then locks[i].timestampHiddenFromOwner = val(value$)
 				if (variable$ = "timestampLastAutoReset") then locks[i].timestampLastAutoReset = val(value$)
 				if (variable$ = "timestampLastCardReset") then locks[i].timestampLastCardReset = val(value$)
 				if (variable$ = "timestampLastCheckedIn") then locks[i].timestampLastCheckedIn = val(value$)
+				if (variable$ = "timestampLastCheckedUpdates") then locks[i].timestampLastCheckedUpdates = val(value$)
 				if (variable$ = "timestampLastFullReset") then locks[i].timestampLastFullReset = val(value$)
 				if (variable$ = "timestampLastPicked") then locks[i].timestampLastPicked = val(value$)
 				if (variable$ = "timestampLastReset") then locks[i].timestampLastReset = val(value$)
@@ -3326,7 +3366,7 @@ function GetLocksData()
 			if (locks[i].resetCards > cappedResetCards) then locks[i].resetCards = cappedResetCards
 			if (locks[i].yellowCards < 0) then locks[i].yellowCards = 0
 			if (locks[i].yellowCards > cappedYellowCardsTotal) then locks[i].yellowCards = cappedYellowCardsTotal
-			
+		
 			if (locks[i].emojiColourSelected = 0) then locks[i].emojiColourSelected = 1
 			if (fixed = 0 and locks[i].goAgainCardsPercentage# = 0) then locks[i].goAgainCardsPercentage# = random(minGoAgainPercentage# * 100.0, maxGoAgainPercentage# * 100.0) / 100.0
 			if (locks[i].keyholderEmojiColourSelected = 0) then locks[i].keyholderEmojiColourSelected = 1
@@ -3342,6 +3382,65 @@ function GetLocksData()
 			total = GetNoOfCards(i)
 			if (total > largestDeckSize) then largestDeckSize = total
 			if (GetFileExists("ID" + str(locks[i].id) + "V2.log")) then locks[i].lockLog.load("ID" + str(locks[i].id) + "V2.log")
+			
+			// LOCK FIXES
+			if (locks[i].timestampLocked <= 1500000000 and locks[i].groupID > 1500000000) then locks[i].timestampLocked = locks[i].groupID
+			if (locks[i].timestampLastPicked <= 1500000000 and locks[i].fixed = 1)
+				if (locks[i].regularity# = 0.016667)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 60
+				elseif (locks[i].regularity# = 0.25)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 900
+				elseif (locks[i].regularity# = 0.50)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 1800
+				elseif (locks[i].regularity# = 1)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 3600
+				elseif (locks[i].regularity# = 3)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 10800
+				elseif (locks[i].regularity# = 6)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 21600
+				elseif (locks[i].regularity# = 12)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 43200
+				elseif (locks[i].regularity# = 24)
+					locks[i].timestampLastPicked = locks[i].timestampLocked - 86400
+				endif
+			endif
+//~			if (locks[i].timestampLastPicked <= 1500000000 and locks[i].fixed = 0)
+//~				if (locks[i].regularity# = 0.016667)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 60
+//~				elseif (locks[i].regularity# = 0.25)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 900
+//~				elseif (locks[i].regularity# = 0.50)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 1800
+//~				elseif (locks[i].regularity# = 1)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 3600
+//~				elseif (locks[i].regularity# = 3)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 10800
+//~				elseif (locks[i].regularity# = 6)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 21600
+//~				elseif (locks[i].regularity# = 12)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 43200
+//~				elseif (locks[i].regularity# = 24)
+//~					locks[i].timestampLastPicked = locks[i].timestampLocked - 86400
+//~				endif
+//~				for j = 0 to locks[i].lockLog.length
+//~					if (locks[i].lockLog[j].action$ = "PickedACard")
+//~						if (locks[i].lockLog[j].timestamp > locks[i].timestampLastPicked)
+//~							if (locks[lockSelected].lockLog[sortedIteration].result$ = "FreezeCard")
+//~								locks[i].timestampLastPicked = locks[i].lockLog[j].timestamp
+//~							endif
+//~							if (locks[lockSelected].lockLog[sortedIteration].result$ = "RedCard")
+//~								locks[i].timestampLastPicked = locks[i].lockLog[j].timestamp
+//~							endif
+//~							if (locks[lockSelected].lockLog[sortedIteration].result$ = "ResetCard")
+//~								locks[i].timestampLastPicked = locks[i].lockLog[j].timestamp
+//~							endif
+//~							if (locks[lockSelected].lockLog[sortedIteration].result$ = "StickyCard")
+//~								locks[i].timestampLastPicked = locks[i].lockLog[j].timestamp
+//~							endif
+//~						endif
+//~					endif
+//~				next
+//~			endif
 		endif
 	next
 	ResetAllNotifications()
@@ -3440,6 +3539,16 @@ function GetProfileData(profileID as integer, addToFront)
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:GetProfileData=" + str(profileID) + ";script:" + URLs[0].URLPath + "/" + URLs[0].GetProfileData + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
 
+function GetRecentActivity(addToFront)
+	local postData$ as string
+	
+	postData$ = ""
+	postData$ = postData$ + "&platform=" + GetDeviceBaseName()
+	postData$ = postData$ + "&userID1=" + userID$
+	postData$ = postData$ + "&userID2=" + userID$
+	OryUIAddItemToHTTPSQueue(httpsQueue, "name:GettRecentActivity;script:" + URLs[0].URLPath + "/" + URLs[0].GetRecentActivity + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
+endfunction
+
 function GetServerVariables(addToFront)
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:GetServerVariables;script:" + URLs[0].URLPath + "/" + URLs[0].GetServerVariables + ";postData:;addToFront:" + str(addToFront))
 endfunction
@@ -3503,6 +3612,16 @@ function GetUserLog(sharedLockNo, userNo, usersTab, addToFront)
 	postData$ = postData$ + "&usersID=" + str(sharedLocks[sharedLockNo, usersTab].usersID[userNo])
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:GetUserLog=" + str(sharedLockNo) + "," + str(userNo) + "," + str(usersTab) + ";script:" + URLs[0].URLPath + "/" + URLs[0].GetUserLog + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
+
+//~function GetUsersList(addToFront)
+//~	local postData$ as string
+//~	
+//~	postData$ = ""
+//~	postData$ = postData$ + "&platform=" + GetDeviceBaseName()
+//~	postData$ = postData$ + "&userID1=" + userID$
+//~	postData$ = postData$ + "&userID2=" + userID$
+//~	OryUIAddItemToHTTPSQueue(httpsQueue, "name:GetUsersList;script:" + URLs[0].URLPath + "/" + URLs[0].GetUsersList + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
+//~endfunction
 
 function GetYourRelations(addToFront)
 	local postData$ as string
@@ -3726,6 +3845,9 @@ function ReceivedAccountData()
 		keyholderLevel = val(GetJSONDataVariableValue("keyholderLevel"))
 		if (keyholderLevel = 0) then keyholderLevel = 1
 		
+		lastRecentActivityIDSeen = val(GetJSONDataVariableValue("lastRecentActivityIDSeen"))
+		SaveLocalVariable("lastRecentActivityIDSeen", str(lastRecentActivityIDSeen))
+		
 		lockeeLevel = val(GetJSONDataVariableValue("lockeeLevel"))
 		if (lockeeLevel = 0) then lockeeLevel = 1
 		
@@ -3742,12 +3864,19 @@ function ReceivedAccountData()
 		showCombinationsToKeyholders = val(GetJSONDataVariableValue("showCombinationsToKeyholders"))
 		if (showCombinationsToKeyholders = 2) then showCombinationsToKeyholders = 0
 		
+		showKeyholderStatsOnProfile = val(GetJSONDataVariableValue("showKeyholderStatsOnProfile"))
+		SaveLocalVariable("showKeyholderStatsOnProfile", str(showKeyholderStatsOnProfile))
+		showLockeeStatsOnProfile = val(GetJSONDataVariableValue("showLockeeStatsOnProfile"))
+		SaveLocalVariable("showLockeeStatsOnProfile", str(showLockeeStatsOnProfile))
+		
 		statusSelected = val(GetJSONDataVariableValue("statusSelected"))
 		if (statusSelected = 0) then statusSelected = 1
 		SaveLocalVariable("statusSelected", str(statusSelected))
 		
 		timesReviewBoxShown = val(GetJSONDataVariableValue("timesReviewBoxShown"))
 		SaveLocalVariable("timesReviewBoxShown", str(timesReviewBoxShown))
+		
+		timestampStartTransferAccount = val(GetJSONDataVariableValue("timesReviewBoxShown"))
 		
 		twitterHandle$ = GetJSONDataVariableValue("twitterHandle")
 		SaveLocalVariable("twitterHandle", twitterHandle$)
@@ -4498,11 +4627,11 @@ function ReceivedLockUpdates()
 					endif
 					locks[b].yellowCards = locks[b].noOfAdd1Cards + locks[b].noOfAdd2Cards + locks[b].noOfAdd3Cards + locks[b].noOfMinus1Cards + locks[b].noOfMinus2Cards
 					
-					if (jsonData[a - 1].reset = 0 and jsonData[a - 1].unlocked = 0 and jsonData[a - 1].readyToUnlock = 0)
+					if (jsonData[a - 1].reset = 0 and jsonData[a - 1].allowFreeUnlockModifiedBy = 0 and jsonData[a - 1].autoResetsPausedModifiedBy = 0 and jsonData[a - 1].cumulativeModifiedBy = 0 and jsonData[a - 1].unlocked = 0 and jsonData[a - 1].readyToUnlock = 0)
 						if (noOfLockUpdatesAvailable < 7)
 							cardString$ as string[9]
 							count as integer : count = 0
-							if (locks[b].fixed = 0 and jsonData[a - 1].autoResetsPausedModifiedBy = 0 and jsonData[a - 1].cumulativeModifiedBy = 0)
+							if (locks[b].fixed = 0)
 								if (cardInfoHiddenString$ <> "")
 									inc count
 									cardString$[count] = cardInfoHiddenString$
@@ -4605,6 +4734,17 @@ function ReceivedLockUpdates()
 						endif
 					endif
 					
+					// KEYHOLDER ALLOWS FREE UNLOCK
+					if (jsonData[a - 1].allowFreeUnlockModifiedBy = -1)
+						locks[b].keyholderAllowsFreeUnlock = 0
+						singleUpdate$ = "Disabled free unlock"
+						if (noOfLockUpdatesAvailable < 7) then message$ = message$ + "• " + locks[b].keyholderUsername$ + " has disabled a free unlock." + chr(10)
+					elseif (jsonData[a - 1].allowFreeUnlockModifiedBy = 1)
+						locks[b].keyholderAllowsFreeUnlock = 1
+						singleUpdate$ = "Enabled free unlock"
+						if (noOfLockUpdatesAvailable < 7) then message$ = message$ + "• " + locks[b].keyholderUsername$ + " has enabled a free unlock." + chr(10)
+					endif
+					
 					// UNPAUSED AUTO RESETS
 					if (locks[b].fixed = 0 and jsonData[a - 1].autoResetsPausedModifiedBy = -1)
 						locks[b].autoResetsPaused = 0
@@ -4644,10 +4784,12 @@ function ReceivedLockUpdates()
 					// RESET LOCK
 					if (jsonData[a - 1].reset = 1)
 						locks[b].readyToUnlock = 0
-						if (locks[b].regularity# = 0.016667)
-							locks[b].timestampLastPicked = jsonData[a - 1].timestampModified - 60
-						else
-							locks[b].timestampLastPicked = jsonData[a - 1].timestampModified - (locks[b].regularity# * 3600)
+						if (locks[b].fixed = 0)
+							if (locks[b].regularity# = 0.016667)
+								locks[b].timestampLastPicked = jsonData[a - 1].timestampModified - 60
+							else
+								locks[b].timestampLastPicked = jsonData[a - 1].timestampModified - (locks[b].regularity# * 3600)
+							endif
 						endif
 						locks[b].timestampLastFullReset = jsonData[a - 1].timestampModified
 						locks[b].timestampLastReset = jsonData[a - 1].timestampModified
@@ -4655,6 +4797,29 @@ function ReceivedLockUpdates()
 						locks[b].pickedCountSinceReset = 0
 						locks[b].greensPickedSinceReset = 0
 						locks[b].hideGreensUntilPickCount = 0
+						
+						if (locks[b].fixed = 0)
+							locks[b].doubleUpCards = locks[b].initialDoubleUpCards
+							locks[b].freezeCards = locks[b].initialFreezeCards
+							locks[b].greenCards = locks[b].initialGreenCards
+							locks[b].noOfAdd1Cards = locks[b].initialYellowAdd1Cards
+							locks[b].noOfAdd2Cards = locks[b].initialYellowAdd2Cards
+							locks[b].noOfAdd3Cards = locks[b].initialYellowAdd3Cards
+							locks[b].noOfMinus1Cards = locks[b].initialYellowMinus1Cards
+							locks[b].noOfMinus2Cards = locks[b].initialYellowMinus2Cards
+							locks[b].redCards = locks[b].initialRedCards
+							locks[b].resetCards = locks[b].initialResetCards
+							locks[b].stickyCards = locks[b].initialStickyCards
+							locks[b].yellowCards = locks[b].initialYellowCards
+						else
+							remstart
+							if (locks[b].regularity# = 0.016667)
+								locks[b].minutes = locks[b].initialMinutes
+							else
+								locks[b].redCards = locks[b].initialRedCards
+							endif
+							remend
+						endif
 						
 						locks[b].autoResetsPaused = 0
 						locks[b].noOfTimesAutoReset = 0
@@ -4688,6 +4853,12 @@ function ReceivedLockUpdates()
 		next
 	next
 	if (noOfLockUpdatesAvailable > 7 and message$ <> "") then message$ = message$ + chr(10) + "More updates were made that aren't listed."
+	for a = 1 to 20
+		if (locks[a].sharedID$ <> "" and locks[a].hiddenFromOwner = 0)
+			locks[a].timestampLastCheckedUpdates = timestampNow
+			UpdateLocksData(a)
+		endif
+	next
 endfunction message$
 
 function ReceivedMissingUserID()
@@ -4705,6 +4876,7 @@ function ReceivedMyLocksDeleted()
 	locksDeleted.myLocks.length = jsonData.length
 	for i = 0 to jsonData.length
 		locksDeleted.myLocks[i].autoResetsPaused = jsonData[i].autoResetsPaused
+		locksDeleted.myLocks[i].blockBotFromUnlocking = jsonData[i].blockBotFromUnlocking
 		locksDeleted.myLocks[i].blockUsersAlreadyLocked = jsonData[i].blockUsersAlreadyLocked
 		locksDeleted.myLocks[i].botChosen = jsonData[i].botChosen
 		locksDeleted.myLocks[i].build = jsonData[i].build
@@ -4777,6 +4949,7 @@ function ReceivedMyLocksDeleted()
 		locksDeleted.myLocks[i].initialYellowMinus2Cards = jsonData[i].initialYellowMinus2Cards
 		locksDeleted.myLocks[i].iteration = i
 		locksDeleted.myLocks[i].keyDisabled = jsonData[i].keyDisabled
+		locksDeleted.myLocks[i].keyholderAllowsFreeUnlock = jsonData[i].keyholderAllowsFreeUnlock
 		locksDeleted.myLocks[i].keyholderBuildNumberInstalled = jsonData[i].keyholderBuildNumberInstalled
 		locksDeleted.myLocks[i].keyholderDecisionDisabled = jsonData[i].keyholderDecisionDisabled
 		locksDeleted.myLocks[i].keyholderDisabledKey = jsonData[i].keyholderDisabledKey
@@ -4851,6 +5024,7 @@ function ReceivedMyLocksDeleted()
 		locksDeleted.myLocks[i].timestampLastAutoReset = jsonData[i].timestampLastAutoReset
 		locksDeleted.myLocks[i].timestampLastCardReset = jsonData[i].timestampLastCardReset
 		locksDeleted.myLocks[i].timestampLastCheckedIn = jsonData[i].timestampLastCheckedIn
+		locksDeleted.myLocks[i].timestampLastCheckedUpdates = 0
 		locksDeleted.myLocks[i].timestampLastFullReset = jsonData[i].timestampLastFullReset
 		locksDeleted.myLocks[i].timestampLastPicked = jsonData[i].timestampLastPicked
 		locksDeleted.myLocks[i].timestampLastReset = jsonData[i].timestampLastReset
@@ -4979,7 +5153,9 @@ function ReceivedProfileData()
 		profileData.avatarApproved = jsonData[0].avatarApproved
 		profileData.avatarName$ = jsonData[0].avatarName$
 		profileData.averageRating# = jsonData[0].averageRating#
+		profileData.averageSecondsLocked = jsonData[0].averageSecondsLocked
 		profileData.banned = jsonData[0].banned
+		profileData.cumulativeSecondsLocked = jsonData[0].cumulativeSecondsLocked
 		profileData.discordDiscriminator = jsonData[0].discordDiscriminator
 		profileData.discordID$ = jsonData[0].discordID$
 		profileData.discordUsername$ = jsonData[0].discordUsername$
@@ -4989,10 +5165,19 @@ function ReceivedProfileData()
 		if (profileData.keyholderLevel = 0) then profileData.keyholderLevel = 1
 		profileData.lockeeLevel = jsonData[0].lockeeLevel
 		if (profileData.lockeeLevel = 0) then profileData.lockeeLevel = 1
+		profileData.longestSecondsLocked = jsonData[0].longestSecondsLocked
 		profileData.mainRoleSelected = jsonData[0].mainRoleSelected
+		profileData.noOfLocks = jsonData[0].noOfLocks
+		profileData.noOfLocksCompleted = jsonData[0].noOfLocksCompleted
+		profileData.noOfLocksManaged = jsonData[0].noOfLocksManaged
+		profileData.noOfLocksManagingNow = jsonData[0].noOfLocksManagingNow
 		profileData.noOfRatings = jsonData[0].noOfRatings
 		profileData.privateProfile = jsonData[0].privateProfile
+		profileData.secondsLockedInCurrentLock = jsonData[0].secondsLockedInCurrentLock
+		profileData.showKeyholderStatsOnProfile = jsonData[0].showKeyholderStatsOnProfile
+		profileData.showLockeeStatsOnProfile = jsonData[0].showLockeeStatsOnProfile
 		profileData.statusSelected = jsonData[0].statusSelected
+		profileData.timestampJoined = jsonData[0].timestampJoined
 		profileData.timestampLastActive = jsonData[0].timestampLastActive
 		profileData.twitterHandle$ = jsonData[0].twitterHandle$
 		profileData.username$ = jsonData[0].username$
@@ -5042,6 +5227,26 @@ function ReceivedProfileData()
 	endif
 endfunction
 
+function ReceivedRecentActivity()
+	local i as integer
+	
+	jsonData as typeRecentActivity[]
+	jsonData.fromJSON(OryUIGetHTTPSQueueRequestResponse(httpsQueue))
+	recentActivity.length = jsonData.length
+	for i = 0 to jsonData.length
+		recentActivity[i].id = jsonData[i].id
+		recentActivity[i].activityType$ = jsonData[i].activityType$
+		recentActivity[i].iteration = i
+		recentActivity[i].lockID$ = jsonData[i].lockID$
+		recentActivity[i].mentionedUserID = jsonData[i].mentionedUserID
+		recentActivity[i].mentionedUsername$ = jsonData[i].mentionedUsername$
+		recentActivity[i].readActivity = jsonData[i].readActivity
+		recentActivity[i].shareID$ = jsonData[i].shareID$
+		recentActivity[i].testLock = jsonData[i].testLock
+		recentActivity[i].timestamp = jsonData[i].timestamp
+	next
+endfunction
+
 function ReceivedRestoreAccount()
 	local a as integer
 	local fileID as integer
@@ -5052,6 +5257,7 @@ function ReceivedRestoreAccount()
 	for i = 1 to jsonData.length + 1
 		noOfLocks = noOfLocks + 1
 		locks[i].autoResetsPaused = jsonData[i - 1].autoResetsPaused
+		locks[i].blockBotFromUnlocking = jsonData[i - 1].blockBotFromUnlocking
 		locks[i].blockUsersAlreadyLocked = jsonData[i - 1].blockUsersAlreadyLocked
 		locks[i].botChosen = jsonData[i - 1].botChosen
 		locks[i].build = jsonData[i - 1].build
@@ -5122,6 +5328,7 @@ function ReceivedRestoreAccount()
 		locks[i].initialYellowMinus2Cards = jsonData[i - 1].initialYellowMinus2Cards
 		locks[i].iteration = i
 		locks[i].keyDisabled = jsonData[i - 1].keyDisabled
+		locks[i].keyholderAllowsFreeUnlock = jsonData[i - 1].keyholderAllowsFreeUnlock
 		locks[i].keyholderBuildNumberInstalled = jsonData[i - 1].keyholderBuildNumberInstalled
 		locks[i].keyholderDecisionDisabled = jsonData[i - 1].keyholderDecisionDisabled
 		locks[i].keyholderDisabledKey = jsonData[i - 1].keyholderDisabledKey
@@ -5195,6 +5402,7 @@ function ReceivedRestoreAccount()
 		locks[i].timestampLastAutoReset = jsonData[i - 1].timestampLastAutoReset
 		locks[i].timestampLastCardReset = jsonData[i - 1].timestampLastCardReset
 		locks[i].timestampLastCheckedIn = jsonData[i - 1].timestampLastCheckedIn
+		locks[i].timestampLastCheckedUpdates = 0
 		locks[i].timestampLastFullReset = jsonData[i - 1].timestampLastFullReset
 		locks[i].timestampLastPicked = jsonData[i - 1].timestampLastPicked
 		locks[i].timestampLastReset = jsonData[i - 1].timestampLastReset
@@ -5239,6 +5447,7 @@ function ReceivedServerVariables()
 	SaveLocalVariable("deviceTimestampOffset", str(deviceTimestampOffset))
 	tmpVersionNumber$ = ReplaceString(constVersionNumber$, " ", "_", -1)
 	tmpVersionNumber$ = ReplaceString(tmpVersionNumber$, ".", "_", -1)
+	//allowAccountTransfers = val(GetJSONDataVariableValue("allow_account_transfers"))
 	dateDeactivatingVersion$ = GetJSONDataVariableValue("date_deactivating_v" + tmpVersionNumber$)
 	disableCreationOfNewLocks = val(GetJSONDataVariableValue("disable_creation_of_new_locks"))
 	noOfGeneratedLocks = val(GetJSONDataVariableValue("noOfGeneratedLocks"))
@@ -5248,6 +5457,7 @@ function ReceivedServerVariables()
 		botsData[i].phrase$ = GetJSONDataVariableValue("phraseBOT" + AddLeadingZeros(str(i), 2))
 		botsData[i].rating# = valFloat(GetJSONDataVariableValue("ratingBOT" + AddLeadingZeros(str(i), 2)))
 		botsData[i].noOfRatings = val(GetJSONDataVariableValue("noOfRatingsBOT" + AddLeadingZeros(str(i), 2)))
+		botsData[i].totalManaged = val(GetJSONDataVariableValue("totalManagedBOT" + AddLeadingZeros(str(i), 2)))
 	next
 	if (val(GetJSONDataVariableValue("maintenance_mode")) = 1)
 		SetMaintenanceValue(1)
@@ -5328,6 +5538,7 @@ function ReceivedSharedLockInformation()
 		sharedLockError$ = ""
 		absoluteMaxCopies = jsonData[0].maxRandomCopies
 		absoluteMinCopies = jsonData[0].minRandomCopies
+		blockTestLocks = jsonData[0].blockTestLocks
 		blockUsersAlreadyLocked = jsonData[0].blockUsersAlreadyLocked
 		blockUsersWithStatsHidden = jsonData[0].blockUsersWithStatsHidden
 		build = jsonData[0].build
@@ -5401,8 +5612,11 @@ function ReceivedSharedLocksData()
 	jsonData as typeSharedLocks[]
 	jsonData.fromJSON(OryUIGetHTTPSQueueRequestResponse(httpsQueue))
 	noOfSharedLocks = jsonData.length + 1
+	//noOfSharedLocksLastSession = noOfSharedLocks
+	//SaveLocalVariable("noOfSharedLocksLastSession", str(noOfSharedLocks))
 	for i = 1 to noOfSharedLocks
 		sharedLocks[i, 0].awaitingDecision = jsonData[i - 1].awaitingDecision
+		sharedLocks[i, 0].blockTestLocks = jsonData[i - 1].blockTestLocks
 		sharedLocks[i, 0].blockUsersAlreadyLocked = jsonData[i - 1].blockUsersAlreadyLocked
 		sharedLocks[i, 0].blockUsersWithStatsHidden = jsonData[i - 1].blockUsersWithStatsHidden
 		sharedLocks[i, 0].build = jsonData[i - 1].build
@@ -5521,6 +5735,8 @@ function ReceivedSharedLocksData()
 		if (sharedLocks[i, 0].temporarilyDisabled = 1) then sharedLocks[i, 0].minVersionRequired$ = "2.6.5"
 		//2.6.8
 		if (sharedLocks[i, 0].lateCheckInWindowInSeconds > 0) then sharedLocks[i, 0].minVersionRequired$ = "2.6.8"
+		//2.7.2
+		if (sharedLocks[i, 0].blockTestLocks = 1) then sharedLocks[i, 0].minVersionRequired$ = "2.7.2"
 	next
 endfunction
 
@@ -5531,6 +5747,7 @@ function ReceivedSharedLocksDeleted()
 	jsonData.fromJSON(OryUIGetHTTPSQueueRequestResponse(httpsQueue))
 	locksDeleted.sharedLocks.length = jsonData.length
 	for i = 0 to jsonData.length
+		locksDeleted.sharedLocks[i].blockTestLocks = jsonData[i].blockTestLocks
 		locksDeleted.sharedLocks[i].blockUsersAlreadyLocked = jsonData[i].blockUsersAlreadyLocked
 		locksDeleted.sharedLocks[i].blockUsersWithStatsHidden = jsonData[i].blockUsersWithStatsHidden
 		locksDeleted.sharedLocks[i].build = jsonData[i].build
@@ -5600,7 +5817,7 @@ endfunction
 function ReceivedSharedLockUserData(sharedLockNo, usersTab)
 	local fakeLockedUsers as integer
 	local i as integer
-	
+
 	jsonData as typeSharedLockUsers[]
 	jsonData.fromJSON(OryUIGetHTTPSQueueRequestResponse(httpsQueue))
 	sharedLocks[sharedLockNo, 1].noOfUsers = 0
@@ -5732,10 +5949,11 @@ function ReceivedSharedLockUserData(sharedLockNo, usersTab)
 			if (sharedLocks[sharedLockNo, 1].usersInitialYellowCards[lockedUserCount, 4] < 0) then sharedLocks[sharedLockNo, 1].usersInitialYellowCards[lockedUserCount, 4] = 0
 			sharedLocks[sharedLockNo, 1].usersInitialYellowCards[lockedUserCount, 5] = jsonData[i - 1].usersInitialYellowCards[5]
 			if (sharedLocks[sharedLockNo, 1].usersInitialYellowCards[lockedUserCount, 5] < 0) then sharedLocks[sharedLockNo, 1].usersInitialYellowCards[lockedUserCount, 5] = 0
-			sharedLocks[sharedLockNo, 1].usersKeysDisabled[lockedUserCount] = jsonData[i - 1].usersKeysDisabled
+			sharedLocks[sharedLockNo, 1].usersKeyholderAllowsFreeUnlock[lockedUserCount] = jsonData[i - 1].usersKeyholderAllowsFreeUnlock
 			sharedLocks[sharedLockNo, 1].usersKeyholderEmojiChosen[lockedUserCount] = jsonData[i - 1].usersKeyholderEmojiChosen
 			sharedLocks[sharedLockNo, 1].usersKeyholderEmojiColourSelected[lockedUserCount] = jsonData[i - 1].usersKeyholderEmojiColourSelected
 			if (sharedLocks[sharedLockNo, 1].usersKeyholderEmojiColourSelected[lockedUserCount] = 0) then sharedLocks[sharedLockNo, 1].usersKeyholderEmojiColourSelected[lockedUserCount] = 1
+			sharedLocks[sharedLockNo, 1].usersKeysDisabled[lockedUserCount] = jsonData[i - 1].usersKeysDisabled
 			sharedLocks[sharedLockNo, 1].usersLastActive[lockedUserCount] = jsonData[i - 1].usersLastActive
 			sharedLocks[sharedLockNo, 1].usersLastUpdateIDSeen[lockedUserCount] = jsonData[i - 1].usersLastUpdateIDSeen
 			sharedLocks[sharedLockNo, 1].usersLateCheckInWindowInSeconds[lockedUserCount] = jsonData[i - 1].usersLateCheckInWindowInSeconds
@@ -5775,6 +5993,7 @@ function ReceivedSharedLockUserData(sharedLockNo, usersTab)
 			sharedLocks[sharedLockNo, 1].usersTimestampFrozenByKeyholder[lockedUserCount] = jsonData[i - 1].usersTimestampFrozenByKeyholder
 			sharedLocks[sharedLockNo, 1].usersTimestampLastAutoReset[lockedUserCount] = jsonData[i - 1].usersTimestampLastAutoReset
 			sharedLocks[sharedLockNo, 1].usersTimestampLastCardReset[lockedUserCount] = jsonData[i - 1].usersTimestampLastCardReset
+			sharedLocks[sharedLockNo, 1].usersTimestampLastCheckedIn[lockedUserCount] = jsonData[i - 1].usersTimestampLastCheckedIn
 			sharedLocks[sharedLockNo, 1].usersTimestampLastCheckedIn[lockedUserCount] = jsonData[i - 1].usersTimestampLastCheckedIn
 			sharedLocks[sharedLockNo, 1].usersTimestampLastFullReset[lockedUserCount] = jsonData[i - 1].usersTimestampLastFullReset
 			sharedLocks[sharedLockNo, 1].usersTimestampLastPicked[lockedUserCount] = jsonData[i - 1].usersTimestampLastPicked
@@ -6298,6 +6517,8 @@ function ResetData()
 	SaveLocalVariable("noOfKeysPurchased", str(noOfKeysPurchased))
 	noOfLocksNaturallyUnlocked = 0
 	SaveLocalVariable("noOfLocksNaturallyUnlocked", str(noOfLocksNaturallyUnlocked))
+	//noOfSharedLocks = 0
+	//SaveLocalVariable("noOfSharedLocksLastSession", str(noOfSharedLocks))
 	notificationsOn = 1
 	SaveLocalVariable("notificationsOn", str(notificationsOn))
 	privateProfile = 0
@@ -6392,6 +6613,7 @@ endfunction
 function ResetModifiedByCounts(sharedLockNo, usersTab, userNo)
 	sharedLocks[sharedLockNo, usersTab].usersAutoResetsPausedModifiedBy[userNo] = 0
 	sharedLocks[sharedLockNo, usersTab].usersCardInfoHiddenModifiedBy[userNo] = 0
+	sharedLocks[sharedLockNo, usersTab].usersCumulativeModifiedBy[userNo] = 0
 	sharedLocks[sharedLockNo, usersTab].usersDoubleUpCardsModifiedBy[userNo] = 0
 	sharedLocks[sharedLockNo, usersTab].usersFreezeCardsModifiedBy[userNo] = 0
 	sharedLocks[sharedLockNo, usersTab].usersGreenCardsModifiedBy[userNo] = 0
@@ -6453,6 +6675,7 @@ function RestoreDeletedMyLock(deletedLockNo)
 	lockNo = noOfLocks
 	
 	locks[lockNo].autoResetsPaused = locksDeleted.myLocks[deletedLockNo].autoResetsPaused
+	locks[lockNo].blockBotFromUnlocking = locksDeleted.myLocks[deletedLockNo].blockBotFromUnlocking
 	locks[lockNo].blockUsersAlreadyLocked = locksDeleted.myLocks[deletedLockNo].blockUsersAlreadyLocked
 	locks[lockNo].botChosen = locksDeleted.myLocks[deletedLockNo].botChosen
 	locks[lockNo].build = locksDeleted.myLocks[deletedLockNo].build
@@ -6524,6 +6747,7 @@ function RestoreDeletedMyLock(deletedLockNo)
 	locks[lockNo].initialYellowMinus2Cards = locksDeleted.myLocks[deletedLockNo].initialYellowMinus2Cards
 	locks[lockNo].iteration = lockNo
 	locks[lockNo].keyDisabled = locksDeleted.myLocks[deletedLockNo].keyDisabled
+	locks[lockNo].keyholderAllowsFreeUnlock = locksDeleted.myLocks[deletedLockNo].keyholderAllowsFreeUnlock
 	locks[lockNo].keyholderBuildNumberInstalled = locksDeleted.myLocks[deletedLockNo].keyholderBuildNumberInstalled
 	locks[lockNo].keyholderDecisionDisabled = locksDeleted.myLocks[deletedLockNo].keyholderDecisionDisabled
 	locks[lockNo].keyholderDisabledKey = locksDeleted.myLocks[deletedLockNo].keyholderDisabledKey
@@ -6601,6 +6825,7 @@ function RestoreDeletedMyLock(deletedLockNo)
 	locks[lockNo].timestampLastAutoReset = locksDeleted.myLocks[deletedLockNo].timestampLastAutoReset
 	locks[lockNo].timestampLastCardReset = locksDeleted.myLocks[deletedLockNo].timestampLastCardReset
 	locks[lockNo].timestampLastCheckedIn = locksDeleted.myLocks[deletedLockNo].timestampLastCheckedIn
+	locks[lockNo].timestampLastCheckedUpdates = 0
 	locks[lockNo].timestampLastFullReset = locksDeleted.myLocks[deletedLockNo].timestampLastFullReset
 	locks[lockNo].timestampLastPicked = locksDeleted.myLocks[deletedLockNo].timestampLastPicked
 	locks[lockNo].timestampLastReset = locksDeleted.myLocks[deletedLockNo].timestampLastReset
@@ -6660,7 +6885,28 @@ function RestoreDeletedSharedLock(deletedSharedLockNo, addToFront)
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:RestoreDeletedSharedLock;script:" + URLs[0].URLPath + "/" + URLs[0].RestoreDeletedSharedLock + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
 
-function RunSimulation()
+function ReturnSharedLockName(shareID$ as string)
+	local i as integer
+	local sharedLockName$ as string : sharedLockName$ = ""
+	
+	for i = 0 to sharedLocks.length
+		if (sharedLocks[i, 0].shareID$ = shareID$)
+			sharedLockName$ = sharedLocks[i, 0].lockName$
+			exit
+		endif
+	next
+	
+	if (sharedLockName$ = "")
+		for i = 1 to noOfLocks
+			if (locks[i].sharedID$ = shareID$)
+				sharedLockName$ = locks[i].lockName$
+				exit
+			endif
+		next
+	endif
+endfunction sharedLockName$
+
+function RunSimulation(newLock as integer)
 	local i as integer
 	local minutesFrozen as integer
 	local originalNoOfGreens as integer
@@ -6672,14 +6918,21 @@ function RunSimulation()
 	local originalNoOfYellowsMinus1 as integer
 	local originalNoOfYellowsMinus2 as integer
 	local picked as integer
-	
+
+	if (debugMode = 1 and simulationCount = 0)
+		simulationDataFileID = OpenToWrite("ChastiKeySimulationData.txt", 0)	
+	endif
 	if (simulationCount < simulationsToTry)
 		inc simulationCount
+		simulationLastAutoReset = 0
 		simulationMinutesLocked = 0
+		simulationMinutesLocked = simulationMinutesLocked + floor(simulationSecondsUntilUnfreezes / 60)
 		simulationNoOfTurns = 0
 		simulationNoOfCardsDrawn = 0
 		simulationNoOfLockResets = 0
+		simulationNoOfLockAutoResets = 0
 		simulationSecondsLocked = 0
+		simulationSecondsLocked = simulationSecondsLocked + simulationSecondsUntilUnfreezes
 		if (simulationCount = 1)
 			simulationAverageMinutesLocked = 0
 			simulationAverageNoOfTurns = 0
@@ -6694,15 +6947,23 @@ function RunSimulation()
 			simulationWorstCaseNoOfCardsDrawn = 0
 			simulationWorstCaseNoOfLockResets = 0
 		endif
-		CreateSimulationDeck()
+		simulationAverageMinutesLocked = simulationAverageMinutesLocked + floor(simulationSecondsUntilUnfreezes / 60)
+		CreateSimulationDeck(newLock)
 		ShuffleSimulationDeck()
 
+		if (debugMode = 1) then WriteString(simulationDataFileID, "### SIMULATION " + str(simulationCount) + chr(13))
+		
 		while (simulationDeck$.length >= 0)
+			if (debugMode = 1) then WriteString(simulationDataFileID, "## CARDS: " + str(simulationNoOfGreens) + " greens | " + str(simulationNoOfReds) + " reds | " + str(simulationNoOfStickies) + " stickies | " + str(simulationNoOfYellows) + " yellows | " + str(simulationNoOfFreezes) + " freezes | " + str(simulationNoOfDoubleUps) + " double ups | " + str(simulationNoOfResets) + " resets" + chr(13))
+			
 			picked = random(0, simulationDeck$.length)
+			
+			if (debugMode = 1) then WriteString(simulationDataFileID, "# PICKED: " + simulationDeck$[picked] + chr(13))
 			
 			if (simulationDeck$[picked] = "Green" and simulationNoOfTurns < simulationMinimumRedCards and (simulationNoOfDoubleUps > 0 or simulationNoOfFreezes > 0 or simulationNoOfReds > 0 or simulationNoOfResets > 0 or simulationNoOfYellows > 0))
 				continue
 			endif
+			
 			if (simulationDeck$[picked] = "DoubleUp")
 				RemoveCardFromSimulationDeck(picked)
 				originalNoOfReds = simulationNoOfReds
@@ -6880,14 +7141,23 @@ function RunSimulation()
 
 			// AUTO RESET
 			if (resetFrequencyInSeconds > 0)
-				if (mod(simulationSecondsLocked, resetFrequencyInSeconds) = 0 and simulationNoOfLockResets < maxAutoResets)
+				if (simulationSecondsLocked > simulationLastAutoReset + resetFrequencyInSeconds and simulationNoOfLockAutoResets < maxAutoResets)
+				//if (mod(simulationSecondsLocked, resetFrequencyInSeconds) = 0 and simulationNoOfLockAutoResets < maxAutoResets)
+					simulationLastAutoReset = simulationSecondsLocked
+					inc simulationSecondsLocked
 					inc simulationAverageNoOfLockResets
 					inc simulationNoOfLockResets
-					CreateSimulationDeck()
+					inc simulationNoOfLockAutoResets
+					CreateSimulationDeck(newLock)
 					ShuffleSimulationDeck()
 				endif
 			endif
 		endwhile
+
+	endif
+	
+	if (debugMode = 1 and simulationCount = 100)
+		CloseFile(simulationDataFileID)
 	endif
 endfunction
 
@@ -7230,6 +7500,39 @@ function SortDesertedUsers(searchString$ as string)
 	endif
 endfunction
 
+//~function SortFindUsers(searchString$ as string)
+//~	local filterIn as integer
+//~	local i as integer
+//~	local sortKeyType$ as string
+//~	local sortValue$ as string
+//~	
+//~	findUsersDelimitedIDs$ = ""
+//~	findUsersSorted.length = findUsers.length
+//~	filterCount = 0
+//~	for i = 0 to findUsers.length
+//~		filterIn = 0
+//~		if (findUsers[i].id > 0)
+//~			if (searchString$ = "")
+//~				filterIn = 1
+//~			else
+//~				if (FindString(findUsers[i].username$, searchString$) > 0) then filterIn = 1
+//~			endif
+//~			if (filterIn = 1)
+//~				sortKeyType$ = "string"
+//~				sortValue$ = lower(findUsers[i].username$)
+//~				findUsersSorted[filterCount].sortKey$ = sortValue$
+//~				findUsersSorted[filterCount].iteration = findUsers[i].iteration
+//~				findUsersDelimitedIDs$ = findUsersDelimitedIDs$ + "|" + str(findUsers[i].id) + "|"
+//~				inc filterCount
+//~			endif
+//~		endif
+//~	next
+//~	if (filterCount > 0)
+//~		findUsersSorted.length = filterCount - 1
+//~		findUsersSorted.sort()
+//~	endif
+//~endfunction
+
 function SortLockedUsers(searchString$ as string)
 	local a as integer
 	local cappedLockedUsers as integer
@@ -7554,6 +7857,22 @@ function SortMyLocks(searchString$ as string)
 					filterInFlag = 1
 					filterInType = 1
 				endif
+				lockID$ as string
+				if (locks[i].build < 195)
+					// LOCKS CREATED BEFORE 2.5.2.ALPHA.4
+					lockID$ = str(locks[i].groupID)
+				else
+					// NEW LOCKS CREATED IN OR AFTER 2.5.2.ALPHA.4
+					lockID$ = str(locks[i].groupID) + AddLeadingZeros(str(locks[i].id - locks[i].groupID), 2)
+				endif
+				if (FindString(lockID$, searchString$) > 0)
+					filterInFlag = 1
+					filterInType = 1
+				endif
+				if (FindString(str(locks[i].groupID), searchString$) > 0)
+					filterInFlag = 1
+					filterInType = 1
+				endif
 			endif
 			if (filterInFlag = 1 and filterInType = 1)
 				sortValue$ = "0"
@@ -7703,6 +8022,43 @@ function SortOthersFollowers(searchString$ as string)
 	if (filterCount > 0)
 		othersFriends.followersSorted.length = filterCount - 1
 		othersFriends.followersSorted.sort()
+	endif
+endfunction
+
+function SortRecentActivity()
+	local filterIn as integer
+	local i as integer
+	local sortKeyType$ as string
+	local sortValue$ as string
+	
+	recentActivitySorted.length = recentActivity.length
+	filterCount = 0
+	for i = 0 to recentActivity.length
+		filterIn = 0
+		if (recentActivity[i].id > 0)
+			if (filterRecentActivityBy$ = "FilterRecentActivityAll" or filterRecentActivityBy$ = "") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsKeyholder" and recentActivity[i].activityType$ = "LoadedSharedLock") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsKeyholder" and recentActivity[i].activityType$ = "LockeeAbandonedLock") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsKeyholder" and recentActivity[i].activityType$ = "LockeeFinishedLock") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsKeyholder" and recentActivity[i].activityType$ = "RequestKeyholdersDecision") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsLockee" and recentActivity[i].activityType$ = "KeyholderUnlockedLock") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityAsLockee" and recentActivity[i].activityType$ = "KeyholderUpdatedLock") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityFollows" and recentActivity[i].activityType$ = "NewFollow") then filterIn = 1
+			if (filterRecentActivityBy$ = "FilterRecentActivityFollows" and recentActivity[i].activityType$ = "NewFollowRequest") then filterIn = 1
+			if (FindRelation("blockedByYou", recentActivity[i].mentionedUserID) = 1) then filterIn = 0
+			if (filterIn = 1)
+				sortKeyType$ = "integer"
+				sortValue$ = str(recentActivity[i].timestamp)
+				recentActivitySorted[filterCount].sortKey$ = sortValue$
+				recentActivitySorted[filterCount].iteration = recentActivity[i].iteration
+				inc filterCount
+			endif
+		endif
+	next
+	if (filterCount > 0)
+		recentActivitySorted.length = filterCount - 1
+		recentActivitySorted.sort()
+		recentActivitySorted.reverse()
 	endif
 endfunction
 
@@ -8198,6 +8554,7 @@ function UnlockLock(lockNo, unlockedBy$, unlockedHow$)
 	locks[lockNo].cardInfoHidden = 0
 	locks[lockNo].timerHidden = 0
 	locks[lockNo].greenCards = 0
+	locks[lockNo].justUnlocked = 1
 	locks[lockNo].lockFrozenByCard = 0
 	locks[lockNo].lockFrozenByKeyholder = 0
 	locks[lockNo].unlocked = 1
@@ -8260,7 +8617,10 @@ function UpdateAccount(addToFront)
 	postData$ = postData$ + "&pushNotificationToken=" + ReplaceString(pushNotificationToken$, ":", "[colon]", -1)
 	postData$ = postData$ + "&privateProfile=" + str(privateProfile)
 	postData$ = postData$ + "&showCombinationsToKeyholders=" + str(showCombinationsToKeyholders)
+	postData$ = postData$ + "&showKeyholderStatsOnProfile=" + str(showKeyholderStatsOnProfile)
+	postData$ = postData$ + "&showLockeeStatsOnProfile=" + str(showLockeeStatsOnProfile)
 	postData$ = postData$ + "&status=" + str(statusSelected)
+	postData$ = postData$ + "&timestampStartTransferAccount=" + str(timestampStartTransferAccount)
 	postData$ = postData$ + "&userID1=" + userID$
 	postData$ = postData$ + "&userID2=" + userID$
 	postData$ = postData$ + "&version=" + ReplaceString(constVersionNumber$, " ", ".", -1)
@@ -8647,7 +9007,8 @@ function UpdateItemsInGeneratedLocksCard(cardNo as integer, sortedIteration, rep
 		OryUIUpdateText(generatedLocksCard[cardNo].txtConfig, "text:" + config$ + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		OryUIPinTextToTopCentreOfSprite(generatedLocksCard[cardNo].txtConfig, generatedLocksCard[cardNo].sprBackground, 0, 0.5)
 		
-		OryUIUpdateButton(generatedLocksCard[cardNo].rightButton, "position:" + str(GetSpriteX(generatedLocksCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(generatedLocksCard[cardNo].rightButton)) + "," +  str(GetSpriteY(generatedLocksCard[cardNo].sprBackground) + (GetSpriteHeight(generatedLocksCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(generatedLocksCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgNewLockIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+		//OryUIUpdateButton(generatedLocksCard[cardNo].rightButton, "position:" + str(GetSpriteX(generatedLocksCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(generatedLocksCard[cardNo].rightButton)) + "," +  str(GetSpriteY(generatedLocksCard[cardNo].sprBackground) + (GetSpriteHeight(generatedLocksCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(generatedLocksCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgNewLockIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+		OryUIUpdateButton(generatedLocksCard[cardNo].rightButton, "position:" + str(GetSpriteX(generatedLocksCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(generatedLocksCard[cardNo].rightButton)) + "," +  str(GetSpriteY(generatedLocksCard[cardNo].sprBackground) + (GetSpriteHeight(generatedLocksCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(generatedLocksCard[cardNo].rightButton) / 2)) + ";icon:content_copy;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 		
 		OryUIUpdateSprite(generatedLocksCard[cardNo].sprCols[1], "colorID:" + str(colorMode[colorModeSelected].pageColor))
 		OryUIPinSpriteToTopCentreOfSprite(generatedLocksCard[cardNo].sprCols[1], generatedLocksCard[cardNo].sprBackground, -25, 13.5)
@@ -8804,6 +9165,10 @@ function UpdateItemsInLockedUsersCard(cardNo as integer, sortedIteration as inte
 		if (sharedLocks[sharedLockSelected, 1].usersKeysDisabled[sortedIteration] = 1)
 			inc rightIconCount
 			OryUIPinSpriteToSprite(userCard[cardNo].sprKeysDisabled, userCard[cardNo].sprBackground, 50 + (GetTextTotalWidth(userCard[cardNo].txtUsername) / 2.0) + ((GetSpriteWidth(userCard[cardNo].sprKeysDisabled) + 1) * rightIconCount), 0.2 + (GetTextTotalHeight(userCard[cardNo].txtUsername) / 2))
+		endif
+		if (sharedLocks[sharedLockSelected, 1].usersKeyholderAllowsFreeUnlock[sortedIteration] = 1)
+			inc rightIconCount
+			OryUIPinSpriteToSprite(userCard[cardNo].sprFreeUnlock, userCard[cardNo].sprBackground, 50 + (GetTextTotalWidth(userCard[cardNo].txtUsername) / 2.0) + ((GetSpriteWidth(userCard[cardNo].sprKeysDisabled) + 1) * rightIconCount), 0.2 + (GetTextTotalHeight(userCard[cardNo].txtUsername) / 2))
 		endif
 		if (sharedLocks[sharedLockSelected, 1].usersFakeLock[sortedIteration] = 1)
 			inc rightIconCount
@@ -8992,9 +9357,9 @@ function UpdateItemsInLockedUsersCard(cardNo as integer, sortedIteration as inte
 				hh = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersLastActive[sortedIteration]) / 60 / 60, 24)
 				mm = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersLastActive[sortedIteration]) / 60, 60)
 				ss = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersLastActive[sortedIteration]), 60)
+				prefixLabel$ = "Last online "
+				suffixLabel$ = " ago"
 			endif
-			prefixLabel$ = "Last online "
-			suffixLabel$ = " ago"
 		endif
 		if (mod24 >= 9 and mod24 <= 12)
 			if (sharedLocks[sharedLockSelected, 1].usersTimestampRealLastPicked[sortedIteration] > sharedLocks[sharedLockSelected, 1].usersTimestampLocked[sortedIteration])
@@ -9002,9 +9367,9 @@ function UpdateItemsInLockedUsersCard(cardNo as integer, sortedIteration as inte
 				hh = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampRealLastPicked[sortedIteration]) / 60 / 60, 24)
 				mm = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampRealLastPicked[sortedIteration]) / 60, 60)
 				ss = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampRealLastPicked[sortedIteration]), 60)
+				prefixLabel$ = "Last picked "
+				suffixLabel$ = " ago"
 			endif
-			prefixLabel$ = "Last picked "
-			suffixLabel$ = " ago"
 		endif
 		if (mod24 >= 13 and mod24 <= 16)
 			if (sharedLocks[sharedLockSelected, 1].usersTimestampLastUpdated[sortedIteration] > 0)
@@ -9012,9 +9377,9 @@ function UpdateItemsInLockedUsersCard(cardNo as integer, sortedIteration as inte
 				hh = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampLastUpdated[sortedIteration]) / 60 / 60, 24)
 				mm = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampLastUpdated[sortedIteration]) / 60, 60)
 				ss = mod((timestampNow - sharedLocks[sharedLockSelected, 1].usersTimestampLastUpdated[sortedIteration]), 60)
+				prefixLabel$ = "You updated "
+				suffixLabel$ = " ago"
 			endif
-			prefixLabel$ = "You updated "
-			suffixLabel$ = " ago"
 		endif
 		if (mod24 >= 17 and mod24 <= 20)
 			if (sharedLocks[sharedLockSelected, 1].usersLockFrozenByCard[sortedIteration] = 1 and sharedLocks[sharedLockSelected, 1].usersTimestampFrozenByCard[sortedIteration] > 0)
@@ -9662,6 +10027,7 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 	local noOfCenterButtons as integer
 	local noOfLeftButtons as integer
 	local noOfRightButtons as integer
+	local restartButtonVisible as integer
 	local secondsLeft as integer
 	local secondsSinceLastCheckIn as integer
 	local secondsUntilNextCheckIn as integer
@@ -9672,6 +10038,11 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 	local value as integer
 	local valuePercentage# as float
 
+	if (locks[sortedIteration].checkingForUpdates = 1 and OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetLockUpdates) = 0)
+		locks[sortedIteration].checkingForUpdates = 0
+		SetScreenToView(constMyLocksScreen)
+	endif
+	
 	if (reposition = 1)
 		if (timestampFromServer >= 1000000000 and timestampNow <= locks[sortedIteration].timestampRibbonAdded + 120)
 			if (locks[sortedIteration].ribbonType$ = "Auto Reset Lock")
@@ -9687,6 +10058,10 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 		endif
 		lockName$ = ""
 		if (locks[sortedIteration].lockName$ <> "") then lockName$ = locks[sortedIteration].lockName$
+		if (locks[sortedIteration].test = 1)
+			if (lockName$ <> "") then lockName$ = lockName$ + " | "
+			lockName$ = lockName$ + "TEST"
+		endif
 		OryUIUpdateText(lockCard[cardNo].txtGroupID, "text:" + lockName$ + ";colorID:" + str(colorMode[colorModeSelected].textColor) + ";alpha:150")
 		OryUIPinTextToTopRightOfSprite(lockCard[cardNo].txtGroupID, lockCard[cardNo].sprBackground, -6.5, 0.5)
 		OryUIPinSpriteToTopRightOfSprite(lockCard[cardNo].sprSyncStatus, lockCard[cardNo].sprBackground, 1.5, 0.6)
@@ -9731,7 +10106,20 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 			else
 				if (locks[sortedIteration].readyToUnlock = 0)
 					if (locks[sortedIteration].fixed = 0)
-						if (locks[sortedIteration].lockFrozenByKeyholder = 1)
+						locks[sortedIteration].checkingForUpdates = 0
+						//if (timestampNow - locks[sortedIteration].timestampLastCheckedUpdates >= 60 and locks[sortedIteration].timestampLastCheckedUpdates >= locks[sortedIteration].timestampLocked and locks[sortedIteration].sharedID$ <> "" and locks[sortedIteration].hiddenFromOwner = 0)
+							//if (OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].GetLockUpdates) = 0) then GetLockUpdates(1)
+						//	locks[sortedIteration].checkingForUpdates = 1
+						//endif
+						if (locks[sortedIteration].sharedID$ <> "" and locks[sortedIteration].keyholderID <> 0 and OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetLockUpdates) = 1) then locks[sortedIteration].checkingForUpdates = 1
+						if (locks[sortedIteration].checkingForUpdates = 1)
+							if (reposition = 1)
+								OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlock, lockCard[cardNo].sprBackground, 0, 0)
+								OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlockFooter, lockCard[cardNo].sprBackground, 0, GetTextTotalHeight(lockCard[cardNo].txtTapToUnlock) / 1.5)
+								OryUIUpdateText(lockCard[cardNo].txtTapToUnlock, "text:Checking For Updates;color:192,57,42,255")
+								OryUIUpdateText(lockCard[cardNo].txtTapToUnlockFooter, "text:Checking for keyholder updates. Please wait;colorID:" + str(colorMode[colorModeSelected].textColor) + ";alpha:150")
+							endif
+						elseif (locks[sortedIteration].lockFrozenByKeyholder = 1)
 							if (reposition = 1)
 								OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlock, lockCard[cardNo].sprBackground, 0, 0)
 								OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlockFooter, lockCard[cardNo].sprBackground, 0, GetTextTotalHeight(lockCard[cardNo].txtTapToUnlock) / 1.5)
@@ -9895,7 +10283,7 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 								next
 								if (locks[sortedIteration].cardInfoHidden = 0)
 									SetTextString(lockCard[cardNo].txtCircleFooter[4], "CHANCE")
-									mod12 = mod(secondsRunning, 13)
+									mod12 = mod(secondsRunning, 14)
 									if (mod12 = 1 or mod12 = 2)
 										SetSpriteColor(lockCard[cardNo].sprChanceArc[1], 22, 160, 133, 255)
 										SetTextString(lockCard[cardNo].txtCircleHeader[4], "GREEN")
@@ -10010,7 +10398,20 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 						
 						if (secondsLeft > 0)
 							if (locks[sortedIteration].timerHidden = 1)
-								if (locks[sortedIteration].lockFrozenByKeyholder = 1)
+								locks[sortedIteration].checkingForUpdates = 0
+								//if (timestampNow - locks[sortedIteration].timestampLastCheckedUpdates >= 60 and locks[sortedIteration].timestampLastCheckedUpdates >= locks[sortedIteration].timestampLocked and locks[sortedIteration].sharedID$ <> "" and locks[sortedIteration].hiddenFromOwner = 0)
+									//if (OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].GetLockUpdates) = 0) then GetLockUpdates(1)
+									//locks[sortedIteration].checkingForUpdates = 1
+								//endif
+								if (locks[sortedIteration].sharedID$ <> "" and OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetLockUpdates) = 1) then locks[sortedIteration].checkingForUpdates = 1
+								if (locks[sortedIteration].checkingForUpdates = 1)
+									if (reposition = 1)
+										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlock, lockCard[cardNo].sprBackground, 0, 0)
+										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlockFooter, lockCard[cardNo].sprBackground, 0, GetTextTotalHeight(lockCard[cardNo].txtTapToUnlock) / 1.5)
+										OryUIUpdateText(lockCard[cardNo].txtTapToUnlock, "text:Checking For Updates;color:192,57,42,255")
+										OryUIUpdateText(lockCard[cardNo].txtTapToUnlockFooter, "text:Checking for keyholder updates. Please wait;colorID:" + str(colorMode[colorModeSelected].textColor) + ";alpha:150")
+									endif
+								elseif (locks[sortedIteration].lockFrozenByKeyholder = 1)
 									if (reposition = 1)
 										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlock, lockCard[cardNo].sprBackground, 0, 0)
 										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlockFooter, lockCard[cardNo].sprBackground, 0, GetTextTotalHeight(lockCard[cardNo].txtTapToUnlock) / 1.5)
@@ -10026,52 +10427,67 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 									endif
 								endif
 							else
-								if (locks[sortedIteration].lockFrozenByKeyholder = 1)
+								locks[sortedIteration].checkingForUpdates = 0
+								//if (timestampNow - locks[sortedIteration].timestampLastCheckedUpdates >= 60 and locks[sortedIteration].timestampLastCheckedUpdates >= locks[sortedIteration].timestampLocked and locks[sortedIteration].sharedID$ <> "" and locks[sortedIteration].hiddenFromOwner = 0)
+									//if (OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].GetLockUpdates) = 0) then GetLockUpdates(1)
+									//locks[sortedIteration].checkingForUpdates = 1
+								//endif
+								if (locks[sortedIteration].sharedID$ <> "" and OryUIIsScriptInHTTPSQueue(httpsQueue, URLs[0].URLPath + "/" + URLs[0].GetLockUpdates) = 1) then locks[sortedIteration].checkingForUpdates = 1
+								if (locks[sortedIteration].checkingForUpdates = 1)
+									if (reposition = 1)
+										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlock, lockCard[cardNo].sprBackground, 0, 0)
+										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtTapToUnlockFooter, lockCard[cardNo].sprBackground, 0, GetTextTotalHeight(lockCard[cardNo].txtTapToUnlock) / 1.5)
+										OryUIUpdateText(lockCard[cardNo].txtTapToUnlock, "text:Checking For Updates;color:192,57,42,255")
+										OryUIUpdateText(lockCard[cardNo].txtTapToUnlockFooter, "text:Checking for keyholder updates. Please wait;colorID:" + str(colorMode[colorModeSelected].textColor) + ";alpha:150")
+									endif
+								elseif (locks[sortedIteration].lockFrozenByKeyholder = 1)
 									OryUIUpdateText(lockCard[cardNo].txtUnlocksInHeader, "text:Frozen By Keyholder;color:192,57,42,200")
 								else
 									OryUIUpdateText(lockCard[cardNo].txtUnlocksInHeader, "text:Unlocks In;colorID:" + str(colorMode[colorModeSelected].textColor) + ";alpha:200")
 								endif
-								if (reposition = 1)
-									OrYUIPinTextToTopLeftOfSprite(lockCard[cardNo].txtUnlocksInHeader, lockCard[cardNo].sprBackground, 2 / GetDisplayAspect(), 0.1)
-									for a = 1 to 4
-										OryUIUpdateSprite(lockCard[cardNo].sprCircle[a], "colorID:" + str(colorMode[colorModeSelected].barColor) + ";alpha:255")
-										OryUIPinSpriteToSprite(lockCard[cardNo].sprCircle[a], lockCard[cardNo].sprBackground, (2 / GetDisplayAspect()) + ((a - 1) * (9.0 / GetDisplayAspect())), (GetSpriteHeight(lockCard[cardNo].sprBackground) / 2.0) - (GetSpriteHeight(lockCard[cardNo].sprCircle[a]) / 2.0))	
-										if (colorModeSelected <> 2)
-											OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(theme[themeSelected].color[3]))
-										else
-											if (themeSelected <> 10)
-												OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(theme[themeSelected].color[1]))
-											else
-												OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
-											endif
-										endif
-										OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtCircle[a], lockCard[cardNo].sprCircle[a], 0, 0)
-										if (colorModeSelected <> 2)
-											OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(theme[themeSelected].color[3]))
-										else
-											if (themeSelected <> 10)
-												OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(theme[themeSelected].color[1]))
-											else
-												OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
-											endif
-										endif
-										OryUIPinTextToBottomCentreOfSprite(lockCard[cardNo].txtCircleFooter[a], lockCard[cardNo].sprCircle[a], 0, -1.4)
-										if (locks[sortedIteration].lockFrozenByKeyholder = 1)
-											OryUIPinSpriteToCentreOfSprite(lockCard[cardNo].sprIceCapArch[a], lockCard[cardNo].sprCircle[a], 0, 0)
-										else
+								if (locks[sortedIteration].checkingForUpdates = 0)
+									if (reposition = 1)
+										OrYUIPinTextToTopLeftOfSprite(lockCard[cardNo].txtUnlocksInHeader, lockCard[cardNo].sprBackground, 2 / GetDisplayAspect(), 0.1)
+										for a = 1 to 4
+											OryUIUpdateSprite(lockCard[cardNo].sprCircle[a], "colorID:" + str(colorMode[colorModeSelected].barColor) + ";alpha:255")
+											OryUIPinSpriteToSprite(lockCard[cardNo].sprCircle[a], lockCard[cardNo].sprBackground, (2 / GetDisplayAspect()) + ((a - 1) * (9.0 / GetDisplayAspect())), (GetSpriteHeight(lockCard[cardNo].sprBackground) / 2.0) - (GetSpriteHeight(lockCard[cardNo].sprCircle[a]) / 2.0))	
 											if (colorModeSelected <> 2)
-												OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(theme[themeSelected].color[3]))
+												OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(theme[themeSelected].color[3]))
 											else
 												if (themeSelected <> 10)
-													OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(theme[themeSelected].color[1]))
+													OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(theme[themeSelected].color[1]))
 												else
-													OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
+													OryUIUpdateText(lockCard[cardNo].txtCircle[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
 												endif
 											endif
-											OryUIPinSpriteToSprite(lockCard[cardNo].sprArc[a], lockCard[cardNo].sprCircle[a], -0.3 / GetDisplayAspect(), -0.3)
-										endif
-									next
-								endif	
+											OryUIPinTextToCentreOfSprite(lockCard[cardNo].txtCircle[a], lockCard[cardNo].sprCircle[a], 0, 0)
+											if (colorModeSelected <> 2)
+												OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(theme[themeSelected].color[3]))
+											else
+												if (themeSelected <> 10)
+													OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(theme[themeSelected].color[1]))
+												else
+													OryUIUpdateText(lockCard[cardNo].txtCircleFooter[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
+												endif
+											endif
+											OryUIPinTextToBottomCentreOfSprite(lockCard[cardNo].txtCircleFooter[a], lockCard[cardNo].sprCircle[a], 0, -1.4)
+											if (locks[sortedIteration].lockFrozenByKeyholder = 1)
+												OryUIPinSpriteToCentreOfSprite(lockCard[cardNo].sprIceCapArch[a], lockCard[cardNo].sprCircle[a], 0, 0)
+											else
+												if (colorModeSelected <> 2)
+													OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(theme[themeSelected].color[3]))
+												else
+													if (themeSelected <> 10)
+														OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(theme[themeSelected].color[1]))
+													else
+														OryUIUpdateSprite(lockCard[cardNo].sprArc[a], "colorID:" + str(colorMode[colorModeSelected].textColor))
+													endif
+												endif
+												OryUIPinSpriteToSprite(lockCard[cardNo].sprArc[a], lockCard[cardNo].sprCircle[a], -0.3 / GetDisplayAspect(), -0.3)
+											endif
+										next
+									endif
+								endif
 									
 								for a = 1 to 4
 									if (a = 1)
@@ -10384,7 +10800,7 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 			endif
 			
 			// RATING
-			if (locks[sortedIteration].sharedID$ <> "")
+			if (locks[sortedIteration].sharedID$ <> "" and locks[sortedIteration].hiddenFromOwner = 0 and locks[sortedIteration].removedByKeyholder = 0)
 				// If not rated and unlocked less than 7 days ago, or if rated and was last updated 1 day ago then let lockee rate keyholder
 				if (locks[sortedIteration].test = 0 and ((timestampNow - locks[sortedIteration].timestampUnlocked <= 604800 and locks[sortedIteration].rating = 0) or (timestampNow - locks[sortedIteration].timestampRated <= 86400 and locks[sortedIteration].rating > 0)))
 					OryUIUpdateText(lockCard[cardNo].txtRateKeyholder, "text:Rate " + locks[sortedIteration].keyholderUsername$ + " and this lock;colorID:" + str(colorMode[colorModeSelected].textColor))
@@ -10421,6 +10837,7 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 	
 		deleteButtonVisible = 0
 		unlockButtonVisible = 0
+		restartButtonVisible = 0
 		emptyLeftButtonVisible = 1
 		checkInButtonVisible = 0
 		cleanButtonVisible = 0
@@ -10431,11 +10848,15 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 		buttonX# = 0
 		buttonsPlaced = 0
 		if (maintenance = 0 and offline = 0) then deleteButtonVisible = 1
-		if (locks[sortedIteration].unlocked = 0 and ((locks[sortedIteration].keyDisabled = 0 and locks[sortedIteration].keyholderDisabledKey = 0) or (locks[sortedIteration].hiddenFromOwner = 1 and locks[sortedIteration].hiddenFromOwnerAlertHidden = 0) or (locks[sortedIteration].removedByKeyholder = 1 and locks[sortedIteration].removedByKeyholderAlertHidden = 0))) then unlockButtonVisible = 1
-		if (locks[sortedIteration].unlocked = 0 and locks[sortedIteration].readyToUnlock = 1) then unlockButtonVisible = 1
+		if (locks[sortedIteration].unlocked = 0 and ((locks[sortedIteration].keyDisabled = 0 and locks[sortedIteration].keyholderDisabledKey = 0) or (locks[sortedIteration].hiddenFromOwner = 1 and locks[sortedIteration].hiddenFromOwnerAlertHidden = 0) or (locks[sortedIteration].removedByKeyholder = 1 and locks[sortedIteration].removedByKeyholderAlertHidden = 0) or locks[sortedIteration].keyholderAllowsFreeUnlock = 1)) then unlockButtonVisible = 1
+		if (locks[sortedIteration].fixed = 0 and locks[sortedIteration].regularity# <= 3) then maxWaitTime = 3600 * 3
+		if (locks[sortedIteration].fixed = 0 and locks[sortedIteration].regularity# >= 6) then maxWaitTime = 3600 * 6
+		if (locks[sortedIteration].fixed = 1 and locks[sortedIteration].regularity# = 0.016667 and (locks[sortedIteration].botChosen > 0 or (locks[lockSelected].keyholderUsername$ <> "" and locks[sortedIteration].hiddenFromOwner = 0 and locks[sortedIteration].removedByKeyholder = 0))) then maxWaitTime = 3600 * 3
+		if (locks[sortedIteration].unlocked = 0 and locks[sortedIteration].readyToUnlock = 1 and maxWaitTime - (timestampNow - locks[sortedIteration].timestampRequestedKeyholdersDecision) <= 0) then unlockButtonVisible = 1
+		if (disableCreationOfNewLocks = 0 and locks[sortedIteration].unlocked = 1 and locks[sortedIteration].botChosen = 0 and locks[sortedIteration].sharedID$ <> "") then restartButtonVisible = 1
 		if (locks[sortedIteration].unlocked = 0 and locks[sortedIteration].checkInFrequencyInSeconds > 0 and maintenance = 0 and offline = 0 and locks[sortedIteration].hiddenFromOwner = 0 and locks[sortedIteration].removedByKeyholder = 0) then checkInButtonVisible = 1
 		if (locks[sortedIteration].unlocked = 0 and locks[sortedIteration].keyholderUsername$ <> "" and maintenance = 0 and offline = 0) then moodButtonVisible = 1
-		noOfLeftButtons = deleteButtonVisible + unlockButtonVisible
+		noOfLeftButtons = deleteButtonVisible + unlockButtonVisible + restartButtonVisible
 		noOfCenterButtons = checkInButtonVisible + cleanButtonVisible
 		noOfRightButtons = moodButtonVisible + flagButtonVisible + moreButtonVisible
 		if (deleteButtonVisible = 1)
@@ -10452,12 +10873,21 @@ function UpdateItemsInMyLockCard(cardNo as integer, sortedIteration, reposition 
 				OryUIPinSpriteToSprite(lockCard[cardNo].sprUnlockButton, lockCard[cardNo].sprButtonBar, buttonX#, 0.2)
 				OryUIPinSpriteToCentreOfSprite(lockCard[cardNo].sprUnlockIcon, lockCard[cardNo].sprUnlockButton, 0, 0)
 				OryUIUpdateSprite(lockCard[cardNo].sprUnlockButton, "colorID:" + str(colorMode[colorModeSelected].pageColor))
-				if ((locks[sortedIteration].hiddenFromOwner = 1 and locks[sortedIteration].hiddenFromOwnerAlertHidden = 0) or (locks[sortedIteration].removedByKeyholder = 1 and locks[sortedIteration].removedByKeyholderAlertHidden = 0))
+				if (locks[sortedIteration].keyholderAllowsFreeUnlock = 1 or (locks[sortedIteration].hiddenFromOwner = 1 and locks[sortedIteration].hiddenFromOwnerAlertHidden = 0) or (locks[sortedIteration].removedByKeyholder = 1 and locks[sortedIteration].removedByKeyholderAlertHidden = 0))
 					local unlockColour# as float[4] : unlockColour# = OryUIConvertColor("#009051")
 					OryUIUpdateSprite(lockCard[cardNo].sprUnlockIcon, "color:" + str(unlockColour#[1]) + "," + str(unlockColour#[2]) + "," + str(unlockColour#[3]) + "," + str(unlockColour#[4]) + ";alpha:150")
 				else
 					OryUIUpdateSprite(lockCard[cardNo].sprUnlockIcon, "colorID:" + str(colorMode[colorModeSelected].barIconColor) + ";alpha:130")
 				endif
+			endif
+			buttonX# = buttonX# + 10
+		endif
+		if (restartButtonVisible = 1)
+			if (reposition = 1)
+				OryUIPinSpriteToSprite(lockCard[cardNo].sprRestartButton, lockCard[cardNo].sprButtonBar, buttonX#, 0.2)
+				OryUIPinSpriteToCentreOfSprite(lockCard[cardNo].sprRestartIcon, lockCard[cardNo].sprRestartButton, 0, 0)
+				OryUIUpdateSprite(lockCard[cardNo].sprRestartButton, "colorID:" + str(colorMode[colorModeSelected].pageColor))
+				OryUIUpdateSprite(lockCard[cardNo].sprRestartIcon, "colorID:" + str(colorMode[colorModeSelected].barIconColor) + ";alpha:130")
 			endif
 			buttonX# = buttonX# + 10
 		endif
@@ -10719,9 +11149,11 @@ function UpdateItemsInMyLockDeletedCard(cardNo as integer, sortedIteration, repo
 		endif
 		
 		if (locksDeleted.myLocks[sortedIteration].unlocked = 0 and timestampNow - locksDeleted.myLocks[sortedIteration].timestampDeleted <= 86400)
-			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgUndeleteIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+			//OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgUndeleteIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";icon:restore_from_trash;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 		elseif (disableCreationOfNewLocks = 0 and locksDeleted.myLocks[sortedIteration].unlocked = 1 and locksDeleted.myLocks[sortedIteration].botChosen = 0 and locksDeleted.myLocks[sortedIteration].sharedID$ <> "")
-			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgNewLockIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+			//OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgNewLockIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";icon:replay;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 		endif
 			
 		if (locksDeleted.myLocks[sortedIteration].unlocked = 0)
@@ -10755,6 +11187,7 @@ function UpdateItemsInSharedLockCard(cardNo as integer, sortedIteration, reposit
 	local buttonX# as float
 	local cards$ as string
 	local checkIns$ as string
+	local cloneButtonVisible as integer
 	local deleteButtonVisible as integer
 	local leftEmptyButtonVisible as integer
 	local manageButtonVisible as integer
@@ -10951,6 +11384,7 @@ function UpdateItemsInSharedLockCard(cardNo as integer, sortedIteration, reposit
 			OryUIPinTextToBottomCentreOfSprite(sharedLockCard[cardNo].txtRating, sharedLockCard[cardNo].sprBackground, 0, -0.4)
 
 			deleteButtonVisible = 0
+			cloneButtonVisible = 1
 			leftEmptyButtonVisible = 1
 			manageButtonVisible = 1
 			showMatchingUsersButtonVisible = 0
@@ -10963,12 +11397,19 @@ function UpdateItemsInSharedLockCard(cardNo as integer, sortedIteration, reposit
 			if (FindString(sharedLocks[sortedIteration, 0].lockedUsersDelimited$, OryUIGetTextFieldString(editSharedLocksSearch)) > 0) then showMatchingUsersButtonVisible = 1
 			if (FindString(sharedLocks[sortedIteration, 0].unlockedUsersDelimited$, OryUIGetTextFieldString(editSharedLocksSearch)) > 0) then showMatchingUsersButtonVisible = 1
 			if (FindString(sharedLocks[sortedIteration, 0].desertedUsersDelimited$, OryUIGetTextFieldString(editSharedLocksSearch)) > 0) then showMatchingUsersButtonVisible = 1
-			noOfButtons = deleteButtonVisible + manageButtonVisible + showMatchingUsersButtonVisible + shareButtonVisible + moreButtonVisible
+			noOfButtons = deleteButtonVisible + cloneButtonVisible + manageButtonVisible + showMatchingUsersButtonVisible + shareButtonVisible + moreButtonVisible
 			if (deleteButtonVisible = 1)
 				OryUIUpdateSprite(sharedLockCard[cardNo].sprDeleteButton, "colorID:" + str(colorMode[colorModeSelected].pageColor))
 				OryUIUpdateSprite(sharedLockCard[cardNo].sprDeleteIcon, "colorID:" + str(colorMode[colorModeSelected].barIconColor) + ";alpha:130")
 				OryUIPinSpriteToSprite(sharedLockCard[cardNo].sprDeleteButton, sharedLockCard[cardNo].sprButtonBar, buttonX#, 0.2)
 				OryUIPinSpriteToCentreOfSprite(sharedLockCard[cardNo].sprDeleteIcon, sharedLockCard[cardNo].sprDeleteButton, 0, 0)
+				buttonX# = buttonX# + 10
+			endif
+			if (cloneButtonVisible = 1)
+				OryUIUpdateSprite(sharedLockCard[cardNo].sprCloneButton, "colorID:" + str(colorMode[colorModeSelected].pageColor))
+				OryUIUpdateSprite(sharedLockCard[cardNo].sprCloneIcon, "colorID:" + str(colorMode[colorModeSelected].barIconColor) + ";alpha:130")
+				OryUIPinSpriteToSprite(sharedLockCard[cardNo].sprCloneButton, sharedLockCard[cardNo].sprButtonBar, buttonX#, 0.2)
+				OryUIPinSpriteToCentreOfSprite(sharedLockCard[cardNo].sprCloneIcon, sharedLockCard[cardNo].sprCloneButton, 0, 0)
 				buttonX# = buttonX# + 10
 			endif
 			if (leftEmptyButtonVisible = 1)
@@ -11145,7 +11586,8 @@ function UpdateItemsInSharedLockDeletedCard(cardNo as integer, sortedIteration, 
 		OryUIUpdateText(lockDeletedCard[cardNo].txtLockInformation, "text:" + lockInformation$ + ";colorID:" + str(colorMode[colorModeSelected].textColor))
 		OryUIPinTextToCentreOfSprite(lockDeletedCard[cardNo].txtLockInformation, lockDeletedCard[cardNo].sprBackground, 0, 0)
 
-		OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgUndeleteIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+		//OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgUndeleteIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
+		OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";icon:restore_from_trash;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 		
 		lockedUsers = locksDeleted.sharedLocks[sortedIteration].lockedUsers - locksDeleted.sharedLocks[sortedIteration].fakeLockedUsers
 		if (lockedUsers < 0) then lockedUsers = 0
@@ -11404,6 +11846,7 @@ function UpdateLocksData(lockNo)
 	fileID = OpenToWrite("ID" + str(locks[lockNo].id) + "V2.txt", 0)
 	WriteString(fileID, "sortKey:" + locks[lockNo].sortKey$)
 	WriteString(fileID, "autoResetsPaused:" + str(locks[lockNo].autoResetsPaused))
+	WriteString(fileID, "blockBotFromUnlocking:" + str(locks[lockNo].blockBotFromUnlocking))
 	WriteString(fileID, "blockUsersAlreadyLocked:" + str(locks[lockNo].blockUsersAlreadyLocked))
 	WriteString(fileID, "botChosen:" + str(locks[lockNo].botChosen))
 	WriteString(fileID, "build:" + str(locks[lockNo].build))
@@ -11471,6 +11914,7 @@ function UpdateLocksData(lockNo)
 	WriteString(fileID, "initialYellowMinus2Cards:" + str(locks[lockNo].initialYellowMinus2Cards))
 	WriteString(fileID, "iteration:" + str(locks[lockNo].iteration))
 	WriteString(fileID, "keyDisabled:" + str(locks[lockNo].keyDisabled))
+	WriteString(fileID, "keyholderAllowsFreeUnlock:" + str(locks[lockNo].keyholderAllowsFreeUnlock))
 	WriteString(fileID, "keyholderBuildNumberInstalled:" + str(locks[lockNo].keyholderBuildNumberInstalled))
 	WriteString(fileID, "keyholderDisabledKey:" + str(locks[lockNo].keyholderDisabledKey))
 	WriteString(fileID, "keyholderDecisionDisabled:" + str(locks[lockNo].keyholderDecisionDisabled))
@@ -11542,6 +11986,7 @@ function UpdateLocksData(lockNo)
 	WriteString(fileID, "timestampLastAutoReset:" + str(locks[lockNo].timestampLastAutoReset))
 	WriteString(fileID, "timestampLastCardReset:" + str(locks[lockNo].timestampLastCardReset))
 	WriteString(fileID, "timestampLastCheckedIn:" + str(locks[lockNo].timestampLastCheckedIn))
+	WriteString(fileID, "timestampLastCheckedUpdates:" + str(locks[lockNo].timestampLastCheckedUpdates))
 	WriteString(fileID, "timestampLastFullReset:" + str(locks[lockNo].timestampLastFullReset))
 	WriteString(fileID, "timestampLastPicked:" + str(locks[lockNo].timestampLastPicked))
 	WriteString(fileID, "timestampLastReset:" + str(locks[lockNo].timestampLastReset))
@@ -11577,6 +12022,7 @@ function UpdateLocksDatabase(lockNo, logData$, addToFront)
 		SplitSingleLogRow(logData$)
 		postData$ = ""
 		postData$ = postData$ + "&autoResetsPaused=" + str(locks[lockNo].autoResetsPaused)
+		postData$ = postData$ + "&blockBotFromUnlocking=" + str(locks[lockNo].blockBotFromUnlocking)
 		postData$ = postData$ + "&blockUsersAlreadyLocked=" + str(locks[lockNo].blockUsersAlreadyLocked)
 		postData$ = postData$ + "&botChosen=" + str(locks[lockNo].botChosen)
 		postData$ = postData$ + "&build=" + str(constBuildNumber)
@@ -11621,7 +12067,9 @@ function UpdateLocksDatabase(lockNo, logData$, addToFront)
 		postData$ = postData$ + "&initialYellowCards=" + str(locks[lockNo].initialYellowCards)
 		postData$ = postData$ + "&initialYellowMinus1Cards=" + str(locks[lockNo].initialYellowMinus1Cards)
 		postData$ = postData$ + "&initialYellowMinus2Cards=" + str(locks[lockNo].initialYellowMinus2Cards)
+		postData$ = postData$ + "&justUnlocked=" + str(locks[lockNo].justUnlocked)
 		postData$ = postData$ + "&keyDisabled=" + str(locks[lockNo].keyDisabled)
+		postData$ = postData$ + "&keyholderAllowsFreeUnlock=" + str(locks[lockNo].keyholderAllowsFreeUnlock)
 		postData$ = postData$ + "&keyholderDecisionDisabled=" + str(locks[lockNo].keyholderDecisionDisabled)
 		postData$ = postData$ + "&keyholderDisabledKey=" + str(locks[lockNo].keyholderDisabledKey)
 		postData$ = postData$ + "&keyholderID=" + str(locks[lockNo].keyholderID)
@@ -11708,7 +12156,31 @@ function UpdateLocksDatabase(lockNo, logData$, addToFront)
 		postData$ = postData$ + "&version=" + store$ + " " + ReplaceString(constVersionNumber$, " ", ".", -1)
 		postData$ = postData$ + "&yellowCards=" + str(locks[lockNo].yellowCards)
 		OryUIAddItemToHTTPSQueue(httpsQueue, "name:UpdateMyLock=" + str(locks[lockNo].id) + ";script:" + URLs[0].URLPath + "/" + URLs[0].UpdateLocksDatabase + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
+		locks[lockNo].justUnlocked = 0
 	endif
+endfunction
+
+function UpdateRecentActivityReadFlag(id, addToFront)
+	if (maintenance = 1) then exitfunction
+	
+	local postData$ as string
+	
+	postData$ = ""
+	postData$ = postData$ + "&id=" + str(id)
+	postData$ = postData$ + "&userID1=" + userID$
+	postData$ = postData$ + "&userID2=" + userID$
+	OryUIAddItemToHTTPSQueue(httpsQueue, "name:UpdateRecentActivityReadFlag=" + str(id) + ";script:" + URLs[0].URLPath + "/" + URLs[0].UpdateRecentActivityReadFlag + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
+endfunction
+
+function UpdateRecentActivityReadFlagForAll(addToFront)
+	if (maintenance = 1) then exitfunction
+	
+	local postData$ as string
+	
+	postData$ = ""
+	postData$ = postData$ + "&userID1=" + userID$
+	postData$ = postData$ + "&userID2=" + userID$
+	OryUIAddItemToHTTPSQueue(httpsQueue, "name:UpdateRecentActivityReadFlagForAll;script:" + URLs[0].URLPath + "/" + URLs[0].UpdateRecentActivityReadFlagForAll + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
 
 function UpdateSharedLock(sharedLockNo, addToFront)
@@ -11752,8 +12224,10 @@ function UpdateSharedLock(sharedLockNo, addToFront)
 	if (resetFrequencyInSeconds > 0) then minVersionRequired$ = "2.6.3.alpha.1"
 	if (temporarilyDisabled = 1) then minVersionRequired$ = "2.6.5.alpha.2"
 	if (lateCheckInWindowInSeconds > 0) then minVersionRequired$ = "2.6.8.alpha.1"
+	if (blockTestLocks = 1) then minVersionRequired$ = "2.7.2.alpha.1"
 	
 	postData$ = ""
+	postData$ = postData$ + "&blockTestLocks=" + str(blockTestLocks)
 	postData$ = postData$ + "&blockUsersAlreadyLocked=" + str(blockUsersAlreadyLocked)
 	postData$ = postData$ + "&blockUsersWithStatsHidden=" + str(blockUsersWithStatsHidden)
 	postData$ = postData$ + "&cardInfoHidden=" + str(cardInfoHidden)
@@ -11799,17 +12273,19 @@ function UpdateUsername(newUsername$, addToFront)
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:UpdateUsername=" + newUsername$ + ";script:" + URLs[0].URLPath + "/" + URLs[0].UpdateUsername + ";postData:" + postData$ + ";addToFront:" + str(addToFront))
 endfunction
 
-function UpdateUsersLock(sharedLockNo, usersTab, userNo, logData$, hideUpdate, addToFront)
+function UpdateUsersLock(sharedLockNo, usersTab, userNo, logData$, hideUpdate, fakeUpdate, addToFront)
 	if (maintenance = 1) then exitfunction
 	
 	local postData$ as string
 	
 	SplitSingleLogRow(logData$)							
 	postData$ = ""
+	postData$ = postData$ + "&allowFreeUnlockModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersKeyholderAllowsFreeUnlockModifiedBy[userNo])
 	postData$ = postData$ + "&autoResetsPausedModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersAutoResetsPausedModifiedBy[userNo])
 	postData$ = postData$ + "&cardInfoHiddenModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersCardInfoHiddenModifiedBy[userNo])
 	postData$ = postData$ + "&cumulativeModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersCumulativeModifiedBy[userNo])
 	postData$ = postData$ + "&doubleUpCardsModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersDoubleUpCardsModifiedBy[userNo])
+	postData$ = postData$ + "&fakeUpdate=" + str(fakeUpdate)
 	postData$ = postData$ + "&freezeCardsModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersFreezeCardsModifiedBy[userNo])
 	postData$ = postData$ + "&greenCardsModifiedBy=" + str(sharedLocks[sharedLockNo, usersTab].usersGreenCardsModifiedBy[userNo])
 	postData$ = postData$ + "&greenCardsPicked=" + str(sharedLocks[sharedLockNo, usersTab].usersGreenCardsPicked[userNo])

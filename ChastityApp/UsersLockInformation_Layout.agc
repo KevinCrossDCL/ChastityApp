@@ -2,7 +2,7 @@
 screenNo = constUsersLockInformationScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Lock ID 1234567890;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Lock ID 1234567890;textAlignment:center;depth:10")
 
 // TABS
 screen[screenNo].tabs = OryUICreateTabs("position:-1000,-1000;scrollable:false;depth:10")
@@ -85,6 +85,13 @@ for i = 1 to 4
 	usersLockEstimations[i].txtRunningSimulation = OryUICreateText("text:Running Lock Simulation XXX of XXX;size:2.6;bold:true;alignment:center;position:-1000,-1000;depth:16")	
 next
 btnRerunUsersLockSimulation as integer : btnRerunUsersLockSimulation = OryUICreateButton("size:90,5;text:Rerun Simulation;position:-1000,-1000;depth:19")
+
+// ALLOW FREE UNLOCK
+crdUsersAllowFreeUnlock as integer : crdUsersAllowFreeUnlock = OryUICreateTextCard("width:94;headerText:Allow user to unlock for free?;headerTextAlignment:center;supportingText:Selecting 'Yes' will allow the user to unlock for free when they need to. For example, an upcoming appointment that you may not be available to unlock them for. If the user does unlock it will be added to the log.;position:-1000,-1000;autoHeight:true;depth:19")
+grpUsersAllowFreeUnlock as integer : grpUsersAllowFreeUnlock = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
+OryUIInsertButtonGroupItem(grpUsersAllowFreeUnlock, -1, "name:Yes;text:Yes")
+OryUIInsertButtonGroupItem(grpUsersAllowFreeUnlock, -1, "name:No;text:No")
+OryUISetButtonGroupItemSelectedByIndex(grpUsersAllowFreeUnlock, 2)
 
 // DELETE USER FROM LOCK
 crdDeleteUserFromLock as integer : crdDeleteUserFromLock = OryUICreateTextCard("width:94;headerText:Delete user from this lock?;headerTextAlignment:center;supportingText:XXXXX;position:-1000,-1000;autoHeight:true;depth:19")

@@ -2,12 +2,12 @@
 screenNo = constYourFollowRequestsListScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Follow Requests;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Follow Requests;textAlignment:center;depth:10")
 OryUIInsertTopBarAction(screen[screenNo].topBar, -1, "name:refresh;icon:Refresh")
 
 // SEARCH BAR
 sprYourFollowRequestsSearchBar as integer : sprYourFollowRequestsSearchBar = OryUICreateSprite("size:100,5.02;position:-1000,-1000;depth:19")
-editYourFollowRequestsSearch as integer : editYourFollowRequestsSearch = OryUICreateTextfield("labelText:Search follow requests...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:cancel;depth:18")
+editYourFollowRequestsSearch as integer : editYourFollowRequestsSearch = OryUICreateTextfield("labelText:Search follow requests...;position:-1000,-1000;size:90,5;showTrailingIcon:true;trailingIcon:clear;depth:18")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:100,0;position:-1000,-1000;depth:20")

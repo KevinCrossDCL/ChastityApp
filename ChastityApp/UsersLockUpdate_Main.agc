@@ -1,6 +1,8 @@
 
 OryUIHideFloatingActionButton(fabUpdateUser)
 if (screenToView = constUsersLockUpdateScreen)
+	local fakeUpdate : fakeUpdate = 1
+	
 	screenNo = constUsersLockUpdateScreen
 	SetLastScreenViewed(screenNo)
 	
@@ -454,6 +456,7 @@ if (screenToView = constUsersLockUpdateScreen)
 		if (sharedLocks[sharedLockSelected, 1].usersDoubleUpCardsModifiedBy[userSelected] <> 0) then modifiedLock = 1
 		if (sharedLocks[sharedLockSelected, 1].usersResetCardsModifiedBy[userSelected] <> 0) then modifiedLock = 1
 		if (modifiedLock = 1)
+			fakeUpdate = 0
 			OryUIShowFloatingActionButton(fabUpdateUser)
 		endif	
 	endif
@@ -576,11 +579,13 @@ if (screenToView = constUsersLockUpdateScreen)
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Adding " + lower(ConvertMinutesToText(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected] * 15, 1)))
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Adding " + lower(ConvertMinutesToText(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected] * 60, 1)))
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Adding " + lower(ConvertMinutesToText(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected] * 1440, 1)))
+				fakeUpdate = 0
 				OryUIShowFloatingActionButton(fabUpdateUser)
 			elseif (sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected] < 0)
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.25) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Deducting " + lower(ConvertMinutesToText(abs(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected]) * 15, 1)))
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 1) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Deducting " + lower(ConvertMinutesToText(abs(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected]) * 60, 1)))
 				if (sharedLocks[sharedLockSelected, 0].regularity# = 24) then OryUIUpdateText(updateUser.txtModifiedBy, "text:Deducting " + lower(ConvertMinutesToText(abs(sharedLocks[sharedLockSelected, 1].usersRedCardsModifiedBy[userSelected]) * 1440, 1)))
+				fakeUpdate = 0
 				OryUIShowFloatingActionButton(fabUpdateUser)
 			else
 				OryUIUpdateText(updateUser.txtModifiedBy, "text: ")	
@@ -702,9 +707,11 @@ if (screenToView = constUsersLockUpdateScreen)
 		if (secondsLeft > 0 and sharedLocks[sharedLockSelected, 1].usersReadyToUnlock[userSelected] = 0)
 			if (sharedLocks[sharedLockSelected, 1].usersMinutesModifiedBy[userSelected] > 0)
 				OryUIUpdateText(updateUser.txtModifiedBy, "text:Adding " + lower(ConvertMinutesToText(sharedLocks[sharedLockSelected, 1].usersMinutesModifiedBy[userSelected], 1)))
+				fakeUpdate = 0
 				OryUIShowFloatingActionButton(fabUpdateUser)
 			elseif (sharedLocks[sharedLockSelected, 1].usersMinutesModifiedBy[userSelected] < 0)
 				OryUIUpdateText(updateUser.txtModifiedBy, "text:Deducting " + lower(ConvertMinutesToText(abs(sharedLocks[sharedLockSelected, 1].usersMinutesModifiedBy[userSelected]), 1)))
+				fakeUpdate = 0
 				OryUIShowFloatingActionButton(fabUpdateUser)
 			else
 				OryUIUpdateText(updateUser.txtModifiedBy, "text: ")	
@@ -755,20 +762,45 @@ if (screenToView = constUsersLockUpdateScreen)
 		OryUIUpdateTextCard(updateUser.crdHideUpdate, "position:-1000,-1000")
 		OryUIUpdateButtonGroup(updateUser.grpHideUpdate, "position:-1000,-1000")
 	endif
+	
+	// FAKE UPDATE?
+	if (sharedLocks[sharedLockSelected, 1].usersBuildNumberInstalled[userSelected] >= 300 and hideUpdate = 1 and fakeUpdate = 1 and (sharedLocks[sharedLockSelected, 0].fixed = 0 or (sharedLocks[sharedLockSelected, 0].fixed = 1 and sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)))
+		OryUIShowFloatingActionButton(fabUpdateUser)
+	endif
 
 	// UPDATE USER BUTTON
 	if (redrawScreen = 1)
 		OryUIUpdateFloatingActionButton(fabUpdateUser, "colorID:" + str(theme[themeSelected].color[3]))
 	endif
 	if (OryUIGetFloatingActionButtonReleased(fabUpdateUser))
+		if (sharedLocks[sharedLockSelected, 1].usersBuildNumberInstalled[userSelected] >= 300 and hideUpdate = 1 and fakeUpdate = 1 and (sharedLocks[sharedLockSelected, 0].fixed = 0 or (sharedLocks[sharedLockSelected, 0].fixed = 1 and sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)))
+			OryUIUpdateDialog(dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Send Fake Update?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Because you've not made any changes do you want to send " + sharedLocks[sharedLockSelected, selectedManageUsersTab].usersUsername$[userSelected] + " an hidden and fake update? The update will appear like any other update on their side, but they won't know that no change has been made to the lock.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+			OryUISetDialogButtonCount(dialog, 2)
+			OryUIUpdateDialogButton(dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:YesSendFakeUpdate;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateDialogButton(dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIShowDialog(dialog)
+		else
+			sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastUpdated[userSelected] = timestampNow
+			if (sharedLocks[sharedLockSelected, 0].fixed = 0)
+				UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedCards", hideUpdate, fakeUpdate, 1)
+			else
+				if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTime", hideUpdate, fakeUpdate, 1)
+				else
+					UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTimeOldVersion", hideUpdate, fakeUpdate, 1)
+				endif
+			endif
+		endif
+	endif
+	if (OryUIGetDialogButtonReleasedByName(dialog, "YesSendFakeUpdate"))
 		sharedLocks[sharedLockSelected, selectedManageUsersTab].usersTimestampLastUpdated[userSelected] = timestampNow
 		if (sharedLocks[sharedLockSelected, 0].fixed = 0)
-			UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedCards", hideUpdate, 1)
+			UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedCards", hideUpdate, fakeUpdate, 1)
 		else
 			if (sharedLocks[sharedLockSelected, 0].regularity# = 0.016667)
-				UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTime", hideUpdate, 1)
+				UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTime", hideUpdate, fakeUpdate, 1)
 			else
-				UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTimeOldVersion", hideUpdate, 1)
+				UpdateUsersLock(sharedLockSelected, selectedManageUsersTab, userSelected, "action:KeyholderUpdate;actionedBy:Keyholder;result:UpdatedTimeOldVersion", hideUpdate, fakeUpdate, 1)
 			endif
 		endif
 	endif

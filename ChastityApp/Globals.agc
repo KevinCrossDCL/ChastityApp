@@ -31,13 +31,15 @@ global add1To4RedCardsAlertHidden as integer : add1To4RedCardsAlertHidden = val(
 global add2RedCardsAlertHidden as integer : add2RedCardsAlertHidden = val(GetLocalVariableValue("add2RedCardsAlertHidden"))
 global add3RedCardsAlertHidden as integer : add3RedCardsAlertHidden = val(GetLocalVariableValue("add3RedCardsAlertHidden"))
 global adsRemoved as integer : adsRemoved = val(GetLocalVariableValue("adsRemoved"))
+if (GetDeviceBaseName() = "ios") then adsRemoved = 1
 global alert as typeAlert
+global allowAccountTransfers as integer
 global allowCopies as integer
 global allowDuplicatesInCombination as integer : allowDuplicatesInCombination = val(GetLocalVariableValue("allowDuplicatesInCombination"))
 if (allowDuplicatesInCombination = 0) then allowDuplicatesInCombination = 1
 global apiProjects as typeAPIProject[]
-global apiProjectCard as typeAPIProjectCard[2]
 if (GetFileExists("apiProjects.json")) then apiProjects.load("apiProjects.json")
+global apiProjectCard as typeAPIProjectCard[2]
 global autoResetLock as integer
 global avatarApproved as integer : avatarApproved = val(GetLocalVariableValue("avatarApproved"))
 global avatarChosenImage as integer
@@ -47,6 +49,7 @@ global averageRating# as float
 global banned as integer : banned = val(GetLocalVariableValue("banned"))
 global bannedAlertHidden as integer : bannedAlertHidden = val(GetLocalVariableValue("bannedAlertHidden"))
 global bannerAdsCreated as integer : bannerAdsCreated = 0
+global blockTestLocks as integer
 global blockUsersAlreadyLocked as integer
 global blockUsersWithSpecificRating as integer
 global blockUsersWithStatsHidden as integer
@@ -88,6 +91,7 @@ global cardWidth# as float : cardWidth# = 10
 global changingScreen as integer
 global checkInFrequencyInSeconds as integer
 global checkingConnectionStatus as integer
+global checkingForUpdates as integer
 global checkInsRequired as integer
 global colorMode as typeColorMode[10]
 global colorModeSelected as integer : colorModeSelected = val(GetLocalVariableValue("colorModeSelected"))
@@ -110,7 +114,7 @@ global dateFormat$ as string : dateFormat$ = "D M YYYY"
 global dateFromServer$ as string
 global dd as integer
 global deactivatingVersionAlertHidden as integer : deactivatingVersionAlertHidden = val(GetLocalVariableValue("deactivatingVersionAlertHidden_v" + tmpVersionNumber$))
-global debugMode as integer : debugMode = 0
+global debugMode as integer : debugMode = 2
 global deck as typeDeck[3000]
 global defaultUsername$ as string : defaultUsername$ = GetLocalVariableValue("defaultUsername")
 global deletedLockToClone as integer
@@ -120,7 +124,12 @@ global desertedUserCount as integer
 global deviceTimestampOffset as integer : deviceTimestampOffset = val(GetLocalVariableValue("deviceTimestampOffset"))
 global developerMode as integer : developerMode = 2
 global developerShowCards as integer : developerShowCards = 2
-global deviceID$ as string : deviceID$ = Sha512("Chasti" + GetDeviceID() + "Key")
+global deviceID$ as string
+if (GetDeviceBaseName() = "ios")
+	deviceID$ = ""
+else
+	deviceID$ = Sha512("Chasti" + GetDeviceID() + "Key")
+endif
 global dialog as integer
 global dialogShown$ as string
 global disableCreationOfNewLocks as integer
@@ -168,6 +177,8 @@ global filterMyLocksBy$ as string : filterMyLocksBy$ = GetLocalVariableValue("fi
 if (filterMyLocksBy$ = "") then filterMyLocksBy$ = "FilterMyLocksAll"
 global filterMyLocksByFlag$ as string : filterMyLocksByFlag$ = GetLocalVariableValue("filterMyLocksByFlag")
 if (filterMyLocksByFlag$ = "") then filterMyLocksByFlag$ = "FilterMyLocksFlagAll"
+global filterRecentActivityBy$ as string : filterRecentActivityBy$ = GetLocalVariableValue("filterRecentActivityBy")
+if (filterRecentActivityBy$ = "") then filterRecentActivityBy$ = "FilterRecentActivityAll"
 global filterSharedLocksBy$ as string : filterSharedLocksBy$ = GetLocalVariableValue("filterSharedLocksBy")
 if (filterSharedLocksBy$ = "") then filterSharedLocksBy$ = "FilterSharedLocksAll"
 if (filterSharedLocksBy$ = "FilterSharedLocksHasUsersLocked") then filterSharedLocksBy$ = "FilterSharedLocksHasUsersLockedIncludingTest"
@@ -178,11 +189,15 @@ if (filterUnlockedUsersByFlag$ = "") then filterUnlockedUsersByFlag$ = "FilterUn
 global filterUnlockedUsersExcludeTestLocks as integer : filterUnlockedUsersExcludeTestLocks = val(GetLocalVariableValue("filterUnlockedUsersExcludeTestLocks"))
 global filterUsersBy$ as string : filterUsersBy$ = "FilterAll"
 global filterUsersLogBy$ as string
+//~global findUsers as typeFriend[0]
+//~global findUsersDelimitedIDs$ as string
+//~global findUsersSorted as typeFriend[0]
 global fixed as integer
 global flippedCardID as integer
 global forceTrust as integer
 global fps as integer : fps = val(GetLocalVariableValue("fps"))
 if (fps = 0) then fps = 60
+OryUISetSyncRate(fps, 0)
 global freeAdsRemovalAvailable as integer
 global freeKeysAvailable as integer
 global freezeCards as integer
@@ -212,6 +227,7 @@ global iterationOffset as integer
 global keepLockGeneratorSettings as integer
 global keyDisabled as integer
 global keyholder as integer
+global keyholderAllowsFreeUnlock as integer
 global keyholderDecisionDisabled as integer
 global keyholderDisabledKey as integer
 global keyholderID as integer
@@ -236,6 +252,7 @@ global lastLockID as integer
 global lastLockGroupID as integer
 global lastNewsIDDownloaded as integer
 global lastNewsIDSeen as integer : lastNewsIDSeen = val(GetLocalVariableValue("lastNewsIDSeen"))
+global lastRecentActivityIDSeen as integer : lastRecentActivityIDSeen = val(GetLocalVariableValue("lastRecentActivityIDSeen"))
 global lastScreenViewed as integer
 global lastScreenViewY# as float
 global lateCheckInWindowInSeconds as integer
@@ -360,6 +377,7 @@ global noOfRatings as integer
 global noOfServerCallsQueued as integer
 global noOfServerUploadsQueued as integer
 global noOfSharedLocks as integer
+global noOfSharedLocksLastSession as integer : noOfSharedLocksLastSession = val(GetLocalVariableValue("noOfSharedLocksLastSession"))
 global notificationsOn as integer : notificationsOn = val(GetLocalVariableValue("notificationsOn"))
 if (notificationsOn = 0) then notificationsOn = 1
 global offline as integer
@@ -378,6 +396,8 @@ global pushNotificationToken$ as string
 global randomCombination as typeCombination[99]
 global randomCombinationAudioOn as integer : randomCombinationAudioOn = val(GetLocalVariableValue("randomCombinationAudioOn"))
 global reasonBanned$ as string : reasonBanned$ = GetLocalVariableValue("reasonBanned")
+global recentActivity as typeRecentActivity[]
+global recentActivitySorted as typeRecentActivity[]
 global redrawScreen as integer
 global regularity# as float
 global repositionItemsInCard as integer
@@ -400,6 +420,7 @@ global screenToView as integer
 global screenToViewY# as float
 global scrollStartX# as float
 global scrollStartY# as float
+global searchStringFromPreviousScreen$ as string
 global secondsLeft as integer
 global secondsLocked as integer
 global secondsRunning as integer
@@ -424,10 +445,13 @@ global sharedLocks as typeSharedLocks[200, 4]
 global sharedLockSelected as integer
 global sharedLocksSearchString$ as string
 global sharedLocksSorted as typeSharedLocks[200]
+global sharedLockToClone as integer
 global sharedLockUsersSorted as typeUsersSorted[200]
 global shareID$ as string
 global showCombinationsToKeyholders as integer : showCombinationsToKeyholders = val(GetLocalVariableValue("showCombinationsToKeyholders"))
 if (showCombinationsToKeyholders = 2) then showCombinationsToKeyholders = 0
+global showKeyholderStatsOnProfile as integer : showKeyholderStatsOnProfile = val(GetLocalVariableValue("showKeyholderStatsOnProfile"))
+global showLockeeStatsOnProfile as integer : showLockeeStatsOnProfile = val(GetLocalVariableValue("showLockeeStatsOnProfile"))
 global showLoadingWheelUntilQueueCleared as integer
 global shownDialog as integer
 global showPleaseWaitWheel as integer
@@ -447,6 +471,7 @@ global simulationBestCaseNoOfLockResets as integer
 global simulationBestCaseNoOfTurns as integer
 global simulationCount as integer
 global simulationDeck$ as string[]
+global simulationDataFileID as integer
 global simulationInitialDoubleUps as integer
 global simulationInitialFreezes as integer
 global simulationInitialGreens as integer
@@ -458,6 +483,7 @@ global simulationInitialYellowsAdd2 as integer
 global simulationInitialYellowsAdd3 as integer
 global simulationInitialYellowsMinus1 as integer
 global simulationInitialYellowsMinus2 as integer
+global simulationLastAutoReset as integer
 global simulationMinimumRedCards as integer	
 global simulationMinutesLocked as integer
 global simulationMultipleGreensRequired as integer
@@ -465,6 +491,7 @@ global simulationNoOfCardsDrawn as integer
 global simulationNoOfDoubleUps as integer
 global simulationNoOfFreezes as integer
 global simulationNoOfGreens as integer
+global simulationNoOfLockAutoResets as integer
 global simulationNoOfLockResets as integer
 global simulationNoOfReds as integer
 global simulationNoOfResets as integer
@@ -477,6 +504,7 @@ global simulationNoOfYellowsAdd3 as integer
 global simulationNoOfYellowsMinus1 as integer
 global simulationNoOfYellowsMinus2 as integer
 global simulationSecondsLocked as integer
+global simulationSecondsUntilUnfreezes as integer
 global simulationsToTry as integer : simulationsToTry = 100
 global simulationWorstCaseMinutesLocked as integer
 global simulationWorstCaseNoOfCardsDrawn as integer
@@ -575,6 +603,7 @@ global timestampLastModifiedLock as integer
 global timestampLastReceivedUpdateResponse as integer
 global timestampLastUnlocked as integer
 global timestampNow as integer
+global timestampStartTransferAccount
 global timeUntilNextPushRequest as integer	
 global tooltip as integer
 global tooltipTextForAfterScreenRefresh$ as string

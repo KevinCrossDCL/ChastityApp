@@ -2,7 +2,7 @@
 screenNo = constEditProfileScreen
 
 // TOP BAR
-screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:back;navigationName:Back;text:Edit Profile;textAlignment:center;depth:10")
+screen[screenNo].topBar = OryUICreateTopBar("position:-1000,-1000;navigationIcon:arrow_back_ios;navigationName:Back;text:Edit Profile;textAlignment:center;depth:10")
 
 // PAGE
 screen[screenNo].sprPage = OryUICreateSprite("size:94,0;position:-1000,-1000;depth:20")
@@ -12,14 +12,14 @@ sprAvatar as integer : sprAvatar = OryUICreateSprite("size:40,-1;image:" + str(i
 sprAvatarAwaitingApproval as integer : sprAvatarAwaitingApproval = OryUICreateSprite("size:40,-1;color:0,0,0,130;offset:20,0;position:-1000,-1000;depth:18")
 txtAvatarAwaitingApproval as integer : txtAvatarAwaitingApproval = OryUICreateText("string:Awaiting" + chr(10) + "Approval;size:4;bold:true;alignment:center;position:-1000,-1000;depth:17")	
 sprAvatarCircleMask as integer : sprAvatarCircleMask = OryUICreateSprite("size:40,-1;image:" + str(imgAvatarCircleMask) + ";offset:20,0;position:-1000,-1000;depth:16")
-fabChangeAvatar as integer : fabChangeAvatar = OryUICreateFloatingActionButton("icon:Camera;mini:true;shadow:false;depth:15")
+fabChangeAvatar as integer : fabChangeAvatar = OryUICreateFloatingActionButton("icon:camera_alt;mini:true;shadow:false;depth:15")
 OryUIHideFloatingActionButton(fabChangeAvatar)
 
 // VIEW PROFILE
 btnViewProfile as integer : btnViewProfile = OryUICreateButton("size:28,4;text:View Profile;textSize:2.8;textBold:true;offset:28,0;position:-1000,-1000;depth:13")
 
 // USERNAME
-editBoxAppUsername as integer : editBoxAppUsername = OryUICreateTextfield("labelText:Username;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:cancel;depth:19")
+editBoxAppUsername as integer : editBoxAppUsername = OryUICreateTextfield("labelText:Username;position:-1000,-1000;width:90;showTrailingIcon:true;trailingIcon:clear;depth:19")
 
 // PRIVATE PROFILE
 crdPrivateProfile as integer : crdPrivateProfile = OryUICreateTextCard("width:94;headerText:Private Profile?;headerTextAlignment:center;supportingText:When private, only people you approve can see your profile and social accounts.;position:-1000,-1000;autoHeight:true;depth:19")
@@ -46,6 +46,14 @@ crdMainRole as integer : crdMainRole = OryUICreateTextCard("width:94;headerText:
 grpMainRole as integer : grpMainRole = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
 OryUIInsertButtonGroupItem(grpMainRole, -1, "text:Keyholder")
 OryUIInsertButtonGroupItem(grpMainRole, -1, "text:Lockee")
+
+// SHOE STATS ON PROFILE?
+crdShowStatsOnProfile as integer : crdShowStatsOnProfile = OryUICreateTextCard("width:94;headerText:Show Stats On Profile?;headerTextAlignment:center;supportingText:;position:-1000,-1000;autoHeight:true;depth:19")
+grpShowStatsOnProfile as integer : grpShowStatsOnProfile = OryUICreateButtonGroup("width:90;position:-1000,-1000;depth:18")
+OryUIInsertButtonGroupItem(grpShowStatsOnProfile, -1, "text:Keyholder")
+OryUIInsertButtonGroupItem(grpShowStatsOnProfile, -1, "text:Lockee")
+OryUIInsertButtonGroupItem(grpShowStatsOnProfile, -1, "text:Both")
+OryUIInsertButtonGroupItem(grpShowStatsOnProfile, -1, "text:None")
 
 // APP USER ID
 crdAppUserIDInfo as integer : crdAppUserIDInfo = OryUICreateTextCard("width:94;headerText:" + constAppName$ + " User ID;headerTextAlignment:center;supportingText:Your " + constAppName$ + " User ID is your unique and private account ID. It is recommended that you keep a copy of this so that you can log in to your account again at a later date.;position:-1000,-1000;autoHeight:true;depth:19")

@@ -92,8 +92,6 @@ if (screenToView = constSharedLocksScreen)
 	OryUIUpdateSprite(sprFilterSharedLocksBarShadow, "position:" + str(screenNo * 100) + "," + str(GetViewOffsetY() + elementY# + GetSpriteHeight(sprFilterSharedLocksBar)))
 	elementY# = elementY# + GetSpriteHeight(sprFilterSharedLocksBar) // + 2
 
-	startScrollBarY# = elementY# + 1
-	
 	// PULL DOWN TO REFRESH
 	if (oryUIScrimVisible = 0)
 		if (PullDownToRefresh(screenNo, elementY#, elementY# + 10, GetSpriteHeight(sprPullToRefreshCircle)))
@@ -245,6 +243,8 @@ if (screenToView = constSharedLocksScreen)
 		elementY# = elementY# + 2
 	endif
 	
+	startScrollBarY# = elementY# - 1
+	
 	// SORT SHARED LOCKS
 	if (redrawScreen = 1 or len(OryUIGetTextFieldString(editSharedLocksSearch)) <> lastSharedLocksSearchLength)
 		lastSharedLocksSearchLength = len(OryUIGetTextFieldString(editSharedLocksSearch))
@@ -344,6 +344,22 @@ if (screenToView = constSharedLocksScreen)
 							DeleteSharedLock(sharedLockSelected, 0)
 							screen[screenNo].lastViewY# = GetViewOffsetY()
 							SetScreenToView(constSharedLocksScreen)
+						endif
+						
+						// CLONE LOCK
+						if (OryUIGetSpriteReleased() = sharedLockCard[i].sprCloneButton or OryUIGetSpriteReleased() = sharedLockCard[i].sprCloneIcon)
+							OryUIUpdateDialog(sharedLockCard[i].dialog, "colorID:" + str(colorMode[colorModeSelected].dialogBackgroundColor)  + ";titleText:Clone Lock?;titleTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingText:Do you want to create a new lock from this locks settings?" + chr(10) + chr(10) + "You can change some or all of the settings on the next screen.;supportingTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";showCheckbox:false;stackButtons:true;flexButtons:true;decisionRequired:true")
+							OryUISetDialogButtonCount(sharedLockCard[i].dialog, 2)
+							OryUIUpdateDialogButton(sharedLockCard[i].dialog, 1, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:CloneLock;text:Yes;textColorID:" + str(colorMode[colorModeSelected].textColor))
+							OryUIUpdateDialogButton(sharedLockCard[i].dialog, 2, "colorID:" + str(colorMode[colorModeSelected].dialogButtonColor) + ";name:Cancel;text:Cancel;textColorID:" + str(colorMode[colorModeSelected].textColor))
+							OryUIShowDialog(sharedLockCard[i].dialog)
+						endif
+						if (OryUIGetDialogButtonReleasedByName(sharedLockCard[i].dialog, "CloneLock"))
+							sharedLockToClone = sortedIteration
+							sharedLockName$ = ""
+							selectedLockOptionsTab = 1
+							OryUISetButtonGroupItemSelectedByIndex(grpWhoIsTheLockFor, 2)
+							SetScreenToView(constLockOptionsScreen)
 						endif
 						
 						// MANAGE USERS BUTTON

@@ -207,10 +207,12 @@ function MinInt(a, b)
 		minValue = b
 	endif
 endfunction minValue
-
+		
 function PurchaseInApp(id as integer)
 	local purchased as integer
+	local token$ as string
 	
+	remstart
 	purchased = 0
 	InAppPurchaseActivate(id)
 	// WAIT FOR USER TO PURCHASE OR CANCEL PROMPT
@@ -224,6 +226,25 @@ function PurchaseInApp(id as integer)
 	// USER HAS PURCHASED
 	if (GetInAppPurchaseAvailable(id) = 1)
 		purchased = 1
+	endif
+	remend
+	purchased = 0
+	InAppPurchaseActivate(id)
+	// WAIT FOR USER TO PURCHASE OR CANCEL PROMPT
+	while (GetInAppPurchaseAvailable2(id) = 1 or GetInAppPurchaseAvailable2(id) = 2)
+		Sync()
+	endwhile
+	// USER HAS CANCELLED OR HAS ALREADY PURCHASED
+	if (GetInAppPurchaseAvailable2(id) = 0)
+
+	endif
+	// USER HAS PURCHASED
+	if (GetInAppPurchaseAvailable2(id) = 4)
+		purchased = 1
+		if (id > 0)
+			token$ = GetInappPurchaseToken(id)
+			InAppPurchaseResetPurchase(token$)
+		endif
 	endif
 endfunction purchased
 
