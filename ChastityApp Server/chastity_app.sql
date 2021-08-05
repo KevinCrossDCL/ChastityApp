@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 15, 2020 at 05:27 PM
+-- Generation Time: Aug 05, 2021 at 07:26 AM
 -- Server version: 10.1.48-MariaDB
 -- PHP Version: 5.6.30
 
@@ -136,6 +136,7 @@ CREATE TABLE `Locks_V2` (
   `shared_id` varchar(20) NOT NULL,
   `name` varchar(30) NOT NULL,
   `auto_resets_paused` tinyint(1) NOT NULL,
+  `block_bot_from_unlocking` tinyint(1) NOT NULL,
   `block_users_already_locked` tinyint(1) NOT NULL,
   `bot_can_hide_info` tinyint(1) NOT NULL,
   `bot_chosen` tinyint(2) NOT NULL,
@@ -144,6 +145,7 @@ CREATE TABLE `Locks_V2` (
   `chances_accumulated_before_freeze` smallint(5) NOT NULL,
   `check_in_frequency_in_seconds` int(11) NOT NULL,
   `combination` varchar(20) NOT NULL,
+  `combination_backup` varchar(20) NOT NULL,
   `cumulative` tinyint(1) NOT NULL,
   `daily` tinyint(1) NOT NULL,
   `date_deleted` varchar(10) NOT NULL,
@@ -182,6 +184,7 @@ CREATE TABLE `Locks_V2` (
   `initial_yellow_minus_2_cards` smallint(5) NOT NULL,
   `key_disabled` tinyint(1) NOT NULL,
   `key_used` tinyint(1) NOT NULL,
+  `keyholder_allows_free_unlock` tinyint(1) NOT NULL,
   `keyholder_decision_disabled` tinyint(1) NOT NULL,
   `keyholder_disabled_key` tinyint(1) NOT NULL,
   `keyholder_emoji` smallint(3) NOT NULL,
@@ -191,6 +194,7 @@ CREATE TABLE `Locks_V2` (
   `late_check_in_window_in_seconds` int(11) NOT NULL,
   `lock_frozen_by_card` tinyint(1) NOT NULL,
   `lock_frozen_by_keyholder` tinyint(1) NOT NULL,
+  `lock_frozen_by_lockee` tinyint(1) NOT NULL,
   `maximum_auto_resets` smallint(3) NOT NULL,
   `maximum_minutes` int(11) NOT NULL,
   `maximum_red_cards` int(11) NOT NULL,
@@ -242,6 +246,7 @@ CREATE TABLE `Locks_V2` (
   `timestamp_ended_clean_time` int(11) NOT NULL,
   `timestamp_frozen_by_card` int(11) NOT NULL,
   `timestamp_frozen_by_keyholder` int(11) NOT NULL,
+  `timestamp_frozen_by_lockee` int(11) NOT NULL,
   `timestamp_keyholder_rated` int(11) NOT NULL,
   `timestamp_last_auto_reset` int(11) NOT NULL,
   `timestamp_last_card_reset` int(11) NOT NULL,
@@ -282,10 +287,12 @@ CREATE TABLE `ModifiedLocks_V2` (
   `user_id` varchar(25) NOT NULL,
   `lock_id` bigint(20) NOT NULL,
   `shared_id` varchar(25) NOT NULL,
+  `allow_free_unlock_modified_by` tinyint(2) NOT NULL,
   `auto_resets_paused_modified_by` tinyint(2) NOT NULL,
   `card_info_hidden_modified_by` tinyint(2) NOT NULL,
   `cumulative_modified_by` tinyint(2) NOT NULL,
   `double_up_cards_modified_by` int(11) NOT NULL,
+  `fake_update` tinyint(1) NOT NULL,
   `freeze_cards_modified_by` int(11) NOT NULL,
   `green_cards_modified_by` int(11) NOT NULL,
   `hidden` tinyint(2) NOT NULL,
@@ -311,6 +318,24 @@ CREATE TABLE `ModifiedLocks_V2` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `RecentActivity`
+--
+
+CREATE TABLE `RecentActivity` (
+  `id` bigint(20) NOT NULL,
+  `user_id` varchar(25) NOT NULL,
+  `activity_type` varchar(50) NOT NULL,
+  `lock_id` bigint(12) NOT NULL,
+  `mentioned_user_id` bigint(20) NOT NULL,
+  `read_activity` tinyint(1) NOT NULL,
+  `share_id` varchar(25) NOT NULL,
+  `test_lock` tinyint(1) NOT NULL,
+  `timestamp_added` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `Records_Deleted`
 --
 
@@ -319,6 +344,7 @@ CREATE TABLE `Records_Deleted` (
   `locks_deleted` int(11) NOT NULL,
   `locks_log_deleted` int(11) NOT NULL,
   `modified_locks_deleted` int(11) NOT NULL,
+  `recent_activity_deleted` int(11) NOT NULL,
   `shareable_locks_deleted` int(11) NOT NULL,
   `test_locks_deleted` int(11) NOT NULL,
   `user_ids_deleted` int(11) NOT NULL,
@@ -373,6 +399,7 @@ CREATE TABLE `ShareableLocks_V2` (
   `share_id` varchar(25) NOT NULL,
   `name` varchar(30) NOT NULL,
   `allow_copies` tinyint(1) NOT NULL,
+  `block_test_locks` tinyint(1) NOT NULL,
   `block_users_already_locked` tinyint(1) NOT NULL,
   `block_users_with_stats_hidden` tinyint(1) NOT NULL,
   `build` int(11) NOT NULL,
@@ -455,6 +482,7 @@ CREATE TABLE `UserIDs_V2` (
   `id` bigint(20) NOT NULL,
   `user_id` varchar(25) NOT NULL,
   `username` varchar(25) NOT NULL,
+  `2fa_salt` varchar(32) NOT NULL,
   `admin_notes` varchar(500) NOT NULL,
   `api_token` varchar(255) NOT NULL,
   `avatar_id` bigint(20) NOT NULL,
@@ -473,6 +501,7 @@ CREATE TABLE `UserIDs_V2` (
   `include_in_api` tinyint(1) NOT NULL,
   `keyholder_level` smallint(3) NOT NULL,
   `last_active` datetime NOT NULL,
+  `last_recent_activity_id_seen` bigint(20) NOT NULL,
   `lockee_level` smallint(3) NOT NULL,
   `main_role` smallint(3) NOT NULL,
   `no_of_keys` smallint(4) NOT NULL,
@@ -486,9 +515,12 @@ CREATE TABLE `UserIDs_V2` (
   `removed_ads` tinyint(1) NOT NULL,
   `requests` int(11) NOT NULL,
   `show_combinations_to_keyholders` tinyint(1) NOT NULL,
+  `show_keyholder_stats_on_profile` tinyint(1) NOT NULL DEFAULT '1',
+  `show_lockee_stats_on_profile` tinyint(1) NOT NULL DEFAULT '1',
   `status` smallint(3) NOT NULL DEFAULT '1',
   `timestamp_deleted` int(11) NOT NULL,
   `timestamp_last_active` int(11) NOT NULL,
+  `timestamp_start_transfer` int(11) NOT NULL,
   `token` text NOT NULL,
   `twitter_handle` varchar(32) DEFAULT NULL,
   `version_installed` varchar(25) NOT NULL
@@ -565,6 +597,14 @@ ALTER TABLE `ModifiedLocks_V2`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `shared_id` (`shared_id`),
   ADD KEY `lock_id` (`lock_id`);
+
+--
+-- Indexes for table `RecentActivity`
+--
+ALTER TABLE `RecentActivity`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `user_id` (`user_id`) USING BTREE;
 
 --
 -- Indexes for table `Records_Deleted`
@@ -658,6 +698,12 @@ ALTER TABLE `Locks_V2`
 -- AUTO_INCREMENT for table `ModifiedLocks_V2`
 --
 ALTER TABLE `ModifiedLocks_V2`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `RecentActivity`
+--
+ALTER TABLE `RecentActivity`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
