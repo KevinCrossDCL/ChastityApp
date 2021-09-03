@@ -9,7 +9,7 @@ SetClearColor(0, 0, 0)
 ClearScreen()
 SetOrientationAllowed(1, 1, 0, 0)
 SetPrintColor(255, 0, 0)
-SetPrintSize(2)
+SetPrintSize(2.5)
 SetScissor(0, 0, 0, 0)
 SetSleepMode(1)
 SetSyncRate(60, 0)
@@ -277,16 +277,16 @@ OryUIDisableFlickScroll()
 do
 	if (debugMode = 1)
 		print("### DEBUG MODE ###")
-		print("Offline Status: " + str(offline))
+		print("FPS: " + str(ScreenFPS()))
+		//print("Offline Status: " + str(offline))
 		print("Timestamp Now: " + str(timestampNow))
 		print("Unix Timestamp Now: " + str(GetUnixTime()))
 		print("Device Timestamp Offset: " + str(deviceTimestampOffset))
 		if (GetUnixTime() - timestampNow < -30 or GetUnixTime() - timestampNow > 30)
 			print("Server and Device Times Have Slipped")
 		endif
-		print("Seconds Until 1 Minute Refresh: " + str(60 - (GetSeconds() - secondsLast1MinuteRefresh)))
-		print("Seconds Until 5 Minute Refresh: " + str(300 - (GetSeconds() - secondsLast5MinuteRefresh)))
-		print("FPS: " + str(ScreenFPS()))
+		//print("Seconds Until 1 Minute Refresh: " + str(60 - (GetSeconds() - secondsLast1MinuteRefresh)))
+		//print("Seconds Until 5 Minute Refresh: " + str(300 - (GetSeconds() - secondsLast5MinuteRefresh)))
 		if (GetErrorOccurred()) then log(GetLastError())
 		OryUIPrintHTTPSQueue(httpsQueue)
 	endif
@@ -764,7 +764,7 @@ syncScreen:
 			AddBreadcrumb(screenNo)
 		endif
 	endif
-	if (screenNo <> constSplashScreen and screenNo <> constLoginScreen and screenNo <> constSetCombinationScreen and screenNo <> constRandomCombinationsScreen)
+	if (screenNo <> constSplashScreen and screenNo <> constLoginScreen and screenNo <> constSetCombinationScreen and screenNo <> constRandomCombinationsScreen and screenNo <> constTransferAccountScreen)
 		if (resumed = 1 and timestampNow > 1500000000 and noOfLocksAutoReset = 0)
 			resumed = 0
 			GetLocksData()

@@ -845,7 +845,7 @@ if (screenToView = constMyLocksScreen)
 							locks[lockSelected].timestampRequestedKeyholdersDecision = timestampNow
 							UpdateLocksData(lockSelected)
 							UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:LetKeyholderDecide", 1)
-							SendNotificationToKeyholder(locks[lockSelected].sharedID$, "RequestKeyholdersDecision", 0)
+							SendNotificationToKeyholder(locks[lockSelected].sharedID$, "RequestKeyholdersDecision", locks[lockSelected].test, 0)
 							screen[screenNo].lastViewY# = GetViewOffsetY()
 							SetScreenToView(constMyLocksScreen)
 						endif

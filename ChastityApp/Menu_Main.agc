@@ -54,7 +54,6 @@ if (disableCreationOfNewLocks = 0) then navigationDrawerItems = navigationDrawer
 if (offline = 0 and maintenance = 0 and timestampNow > 1500000000) then navigationDrawerItems = navigationDrawerItems + 3
 if (adsRemoved = 0 and offline = 0 and maintenance = 0) then navigationDrawerItems = navigationDrawerItems + 1
 if (GetDeviceBaseName() = "ios") then navigationDrawerItems = navigationDrawerItems + 1
-//~if (allowAccountTransfers = 1 and offline = 0 and maintenance = 0) then navigationDrawerItems = navigationDrawerItems + 1
 OryUISetNavigationDrawerItemCount(navigationDrawer, navigationDrawerItems)
 
 inc navigationDrawerItemCount
@@ -65,10 +64,6 @@ inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:RecentActivity;itemType:option;text:Recent Activity;rightText:;")
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:Friends;itemType:option;text:Friends;rightText:;")
-//~if (allowAccountTransfers = 1 and offline = 0 and maintenance = 0)
-//~	inc navigationDrawerItemCount
-//~	OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:TransferAccount;itemType:option;text:Transfer Account;rightText:;")
-//~endif
 inc navigationDrawerItemCount
 OryUIUpdateNavigationDrawerItem(navigationDrawer, navigationDrawerItemCount, "name:ShowMyUserID;itemType:option;text:Show My User ID;rightText:;")
 inc navigationDrawerItemCount
@@ -291,9 +286,6 @@ if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "RestorePurchas
 		endif
 	endif
 endif
-//~if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "TransferAccount"))
-//~	SetScreenToView(constTransferAccountScreen)
-//~endif
 if (OryUIGetNavigationDrawerItemReleasedByName(navigationDrawer, "LogOut"))
 	if (logoutAlertHidden = 0)
 		if (oryUIDialogVisible = 0)

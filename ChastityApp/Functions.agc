@@ -570,6 +570,17 @@ function BuildSharedLockSettingsString()
 					endif
 				endif
 			endif
+			if (maxStickies > 0)
+				if (minStickies = maxStickies)
+					if (minStickies = 1)
+						lockSettings$ = lockSettings$ + "1 Sticky Card" + chr(10)
+					else
+						lockSettings$ = lockSettings$ + str(minStickies) + " Sticky Cards" + chr(10)
+					endif
+				else
+					lockSettings$ = lockSettings$ + str(minStickies) + "-" + str(maxStickies) + " Sticky Cards" + chr(10)
+				endif
+			endif
 			if (screenNo <> constShareLockScreen and loadingSharedLock = 0)
 				if (maxYellowsRandom > 0)
 					if (minYellowsRandom = maxYellowsRandom)
@@ -615,17 +626,6 @@ function BuildSharedLockSettingsString()
 					else
 						lockSettings$ = lockSettings$ + str(minYellowsAdd + minYellowsMinus + minYellowsRandom) + "-" + str(maxYellowsAdd + maxYellowsMinus + maxYellowsRandom) + " Yellow Cards" + chr(10)
 					endif
-				endif
-			endif
-			if (maxStickies > 0)
-				if (minStickies = maxStickies)
-					if (minStickies = 1)
-						lockSettings$ = lockSettings$ + "1 Sticky Card" + chr(10)
-					else
-						lockSettings$ = lockSettings$ + str(minStickies) + " Sticky Cards" + chr(10)
-					endif
-				else
-					lockSettings$ = lockSettings$ + str(minStickies) + "-" + str(maxStickies) + " Sticky Cards" + chr(10)
 				endif
 			endif
 			if (maxFreezes > 0)
@@ -3876,8 +3876,6 @@ function ReceivedAccountData()
 		timesReviewBoxShown = val(GetJSONDataVariableValue("timesReviewBoxShown"))
 		SaveLocalVariable("timesReviewBoxShown", str(timesReviewBoxShown))
 		
-		timestampStartTransferAccount = val(GetJSONDataVariableValue("timesReviewBoxShown"))
-		
 		twitterHandle$ = GetJSONDataVariableValue("twitterHandle")
 		SaveLocalVariable("twitterHandle", twitterHandle$)
 		
@@ -5447,7 +5445,6 @@ function ReceivedServerVariables()
 	SaveLocalVariable("deviceTimestampOffset", str(deviceTimestampOffset))
 	tmpVersionNumber$ = ReplaceString(constVersionNumber$, " ", "_", -1)
 	tmpVersionNumber$ = ReplaceString(tmpVersionNumber$, ".", "_", -1)
-	//allowAccountTransfers = val(GetJSONDataVariableValue("allow_account_transfers"))
 	dateDeactivatingVersion$ = GetJSONDataVariableValue("date_deactivating_v" + tmpVersionNumber$)
 	disableCreationOfNewLocks = val(GetJSONDataVariableValue("disable_creation_of_new_locks"))
 	noOfGeneratedLocks = val(GetJSONDataVariableValue("noOfGeneratedLocks"))
@@ -6406,7 +6403,7 @@ function ResetAllNotifications()
 				secondsLeftUntilAutoReset = locks[a].resetFrequencyInSeconds - secondsSinceLastReset
 				if (noOfAutoResetsLeft <= 0) then secondsLeftUntilAutoReset = 0
 			endif
-			if (secondsLeftUntilAutoReset > 0)
+			if (secondsLeftUntilAutoReset > 0 and locks[a].autoResetsPaused = 0)
 				if (noOfLocks = 1)
 					SetLocalNotification(a + 20, GetUnixTime() + secondsLeftUntilAutoReset, "Your lock has auto reset.")
 				else
@@ -7185,7 +7182,7 @@ function SaveUserFlags()
 	usersFlag7.save("usersFlag7.json")
 endfunction
 
-function SendNotificationToKeyholder(sharedID$, messageType$, addToFront)
+function SendNotificationToKeyholder(sharedID$, messageType$, testLock, addToFront)
 	if (maintenance = 1) then exitfunction
 	
 	local postData$ as string
@@ -7194,6 +7191,7 @@ function SendNotificationToKeyholder(sharedID$, messageType$, addToFront)
 	postData$ = postData$ + "&messageType=" + messageType$
 	postData$ = postData$ + "&platform=" + GetDeviceBaseName()
 	postData$ = postData$ + "&sharedID=" + sharedID$
+	postData$ = postData$ + "&test=" + str(testLock)
 	postData$ = postData$ + "&userID1=" + userID$
 	postData$ = postData$ + "&userID2=" + userID$
 	OryUIAddItemToHTTPSQueue(httpsQueue, "name:SendNotificationToKeyholder;script:" + URLs[0].URLPath + "/agksendnotification.php;postData:" + postData$ + ";addToFront:" + str(addToFront))
@@ -8620,7 +8618,6 @@ function UpdateAccount(addToFront)
 	postData$ = postData$ + "&showKeyholderStatsOnProfile=" + str(showKeyholderStatsOnProfile)
 	postData$ = postData$ + "&showLockeeStatsOnProfile=" + str(showLockeeStatsOnProfile)
 	postData$ = postData$ + "&status=" + str(statusSelected)
-	postData$ = postData$ + "&timestampStartTransferAccount=" + str(timestampStartTransferAccount)
 	postData$ = postData$ + "&userID1=" + userID$
 	postData$ = postData$ + "&userID2=" + userID$
 	postData$ = postData$ + "&version=" + ReplaceString(constVersionNumber$, " ", ".", -1)
@@ -11151,7 +11148,7 @@ function UpdateItemsInMyLockDeletedCard(cardNo as integer, sortedIteration, repo
 		if (locksDeleted.myLocks[sortedIteration].unlocked = 0 and timestampNow - locksDeleted.myLocks[sortedIteration].timestampDeleted <= 86400)
 			//OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgUndeleteIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";icon:restore_from_trash;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
-		elseif (disableCreationOfNewLocks = 0 and locksDeleted.myLocks[sortedIteration].unlocked = 1 and locksDeleted.myLocks[sortedIteration].botChosen = 0 and locksDeleted.myLocks[sortedIteration].sharedID$ <> "")
+		elseif (disableCreationOfNewLocks = 0 and locksDeleted.myLocks[sortedIteration].unlocked = 1 and locksDeleted.myLocks[sortedIteration].botChosen = 0 and locksDeleted.myLocks[sortedIteration].sharedID$ <> "" and disableCreationOfNewLocks = 0)
 			//OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";iconID:" + str(imgNewLockIcon) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 			OryUIUpdateButton(lockDeletedCard[cardNo].rightButton, "position:" + str(GetSpriteX(lockDeletedCard[cardNo].sprBackground) + 100 - 2 - OryUIGetButtonWidth(lockDeletedCard[cardNo].rightButton)) + "," +  str(GetSpriteY(lockDeletedCard[cardNo].sprBackground) + (GetSpriteHeight(lockDeletedCard[cardNo].sprBackground) / 2) - (OryUIGetButtonHeight(lockDeletedCard[cardNo].rightButton) / 2)) + ";icon:replay;colorID:" + str(colorMode[colorModeSelected].pageColor) + ";iconColorID:" + str(colorMode[colorModeSelected].barIconColor))
 		endif
@@ -11246,21 +11243,22 @@ function UpdateItemsInSharedLockCard(cardNo as integer, sortedIteration, reposit
 				cards$ = cards$ + str(sharedLocks[sortedIteration, 0].minRandomReds) + "-" + str(sharedLocks[sortedIteration, 0].maxRandomReds) + " Reds | "
 			endif
 			
-			if (sharedLocks[sortedIteration, 0].minRandomYellows + sharedLocks[sortedIteration, 0].minRandomYellowsAdd + sharedLocks[sortedIteration, 0].minRandomYellowsMinus = sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus)
-				if (sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus = 1) then cards$ = cards$ + "1 Yellow | "
-				if (sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus > 1) then cards$ = cards$ + str(sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus) + " Yellows | "
-			else
-				cards$ = cards$ + str(sharedLocks[sortedIteration, 0].minRandomYellows + sharedLocks[sortedIteration, 0].minRandomYellowsAdd + sharedLocks[sortedIteration, 0].minRandomYellowsMinus) + "-" + str(sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus) + " Yellows | "
-			endif
-			if (right(cards$, 3) = " | ") then cards$ = mid(cards$, 1, len(cards$) - 3)
-			
-			cards$ = cards$ + chr(10)
 			if (sharedLocks[sortedIteration, 0].minRandomStickies = sharedLocks[sortedIteration, 0].maxRandomStickies)
 				if (sharedLocks[sortedIteration, 0].maxRandomStickies = 1) then cards$ = cards$ + "1 Sticky | "
 				if (sharedLocks[sortedIteration, 0].maxRandomStickies > 1) then cards$ = cards$ + str(sharedLocks[sortedIteration, 0].maxRandomStickies) + " Stickies | "
 			else
 				cards$ = cards$ + str(sharedLocks[sortedIteration, 0].minRandomStickies) + "-" + str(sharedLocks[sortedIteration, 0].maxRandomStickies) + " Stickies | "
 			endif
+			if (right(cards$, 3) = " | ") then cards$ = mid(cards$, 1, len(cards$) - 3)
+			
+			cards$ = cards$ + chr(10)
+			if (sharedLocks[sortedIteration, 0].minRandomYellows + sharedLocks[sortedIteration, 0].minRandomYellowsAdd + sharedLocks[sortedIteration, 0].minRandomYellowsMinus = sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus)
+				if (sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus = 1) then cards$ = cards$ + "1 Yellow | "
+				if (sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus > 1) then cards$ = cards$ + str(sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus) + " Yellows | "
+			else
+				cards$ = cards$ + str(sharedLocks[sortedIteration, 0].minRandomYellows + sharedLocks[sortedIteration, 0].minRandomYellowsAdd + sharedLocks[sortedIteration, 0].minRandomYellowsMinus) + "-" + str(sharedLocks[sortedIteration, 0].maxRandomYellows + sharedLocks[sortedIteration, 0].maxRandomYellowsAdd + sharedLocks[sortedIteration, 0].maxRandomYellowsMinus) + " Yellows | "
+			endif
+			
 			if (sharedLocks[sortedIteration, 0].minRandomFreezes = sharedLocks[sortedIteration, 0].maxRandomFreezes)
 				if (sharedLocks[sortedIteration, 0].maxRandomFreezes = 1) then cards$ = cards$ + "1 Freeze | "
 				if (sharedLocks[sortedIteration, 0].maxRandomFreezes > 1) then cards$ = cards$ + str(sharedLocks[sortedIteration, 0].maxRandomFreezes) + " Freezes | "
@@ -12221,7 +12219,7 @@ function UpdateSharedLock(sharedLockNo, addToFront)
 	if (sharedLocks[sharedLockNo, 0].minRandomGreens > 30 or sharedLocks[sharedLockNo, 0].maxRandomGreens > 30) then minVersionRequired$ = "2.5.4.alpha.1"
 	if (sharedLocks[sharedLockNo, 0].minRandomResets > 30 or sharedLocks[sharedLockNo, 0].maxRandomResets > 30) then minVersionRequired$ = "2.5.4.alpha.1"	
 	if (startLockFrozen = 1) then minVersionRequired$ = "2.6.2.alpha.1"
-	if (resetFrequencyInSeconds > 0) then minVersionRequired$ = "2.6.3.alpha.1"
+	if (checkInFrequencyInSeconds > 0) then minVersionRequired$ = "2.6.3.alpha.1"
 	if (temporarilyDisabled = 1) then minVersionRequired$ = "2.6.5.alpha.2"
 	if (lateCheckInWindowInSeconds > 0) then minVersionRequired$ = "2.6.8.alpha.1"
 	if (blockTestLocks = 1) then minVersionRequired$ = "2.7.2.alpha.1"

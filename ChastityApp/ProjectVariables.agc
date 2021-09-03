@@ -7,7 +7,7 @@
 #constant constAppServerDomain$ "https://chastityapp.com"
 #constant constAppMarketingDomain$ "https://chastityapp.com"
 #constant constAppAPIDocumentsURL$ "https://api.chastityapp.com/docs"
-#constant constAppForums$ "https://chastityapp.com/forums"
+#constant constAppForums$ "https://forums.chastityapp.com"
 #constant constAppStatusDomain$ "https://status.chastityapp.com"
 
 #constant constFollowDiscord$ "https://discordapp.com/invite/xxxxx"
@@ -16,8 +16,8 @@
 #constant constFollowGitHub$ "https://github.com/xxxxx"
 #constant constFollowTwitter$ "https://www.twitter.com/xxxxx"
 
-#constant constBuildNumber 343
-#constant constVersionNumber$ "2.7.5"
+#constant constBuildNumber 353
+#constant constVersionNumber$ "2.7.6"
 
 #constant constAdMobAndroid$ "ca-app-pub-xxxxx/xxxxx"
 #constant constAdMobiOS$ "ca-app-pub-xxxxx/xxxxx"

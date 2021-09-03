@@ -96,6 +96,15 @@ if (screenToView = constLockOptionsScreen)
 			OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:0")
 			OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:0")
 		endif
+		if (sharedLocks[sharedLockToClone, 0].maxRandomStickies > 0)
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomStickies))
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomStickies))
+		else
+			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0")
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0")
+		endif
 		if (sharedLocks[sharedLockToClone, 0].maxRandomYellows > 0 or sharedLocks[sharedLockToClone, 0].maxRandomYellowsAdd > 0 or sharedLocks[sharedLockToClone, 0].maxRandomYellowsMinus > 0)
 			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddYellowCards, 1)
 			OryUIUpdateInputSpinner(spinMinNumberOfRandomYellowCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomYellows))
@@ -112,15 +121,6 @@ if (screenToView = constLockOptionsScreen)
 			OryUIUpdateInputSpinner(spinMaxNumberOfYellowMinusCards, "inputText:0")
 			OryUIUpdateInputSpinner(spinMinNumberOfYellowAddCards, "inputText:0")
 			OryUIUpdateInputSpinner(spinMaxNumberOfYellowAddCards, "inputText:0")
-		endif
-		if (sharedLocks[sharedLockToClone, 0].maxRandomStickies > 0)
-			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 1)
-			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].minRandomStickies))
-			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:" + str(sharedLocks[sharedLockToClone, 0].maxRandomStickies))
-		else
-			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
-			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0")
-			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0")
 		endif
 		if (sharedLocks[sharedLockToClone, 0].maxRandomFreezes > 0)
 			OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddFreezeCards, 1)
@@ -359,6 +359,9 @@ if (screenToView = constLockOptionsScreen)
 		OryUIUpdateInputSpinner(spinMaxNumberOfDays, "inputText:0")
 		OryUIUpdateInputSpinner(spinMaxNumberOfHours, "inputText:1")
 		OryUIUpdateInputSpinner(spinMaxNumberOfMinutes, "inputText:0")
+		OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
+		OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0")
+		OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0")
 		OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddYellowCards, 2)
 		OryUIUpdateInputSpinner(spinMinNumberOfRandomYellowCards, "inputText:0")
 		OryUIUpdateInputSpinner(spinMaxNumberOfRandomYellowCards, "inputText:0")
@@ -366,9 +369,6 @@ if (screenToView = constLockOptionsScreen)
 		OryUIUpdateInputSpinner(spinMaxNumberOfYellowMinusCards, "inputText:0")
 		OryUIUpdateInputSpinner(spinMinNumberOfYellowAddCards, "inputText:0")
 		OryUIUpdateInputSpinner(spinMaxNumberOfYellowAddCards, "inputText:0")
-		OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
-		OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0")
-		OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0")
 		OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddFreezeCards, 2)
 		OryUIUpdateInputSpinner(spinMinNumberOfFreezeCards, "inputText:0")
 		OryUIUpdateInputSpinner(spinMaxNumberOfFreezeCards, "inputText:0")
@@ -1301,6 +1301,103 @@ if (screenToView = constLockOptionsScreen)
 		endif
 	endif
 
+	// DO YOU WANT TO ADD STICKY CARDS?
+	if (loadingSharedLock = 0 and fixed = 0 and fixed = 0)
+		if (redrawScreen = 1)
+			if (regularity# = 24) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 24 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded.;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 12) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 12 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 6) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 6 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 3) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 3 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 1) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 1 hour before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 0.5) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 30 minutes before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 0.25) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 15 minutes before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (regularity# = 0.016667) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 1 minute before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "Yes")
+				stickyCards = 1
+			endif
+			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "No")
+				stickyCards = 0
+			endif
+			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "BotDecides")
+				stickyCards = 3
+			endif
+		endif
+		elementY# = elementY# + OryUIGetTextCardHeight(crdDoYouWantToAddStickyCards)
+		if (redrawScreen = 1)
+			OryUIUpdateButtonGroup(grpDoYouWantToAddStickyCards, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
+			if (botControlled = 0)
+				OryUISetButtonGroupItemCount(grpDoYouWantToAddStickyCards, 2)
+				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 1, "name:Yes;text:Yes")
+				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 2, "name:No;text:No")
+			else
+				OryUISetButtonGroupItemCount(grpDoYouWantToAddStickyCards, 3)
+				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 1, "name:Yes;text:Yes")
+				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 2, "name:No;text:No")
+				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 3, "name:BotDecides;text:Bot Decides")
+			endif
+			if (OryUIGetButtonGroupItemSelectedIndex(grpDoYouWantToAddStickyCards) = 0 or OryUIGetButtonGroupItemSelectedIndex(grpDoYouWantToAddStickyCards) > OryUIGetButtonGroupItemCount(grpDoYouWantToAddStickyCards)) then OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
+		endif
+		OryUIInsertButtonGroupListener(grpDoYouWantToAddStickyCards)
+		if (OryUIGetButtonGroupItemReleasedIndex(grpDoYouWantToAddStickyCards) > 0) 
+			screen[screenNo].lastViewY# = GetViewOffsetY()
+			SetScreenToView(constLockOptionsScreen)
+		endif
+		elementY# = elementY# + OryUIGetButtonGroupHeight(grpDoYouWantToAddStickyCards) + 2
+	else
+		if (redrawScreen = 1)
+			if (loadingSharedLock = 0 and fixed = 1) then stickyCards = 0
+			OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "position:-1000,-1000")
+			OryUIUpdateButtonGroup(grpDoYouWantToAddStickyCards, "position:-1000,-1000")
+		endif
+	endif
+
+	// NUMBER OF STICKY CARDS?
+	if (loadingSharedLock = 0 and fixed = 0 and stickyCards = 1)
+		OryUIUpdateTextCard(crdNumberOfStickyCards, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
+		elementY# = elementY# + OryUIGetTextCardHeight(crdNumberOfStickyCards)
+		inputSpinner1Min = 0
+		inputSpinner1Max = cappedStickyCards
+		inputSpinner2Min = 0
+		inputSpinner2Max = cappedStickyCards
+		if (redrawScreen = 1)
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "position:" + str((screenNo * 100) + 9.5 + 8) + "," + str(elementY#) + ";backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";activeButtonColorID:" + str(theme[themeSelected].color[3]) + ";activeIconColor:255,255,255,255;inactiveButtonColorID:" + str(theme[themeSelected].color[3]) + ";inactiveIconColor:255,255,255,64;textColorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateText(txtNumberOfStickyCardsTo, "position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 0.5) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "position:" + str((screenNo * 100) + 63.5 - 8) + "," + str(elementY#) + ";backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";activeButtonColorID:" + str(theme[themeSelected].color[3]) + ";activeIconColor:255,255,255,255;inactiveButtonColorID:" + str(theme[themeSelected].color[3]) + ";inactiveIconColor:255,255,255,64;textColorID:" + str(colorMode[colorModeSelected].textColor))
+		endif
+		OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "min:" + str(inputSpinner1Min) + ";max:" + str(inputSpinner1Max) + ";step:1")
+		OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "min:" + str(inputSpinner2Min) + ";max:" + str(inputSpinner2Max) + ";step:1")
+		elementY# = elementY# + OryUIGetInputSpinnerHeight(spinMinNumberOfStickyCards) + 2
+		OryUIInsertInputSpinnerListener(spinMinNumberOfStickyCards)
+		OryUIInsertInputSpinnerListener(spinMaxNumberOfStickyCards)
+		if (OryUIGetInputSpinnerHasFocus(spinMinNumberOfStickyCards) or OryUIGetInputSpinnerHasFocus(spinMaxNumberOfStickyCards))
+			SetViewOffset(GetViewOffsetX(), OryUIGetTextCardY(crdNumberOfStickyCards) - GetSpriteY(screen[screenNo].sprPage))
+		endif
+		if (OryUIGetInputSpinnerChangedValue(spinMinNumberOfStickyCards) = 1)
+			if (val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards)) > val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards)))
+				OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:" + OryUIGetInputSpinnerString(spinMinNumberOfStickyCards))
+			endif
+		elseif (OryUIGetInputSpinnerChangedValue(spinMaxNumberOfStickyCards) = 1)
+			if (val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards)) < val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards)))
+				OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:" + OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards))
+			endif
+		endif
+		if (OryUIGetInputSpinnerChangedValue(spinMinNumberOfStickyCards) = 1) then simulationCount = 0
+		if (OryUIGetInputSpinnerChangedValue(spinMaxNumberOfStickyCards) = 1) then simulationCount = 0
+		minStickies = val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards))
+		maxStickies = val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards))
+	else
+		if (redrawScreen = 1)
+			if (loadingSharedLock = 0 and (fixed = 1 or freezeCards <> 1))
+				minStickies = 0
+				maxStickies = 0
+			endif
+			OryUIUpdateTextCard(crdNumberOfStickyCards, "position:-1000,-1000")
+			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0;position:-1000,-1000")
+			OryUIUpdateText(txtNumberOfStickyCardsTo, "position:-1000,-1000")
+			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0;position:-1000,-1000")
+		endif
+	endif
+	
 	// DO YOU WANT TO ADD YELLOW CARDS?
 	if (loadingSharedLock = 0 and fixed = 0)
 		if (redrawScreen = 1)
@@ -1482,103 +1579,6 @@ if (screenToView = constLockOptionsScreen)
 			OryUIUpdateInputSpinner(spinMinNumberOfYellowAddCards, "inputText:0;position:-1000,-1000")
 			OryUIUpdateText(txtNumberOfYellowAddCardsTo, "position:-1000,-1000")
 			OryUIUpdateInputSpinner(spinMaxNumberOfYellowAddCards, "inputText:0;position:-1000,-1000")
-		endif
-	endif
-
-	// DO YOU WANT TO ADD STICKY CARDS?
-	if (loadingSharedLock = 0 and fixed = 0 and fixed = 0)
-		if (redrawScreen = 1)
-			if (regularity# = 24) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 24 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded.;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 12) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 12 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 6) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 6 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 3) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 3 hours before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 1) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 1 hour before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 0.5) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 30 minutes before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 0.25) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 15 minutes before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (regularity# = 0.016667) then OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "supportingText:Like a red card, when a sticky card is revealed " + lower(userText$) + " will have to wait 1 minute before " + lower(userText$) + " can pick again. However, a sticky card goes back into play for a chance to be picked again and does not get discarded;position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "Yes")
-				stickyCards = 1
-			endif
-			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "No")
-				stickyCards = 0
-			endif
-			if (OryUIGetButtonGroupItemSelectedName(grpDoYouWantToAddStickyCards) = "BotDecides")
-				stickyCards = 3
-			endif
-		endif
-		elementY# = elementY# + OryUIGetTextCardHeight(crdDoYouWantToAddStickyCards)
-		if (redrawScreen = 1)
-			OryUIUpdateButtonGroup(grpDoYouWantToAddStickyCards, "position:" + str((screenNo * 100) + 5) + "," + str(elementY#) + ";selectedColorID:" + str(colorMode[colorModeSelected].selectedButtonColor) + ";unselectedColorID:" + str(colorMode[colorModeSelected].unselectedButtonColor))
-			if (botControlled = 0)
-				OryUISetButtonGroupItemCount(grpDoYouWantToAddStickyCards, 2)
-				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 1, "name:Yes;text:Yes")
-				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 2, "name:No;text:No")
-			else
-				OryUISetButtonGroupItemCount(grpDoYouWantToAddStickyCards, 3)
-				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 1, "name:Yes;text:Yes")
-				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 2, "name:No;text:No")
-				OryUIUpdateButtonGroupItem(grpDoYouWantToAddStickyCards, 3, "name:BotDecides;text:Bot Decides")
-			endif
-			if (OryUIGetButtonGroupItemSelectedIndex(grpDoYouWantToAddStickyCards) = 0 or OryUIGetButtonGroupItemSelectedIndex(grpDoYouWantToAddStickyCards) > OryUIGetButtonGroupItemCount(grpDoYouWantToAddStickyCards)) then OryUISetButtonGroupItemSelectedByIndex(grpDoYouWantToAddStickyCards, 2)
-		endif
-		OryUIInsertButtonGroupListener(grpDoYouWantToAddStickyCards)
-		if (OryUIGetButtonGroupItemReleasedIndex(grpDoYouWantToAddStickyCards) > 0) 
-			screen[screenNo].lastViewY# = GetViewOffsetY()
-			SetScreenToView(constLockOptionsScreen)
-		endif
-		elementY# = elementY# + OryUIGetButtonGroupHeight(grpDoYouWantToAddStickyCards) + 2
-	else
-		if (redrawScreen = 1)
-			if (loadingSharedLock = 0 and fixed = 1) then stickyCards = 0
-			OryUIUpdateTextCard(crdDoYouWantToAddStickyCards, "position:-1000,-1000")
-			OryUIUpdateButtonGroup(grpDoYouWantToAddStickyCards, "position:-1000,-1000")
-		endif
-	endif
-
-	// NUMBER OF STICKY CARDS?
-	if (loadingSharedLock = 0 and fixed = 0 and stickyCards = 1)
-		OryUIUpdateTextCard(crdNumberOfStickyCards, "position:" + str((screenNo * 100) + 3) + "," + str(elementY#) + ";colorID:" + str(colorMode[colorModeSelected].pageColor) + ";headerTextColorID:" + str(colorMode[colorModeSelected].textColor) + ";supportingTextColorID:" + str(colorMode[colorModeSelected].textColor))
-		elementY# = elementY# + OryUIGetTextCardHeight(crdNumberOfStickyCards)
-		inputSpinner1Min = 0
-		inputSpinner1Max = cappedStickyCards
-		inputSpinner2Min = 0
-		inputSpinner2Max = cappedStickyCards
-		if (redrawScreen = 1)
-			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "position:" + str((screenNo * 100) + 9.5 + 8) + "," + str(elementY#) + ";backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";activeButtonColorID:" + str(theme[themeSelected].color[3]) + ";activeIconColor:255,255,255,255;inactiveButtonColorID:" + str(theme[themeSelected].color[3]) + ";inactiveIconColor:255,255,255,64;textColorID:" + str(colorMode[colorModeSelected].textColor))
-			OryUIUpdateText(txtNumberOfStickyCardsTo, "position:" + str((screenNo * 100) + 50) + "," + str(elementY# + 0.5) + ";colorID:" + str(colorMode[colorModeSelected].textColor))
-			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "position:" + str((screenNo * 100) + 63.5 - 8) + "," + str(elementY#) + ";backgroundColorID:" + str(colorMode[colorModeSelected].pageColor) + ";activeButtonColorID:" + str(theme[themeSelected].color[3]) + ";activeIconColor:255,255,255,255;inactiveButtonColorID:" + str(theme[themeSelected].color[3]) + ";inactiveIconColor:255,255,255,64;textColorID:" + str(colorMode[colorModeSelected].textColor))
-		endif
-		OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "min:" + str(inputSpinner1Min) + ";max:" + str(inputSpinner1Max) + ";step:1")
-		OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "min:" + str(inputSpinner2Min) + ";max:" + str(inputSpinner2Max) + ";step:1")
-		elementY# = elementY# + OryUIGetInputSpinnerHeight(spinMinNumberOfStickyCards) + 2
-		OryUIInsertInputSpinnerListener(spinMinNumberOfStickyCards)
-		OryUIInsertInputSpinnerListener(spinMaxNumberOfStickyCards)
-		if (OryUIGetInputSpinnerHasFocus(spinMinNumberOfStickyCards) or OryUIGetInputSpinnerHasFocus(spinMaxNumberOfStickyCards))
-			SetViewOffset(GetViewOffsetX(), OryUIGetTextCardY(crdNumberOfStickyCards) - GetSpriteY(screen[screenNo].sprPage))
-		endif
-		if (OryUIGetInputSpinnerChangedValue(spinMinNumberOfStickyCards) = 1)
-			if (val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards)) > val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards)))
-				OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:" + OryUIGetInputSpinnerString(spinMinNumberOfStickyCards))
-			endif
-		elseif (OryUIGetInputSpinnerChangedValue(spinMaxNumberOfStickyCards) = 1)
-			if (val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards)) < val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards)))
-				OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:" + OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards))
-			endif
-		endif
-		if (OryUIGetInputSpinnerChangedValue(spinMinNumberOfStickyCards) = 1) then simulationCount = 0
-		if (OryUIGetInputSpinnerChangedValue(spinMaxNumberOfStickyCards) = 1) then simulationCount = 0
-		minStickies = val(OryUIGetInputSpinnerString(spinMinNumberOfStickyCards))
-		maxStickies = val(OryUIGetInputSpinnerString(spinMaxNumberOfStickyCards))
-	else
-		if (redrawScreen = 1)
-			if (loadingSharedLock = 0 and (fixed = 1 or freezeCards <> 1))
-				minStickies = 0
-				maxStickies = 0
-			endif
-			OryUIUpdateTextCard(crdNumberOfStickyCards, "position:-1000,-1000")
-			OryUIUpdateInputSpinner(spinMinNumberOfStickyCards, "inputText:0;position:-1000,-1000")
-			OryUIUpdateText(txtNumberOfStickyCardsTo, "position:-1000,-1000")
-			OryUIUpdateInputSpinner(spinMaxNumberOfStickyCards, "inputText:0;position:-1000,-1000")
 		endif
 	endif
 	

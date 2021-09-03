@@ -3,6 +3,7 @@ if (screenToView = constCardsScreen)
 	// RESET PAGINATION ELEMENT
 	if (screenNo <> constCardsScreen)
 		cardIndexToSlideOutAfterMovedTo as integer : cardIndexToSlideOutAfterMovedTo = 0
+		redsAddedThisPick as integer : redsAddedThisPick = 0
 		OryUISetPaginationSelectedPage(cardPages, 1)
 		if (imgFeltBackground = 0) then imgFeltBackground = LoadImage("FeltBackground.jpg")
 		if (locks[lockSelected].lockFrozenByCard = 1 or locks[lockSelected].lockFrozenByKeyholder = 1) // or locks[lockSelected].lockFrozenByLockee = 1)
@@ -571,7 +572,7 @@ if (screenToView = constCardsScreen)
 	else
 		OryUIUpdatePagination(cardPages, "position:-1000,-1000")
 	endif
-	if (cardsScrimVisible = 0) then OryUIInsertPaginationListener(cardPages)
+	if (cardsScrimVisible = 0 and largeCardVisible = 0) then OryUIInsertPaginationListener(cardPages)
 	if (OryUIGetPaginationChanged(cardPages))
 		newViewX# = (constCardsScreen * 100) + ((OryUIGetPaginationSelectedPage(cardPages) - 1) * 100)
 		timeToScroll# as float : timeToScroll# = (abs(newViewX# - GetViewOffsetX()) / 100) * 0.1
@@ -961,23 +962,45 @@ if (screenToView = constCardsScreen)
 				DeleteSprite(cards[cardSpritesIndex].sprite)
 			elseif (left(deck[shuffledDeck[cardChosen]].value$, 6) = "Yellow")
 				if (deck[shuffledDeck[cardChosen]].value$ = "YellowAdd1" or deck[shuffledDeck[cardChosen]].value$ = "YellowAdd2" or deck[shuffledDeck[cardChosen]].value$ = "YellowAdd3")
+					redsAddedThisPick = 0
 					inc locks[lockSelected].pickedCountIncludingYellows
 					inc locks[lockSelected].pickedCountSinceReset
 					dec locks[lockSelected].yellowCards
 					if (deck[shuffledDeck[cardChosen]].value$ = "YellowAdd1")
 						dec locks[lockSelected].noOfAdd1Cards
 						if (locks[lockSelected].noOfAdd1Cards < 0) then locks[lockSelected].noOfAdd1Cards = 0
-						if (locks[lockSelected].redCards < cappedRedCards) then locks[lockSelected].redCards = locks[lockSelected].redCards + 1
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
 						AddToDiscardPile("YellowAdd1", 1)
 					elseif (deck[shuffledDeck[cardChosen]].value$ = "YellowAdd2") 
 						dec locks[lockSelected].noOfAdd2Cards
 						if (locks[lockSelected].noOfAdd2Cards < 0) then locks[lockSelected].noOfAdd2Cards = 0
-						if (locks[lockSelected].redCards < cappedRedCards - 1) then locks[lockSelected].redCards = locks[lockSelected].redCards + 2
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
 						AddToDiscardPile("YellowAdd2", 1)
 					elseif (deck[shuffledDeck[cardChosen]].value$ = "YellowAdd3")
 						dec locks[lockSelected].noOfAdd3Cards
 						if (locks[lockSelected].noOfAdd3Cards < 0) then locks[lockSelected].noOfAdd3Cards = 0
-						if (locks[lockSelected].redCards < cappedRedCards - 2) then locks[lockSelected].redCards = locks[lockSelected].redCards + 3
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
+						if (locks[lockSelected].redCards < cappedRedCards)
+							inc locks[lockSelected].redCards
+							inc redsAddedThisPick
+						endif
 						AddToDiscardPile("YellowAdd3", 1)
 					endif
 					locks[lockSelected].timestampRealLastPicked = timestampNow
@@ -1285,7 +1308,7 @@ if (screenToView = constCardsScreen)
 		locks[lockSelected].timestampRequestedKeyholdersDecision = timestampNow
 		UpdateLocksData(lockSelected)
 		UpdateLocksDatabase(lockSelected, "action:Decision;actionedBy:Lockee;result:LetKeyholderDecide", 0)
-		SendNotificationToKeyholder(locks[lockSelected].sharedID$, "RequestKeyholdersDecision", 0)
+		SendNotificationToKeyholder(locks[lockSelected].sharedID$, "RequestKeyholdersDecision", locks[lockSelected].test, 0)
 		cardSelected = 0
 		cardChosen = 0
 		SetScreenToView(selectedLocksTab)
@@ -1467,8 +1490,8 @@ if (screenToView = constCardsScreen)
 				UpdateAllTweens(GetFrameTime())
 				Sync()
 			endwhile
-			if (locks[lockSelected].redCards < cappedRedCards)
-				for i = 1 to 1
+			//if (locks[lockSelected].redCards < cappedRedCards)
+				for i = 1 to redsAddedThisPick
 					dec lastCardDepth
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "size:" + str((cardWidth# / GetDisplayAspect()) * 1.5) + "," + str(cardHeight# * 1.5) + ";position:" + str(GetViewOffsetX() + 50) + "," + str(100 + cardHeight#) + ";image:" + str(imgCardRed100) + ";angle:0;depth:1")
 					colX# as float : colX# = ((floor(GetViewOffsetX() / 25) * 25) + 12.5) + ((i - 1) * 25)
@@ -1479,7 +1502,7 @@ if (screenToView = constCardsScreen)
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "angle:" + str(random(355, 365)) + ";depth:" + str(lastCardDepth))
 					Sleep(100)
 				next
-			endif
+			//endif
 			ClearLargeCard()
 			ShuffleDeck(25)
 		elseif (largeCard.value$ = "YellowAdd2")
@@ -1495,8 +1518,8 @@ if (screenToView = constCardsScreen)
 				UpdateAllTweens(GetFrameTime())
 				Sync()
 			endwhile
-			if (locks[lockSelected].redCards < cappedRedCards - 1)
-				for i = 1 to 2
+			//if (locks[lockSelected].redCards < cappedRedCards - 1)
+				for i = 1 to redsAddedThisPick
 					dec lastCardDepth
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "size:" + str((cardWidth# / GetDisplayAspect()) * 1.5) + "," + str(cardHeight# * 1.5) + ";position:" + str(GetViewOffsetX() + 50) + "," + str(100 + cardHeight#) + ";image:" + str(imgCardRed100) + ";angle:0;depth:1")
 					colX# = ((floor(GetViewOffsetX() / 25) * 25) + 12.5) + ((i - 1) * 25)
@@ -1507,7 +1530,7 @@ if (screenToView = constCardsScreen)
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "angle:" + str(random(355, 365)) + ";depth:" + str(lastCardDepth))
 					Sleep(100)
 				next
-			endif
+			//endif
 			ClearLargeCard()
 			ShuffleDeck(25)
 		elseif (largeCard.value$ = "YellowAdd3")
@@ -1523,8 +1546,8 @@ if (screenToView = constCardsScreen)
 				UpdateAllTweens(GetFrameTime())
 				Sync()
 			endwhile
-			if (locks[lockSelected].redCards < cappedRedCards - 2)
-				for i = 1 to 3
+			//if (locks[lockSelected].redCards < cappedRedCards - 2)
+				for i = 1 to redsAddedThisPick
 					dec lastCardDepth
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "size:" + str((cardWidth# / GetDisplayAspect()) * 1.5) + "," + str(cardHeight# * 1.5) + ";position:" + str(GetViewOffsetX() + 50) + "," + str(100 + cardHeight#) + ";image:" + str(imgCardRed100) + ";angle:0;depth:1")
 					colX# = ((floor(GetViewOffsetX() / 25) * 25) + 12.5) + ((i - 1) * 25)
@@ -1535,7 +1558,7 @@ if (screenToView = constCardsScreen)
 					OryUIUpdateSprite(cards[noOfCardSprites + i].sprite, "angle:" + str(random(355, 365)) + ";depth:" + str(lastCardDepth))
 					Sleep(100)
 				next
-			endif
+			//endif
 			ClearLargeCard()
 			ShuffleDeck(25)
 		elseif (largeCard.value$ = "YellowMinus1")

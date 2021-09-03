@@ -145,6 +145,7 @@ if (screenToView = constYourFollowingListScreen)
 					if (yourFriends.following[sortedIteration].lockeeLevel = 2) then mainRoleLevel$ = "Intermediate Lockee"
 					if (yourFriends.following[sortedIteration].lockeeLevel = 3) then mainRoleLevel$ = "Experienced Lockee"
 					if (yourFriends.following[sortedIteration].lockeeLevel = 4) then mainRoleLevel$ = "Devoted Lockee"
+					if (yourFriends.following[sortedIteration].lockeeLevel = 5) then mainRoleLevel$ = "Fanatical Lockee"
 					mainRoleColour = roleColours.lockee[yourFriends.following[sortedIteration].lockeeLevel]
 				endif
 				if (mainRoleLevel$ <> "")

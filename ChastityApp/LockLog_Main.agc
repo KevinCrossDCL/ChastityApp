@@ -688,7 +688,7 @@ if (screenToView = constLockLogScreen)
 					noOfLeftLines = 2
 					line1$ = whom1$ + " updated the lock"
 					line2$ = "Update hidden"
-					leftImageID = imgListBlank
+					leftImageID = imgListUpdateHidden
 				endif
 				if (logItemAction$ = "KeyholderFreezeEnded")
 					noOfLeftLines = 2

@@ -1,7 +1,7 @@
 # About ChastityApp
 Here you will find the (almost) full code from the ChastiKey app (packaged and rebranded as ChastityApp). This repository includes the app code written in AGK (https://appgamekit.com), and the server files written in PHP. 
 
-The code is taken from version 2.7.5 of the ChastiKey app.
+The code is taken from version 2.7.6 of the ChastiKey app.
 
 The AGK app code relies heavily on the OryUI framework which I also created in AGK. OryUI has been included in this repository, but can also be found here: https://github.com/KevinCrossDCL/OryUI
 

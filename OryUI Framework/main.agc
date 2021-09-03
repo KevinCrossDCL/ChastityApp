@@ -39,9 +39,6 @@ UseNewDefaultFonts(1)
 #insert "OryUIDefaultSettings.agc"
 
 do
-	OryUIStartTrackingTouch()
-
-	OryUIEndTrackingTouch()
 	
-	Sync()
+	OryUISync()
 loop
